@@ -1,0 +1,16 @@
+<script src="../assets/js/jquery.min.js"></script>
+<script src="../assets/js/bootstrap.min.js"></script>
+<script src="../assets/js/bootstrap.bundle.min.js"></script>
+<script src="../assets/js/wow.min.js"></script>
+<script src="../assets/js/jquery.isotope.min.js"></script>
+<script src="../assets/js/easing.js"></script>
+<script src="../assets/js/owl.carousel.js"></script>
+<script src="../assets/js/validation.js"></script>
+<script src="../assets/js/jquery.magnific-popup.min.js"></script>
+<script src="../assets/js/enquire.min.js"></script>
+<script src="../assets/js/jquery.plugin.js"></script>
+<script src="../assets/js/jquery.countTo.js"></script>
+<script src="../assets/js/jquery.countdown.js"></script>
+<script src="../assets/js/jquery.lazy.min.js"></script>
+<script src="../assets/js/jquery.lazy.plugins.min.js"></script>
+<script src="../assets/js/designesia.js"></script>
