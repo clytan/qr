@@ -1,3 +1,21 @@
+<?php
+include '../backend/dbconfig/connection.php';
+session_start();
+
+if (isset($_SESSION['user'])) {
+    if($_SESSION['user']=="admin"){
+        header("Location: index.php");
+
+    }else{
+        header("Location: login.php"); ## change the redirect URL here
+    }
+    exit();
+}
+
+mysqli_close($conn);
+?>
+
+
 <!DOCTYPE html>
 <html lang="en" class="h-100">
 
@@ -8,19 +26,14 @@
 	<meta name="author" content="">
 	<meta name="robots" content="">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="description" content="Yashadmin:Sales Management System Admin Bootstrap 5 Template">
-	<meta property="og:title" content="Yashadmin:Sales Management System Admin Bootstrap 5 Template">
-	<meta property="og:description" content="Yashadmin:Sales Management System Admin Bootstrap 5 Template">
-	<meta property="og:image" content="https:/yashadmin.dexignzone.com/xhtml/social-image.png">
-	<meta name="format-detection" content="telephone=no">
 	
 	<!-- PAGE TITLE HERE -->
-	<title>Yash Admin Sales Management System</title>
+	<title>ZQR</title>
 	
 	<!-- FAVICONS ICON -->
-	<link rel="shortcut icon" type="image/png" href="images/favicon.png">
-	<link href="./vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet">
-    <link href="./css/style.css" rel="stylesheet">
+	<link rel="shortcut icon" type="image/png" href="../assets/images/logo/company_logo.jpg">
+	<link href="../assets/vendor/bootstrap-select/dist/css/bootstrap-select.min.css" rel="stylesheet">
+    <link href="../assets/css/style.css" rel="stylesheet">
 
 </head>
 
@@ -30,7 +43,7 @@
 		<!-- Content -->
 		<div class="browse-job login-style3">
 			<!-- Coming Soon -->
-			<div class="bg-img-fix overflow-hidden" style="background:#fff url(images/background/bg6.jpg); height: 100vh;">
+			<div class="bg-img-fix overflow-hidden" style="background:#fff url(../assets/images/background/bg6.jpg); height: 100vh;"> 
 				<div class="row gx-0">
 					<div class="col-xl-4 col-lg-5 col-md-6 col-sm-12 vh-100 bg-white ">
 						<div id="mCSB_1" class="mCustomScrollBox mCS-light mCSB_vertical mCSB_inside" style="max-height: 653px;" tabindex="0">
@@ -40,8 +53,8 @@
 									
 									<div class="card-body">
 										<div class="logo-header">
-											<a href="index.html" class="logo"><img src="images/logo/logo-full.png" alt="" class="width-230 light-logo"></a>
-											<a href="index.html" class="logo"><img src="images/logo/logofull-white.png" alt="" class="width-230 dark-logo"></a>
+											<a href="index.php" class="logo"><img src="../assets/images/logo/company_logo.jpg" alt="" class="width-230 light-logo"></a>
+											<a href="index.php" class="logo"><img src="../assets/images/logo/company_logo.jpg" alt="" class="width-230 dark-logo"></a>
 										</div>
 									
 										<nav>
@@ -49,27 +62,28 @@
 												
 										<div class="tab-content w-100" id="nav-tabContent">
 										  <div class="tab-pane fade show active" id="nav-personal" role="tabpanel" aria-labelledby="nav-personal-tab">
-											<form action="index.html" class=" dz-form pb-3">
-													<h3 class="form-title m-t0">Personal Information</h3>
+											<form id="loginForm" class=" dz-form pb-3">
+													<h3 class="form-title m-t0"> Login </h3>
 													<div class="dz-separator-outer m-b5">
 														<div class="dz-separator bg-primary style-liner"></div>
 													</div>
-													<p>Enter your e-mail address and your password. </p>
+													<!-- <p>Enter your e-mail address ,username ,phone number and your password. </p> -->
 													<div class="form-group mb-3">
-														<input type="email" class="form-control" value="hello@example.com">
+														<input type="text" class="form-control" id="information" name="information" placeholder="Enter your email ,username or phone number">
 													</div>
+													
 													<div class="form-group mb-3">
-														<input type="password" class="form-control" value="Password">
+														<input type="password" class="form-control" id="password" name="password" placeholder="Enter your password">
 													</div>
 													<div class="form-group text-left mb-5 forget-main">
-														<button type="submit" class="btn btn-primary">Sign Me In</button>
-														<span class="form-check d-inline-block">
+														<button class="btn btn-primary" id="loginBtn" >Sign Me In</button>
+														<!-- <span class="form-check d-inline-block">
 															<input type="checkbox" class="form-check-input" id="check1" name="example1">
 															<label class="form-check-label" for="check1">Remember me</label>
-														</span>
-														<button class="nav-link m-auto btn tp-btn-light btn-primary forget-tab " id="nav-forget-tab" data-bs-toggle="tab" data-bs-target="#nav-forget" type="button" role="tab" aria-controls="nav-forget" aria-selected="false">Forget Password ?</button> 	
+														</span> -->
+														<!-- <button class="nav-link m-auto btn tp-btn-light btn-primary forget-tab " id="nav-forget-tab" data-bs-toggle="tab" data-bs-target="#nav-forget" type="button" role="tab" aria-controls="nav-forget" aria-selected="false">Forget Password ?</button> 	 -->
 													</div>
-													<div class="dz-social ">
+													<!-- <div class="dz-social ">
 														<h5 class="form-title fs-20">Sign In With</h5>
 														<ul class="dz-social-icon dz-border dz-social-icon-lg text-white">
 															<li><a target="_blank" href="https://www.facebook.com/" class="fab fa-facebook-f btn-facebook"></a></li>
@@ -77,12 +91,12 @@
 															<li><a target="_blank" href="https://www.linkedin.com/" class="fab fa-linkedin-in btn-linkedin"></a></li>
 															<li><a target="_blank" href="https://twitter.com/" class="fab fa-twitter btn-twitter"></a></li>
 														</ul>
-													</div>
+													</div> -->
 												</form>
-												<div class="text-center bottom"> 
+												<!-- <div class="text-center bottom"> 
 													<button class="btn btn-primary button-md btn-block" id="nav-sign-tab" data-bs-toggle="tab" data-bs-target="#nav-sign" type="button" role="tab" aria-controls="nav-sign" aria-selected="false">Create an account</button> 
 													
-												</div>
+												</div> -->
 										  </div>
 										  <div class="tab-pane fade" id="nav-forget" role="tabpanel" aria-labelledby="nav-forget-tab">
 											<form class="dz-form">
@@ -146,7 +160,7 @@
 											<div class=" bottom-footer clearfix m-t10 m-b20 row text-center">
 											<div class="col-lg-12 text-center">
 												<span> © Copyright by <span class="heart"></span>
-												<a href="javascript:void(0);">DexignZone </a> All rights reserved.</span> 
+												<a href="http://codersdek.com/">CodersDek </a> All rights reserved.</span>
 											</div>
 										</div>
 									</div>	
@@ -171,11 +185,11 @@
 	Scripts
 ***********************************-->
 <!-- Required vendors -->
-<script src="./vendor/global/global.min.js"></script>
-<script src="./vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
-<script src="js/deznav-init.js"></script>
- <script src="./js/custom.js"></script>
-<script src="./js/demo.js"></script>
-<script src="./js/styleSwitcher.js"></script>
+<script src="../assets/vendor/global/global.min.js"></script>
+<script src="../assets/vendor/bootstrap-select/dist/js/bootstrap-select.min.js"></script>
+<script src="../assets/js/deznav-init.js"></script>
+ <script src="../assets/js/custom.js"></script>
+<script src="../assets/js/demo.js"></script>
+<script src="./custom_js/custom_login.js"></script>
 </body>
 </html>
