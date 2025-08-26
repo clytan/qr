@@ -1,5 +1,5 @@
 <div id="preloader">
     <div>
-        <img src="images/pre.gif" alt>
+        <img src="../assets/images/pre.gif" alt>
     </div>
 </div>
