@@ -36,7 +36,7 @@
                         </ul>
                         <!-- mainmenu close -->
                         <div class="menu_side_area">
-                            <a href="../03_grey-wallet.html" class="btn-main btn-wallet"><i
+                            <a href="03_grey-wallet.php" class="btn-main btn-wallet"><i
                                     class="icon_wallet_alt"></i><span>Connect Wallet</span></a>
                             <span id="menu-btn"></span>
                         </div>
