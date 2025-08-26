@@ -27,7 +27,7 @@
         <!--**********************************
             Chat box start
         ***********************************-->
-        <?php include('./components/chatbox.php'); ?>
+        <?php include('../components/chatbox.php'); ?>
         <!--**********************************
             Chat box End
         ***********************************-->
@@ -36,7 +36,7 @@
             Header start
         ***********************************-->
 
-        <?php include('./components/header.php'); ?>
+        <?php include('../components/header.php'); ?>
         <!--**********************************
             Header end ti-comment-alt
         ***********************************-->
