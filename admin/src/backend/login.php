@@ -42,10 +42,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['user_role_id'] = $user['role_id'];
 
         $data = ['redirect' => $redirectUrl, 'sessionID' => $user['role_id']];
+        $stmt->close();
         echo json_encode(['status' => true, 'message' => '', 'data' => $data]);
         exit();
         
     } else {
+        $stmt->close();
         // Provide JSON response for AJAX
         echo json_encode(['status' => false, 'message' => 'Invalid username or password' ,'data' => []]);
         exit();

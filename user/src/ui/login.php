@@ -144,7 +144,7 @@
 										<form name="loginForm" id='login_form' class="form-border" method="post" >
 
                                             <div class="field-set">
-                                                <input type='text' name='information' id='information' class="form-control" placeholder="Email / Username / Phone number">
+                                                <input type='text' name='information' id='information' class="form-control" placeholder="Email / Phone number">
                                             </div>
 											
 											 <div class="field-set">
@@ -152,7 +152,7 @@
                                             </div>
 											
 											<div class="field-set">
-												<input type='submit' id='send_message' value='Submit' class="btn btn-main btn-fullwidth color-2">
+												<input type='submit' id='send_login' value='Submit' class="btn btn-main btn-fullwidth color-2">
 											</div>
 											
 											<div class="clearfix"></div>
