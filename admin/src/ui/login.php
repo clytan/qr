@@ -69,11 +69,11 @@ mysqli_close($conn);
 													</div>
 													<!-- <p>Enter your e-mail address ,username ,phone number and your password. </p> -->
 													<div class="form-group mb-3">
-														<input type="text" class="form-control" id="information" name="information" placeholder="Enter your email ,username or phone number">
+														<input type="text" class="form-control" id="information" name="information" placeholder="Email / username / phone number">
 													</div>
 													
 													<div class="form-group mb-3">
-														<input type="password" class="form-control" id="password" name="password" placeholder="Enter your password">
+														<input type="password" class="form-control" id="password" name="password" placeholder="Password">
 													</div>
 													<div class="form-group text-left mb-5 forget-main">
 														<button class="btn btn-primary" id="loginBtn" >Sign Me In</button>
