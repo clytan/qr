@@ -66,7 +66,7 @@
                     <div class="de-flex">
                         <div class="de-flex-col">
                             <a href="03_grey-index.html">
-                                <span class="copy">&copy; Copyright 2022 - Gigaland by FAWAZ</span>
+                                <span class="copy">&copy; Copyright 2022 - Codersdek</span>
                             </a>
                         </div>
                         <div class="de-flex-col">
