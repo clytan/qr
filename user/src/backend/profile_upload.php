@@ -1,0 +1,48 @@
+<?php
+// profile_upload.php
+require_once('./dbconfig/connection.php');
+// Correct the target directory path
+$targetDir = __DIR__ . "/../ui/profile/";
+if (!file_exists($targetDir)) {
+    mkdir($targetDir, 0777, true);
+}
+
+$response = ['status' => false, 'message' => '', 'src' => ''];
+
+if (isset($_FILES['profile_img']) && isset($_POST['user_id'])) {
+    $file = $_FILES['profile_img'];
+    $fileName = basename($file['name']);
+    $fileType = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
+    $allowed = ['jpg', 'jpeg', 'png'];
+    if (!in_array($fileType, $allowed)) {
+        $response['message'] = 'Only JPG and PNG files are allowed.';
+    } else if ($file['error'] !== 0) {
+        $response['message'] = 'File upload error.';
+    } else {
+        $newName = $fileName;
+        $targetFile = $targetDir . $newName;
+        if (move_uploaded_file($file['tmp_name'], to: $targetFile)) {
+            $src = 'profile/' . $newName;
+            // Update user_user table with new image path
+            $user_id = intval($_POST['user_id']);
+            $sql = "UPDATE user_user SET user_image_path = ? WHERE id = ? AND is_deleted = 0";
+            $stmt = $conn->prepare($sql);
+            if ($stmt) {
+                $stmt->bind_param('si', $src, $user_id);
+                $stmt->execute();
+                $stmt->close();
+                $response['status'] = true;
+                $response['src'] = $src;
+                $response['message'] = 'Upload and DB update successful.';
+            } else {
+                $response['message'] = 'DB update failed.';
+            }
+        } else {
+            $response['message'] = 'Failed to move uploaded file.';
+        }
+    }
+} else {
+    $response['message'] = 'No file uploaded or user_id missing.';
+}
+header('Content-Type: application/json');
+echo json_encode($response);

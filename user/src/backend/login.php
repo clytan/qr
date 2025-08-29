@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Login query with prepared statement to allow login with username or email
-    $sqlLogin = "SELECT * FROM user_user WHERE (user_email = ? OR user_phone = ?) AND user_password = ?";
+    $sqlLogin = "SELECT * FROM user_user WHERE is_deleted = 0 AND (user_email = ? OR user_phone = ?) AND user_password = ?";
     $stmt = $conn->prepare($sqlLogin);
     if (!$stmt) {
         echo json_encode(['status' => false, 'message' => 'Database error', 'data' => []]);

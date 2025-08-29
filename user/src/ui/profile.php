@@ -1,3 +1,8 @@
+<?php
+session_start();
+// Assuming user_id is stored in session as 'user_id' after login
+$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : '';
+?>
 <!DOCTYPE html>
 <html lang="zxx">
 
@@ -11,20 +16,8 @@
     <meta content="" name="author" />
     <!-- CSS Files
     ================================================== -->
-    <link id="bootstrap" href="css/bootstrap.min.css" rel="stylesheet" type="text/css" />
-    <link id="bootstrap-grid" href="css/bootstrap-grid.min.css" rel="stylesheet" type="text/css" />
-    <link id="bootstrap-reboot" href="css/bootstrap-reboot.min.css" rel="stylesheet" type="text/css" />
-    <link href="css/animate.css" rel="stylesheet" type="text/css" />
-    <link href="css/owl.carousel.css" rel="stylesheet" type="text/css" />
-    <link href="css/owl.theme.css" rel="stylesheet" type="text/css" />
-    <link href="css/owl.transitions.css" rel="stylesheet" type="text/css" />
-    <link href="css/magnific-popup.css" rel="stylesheet" type="text/css" />
-    <link href="css/jquery.countdown.css" rel="stylesheet" type="text/css" />
-    <link href="css/style.css" rel="stylesheet" type="text/css" />
-    <link href="css/de-grey.css" rel="stylesheet" type="text/css" />
-    <!-- color scheme -->
-    <link id="colors" href="css/colors/scheme-04.css" rel="stylesheet" type="text/css" />
-    <link href="css/coloring.css" rel="stylesheet" type="text/css" />
+    <?php include('../components/csslinks.php') ?>
+
 </head>
 
 <body class="dark-scheme de-grey">
@@ -207,7 +200,7 @@
                             <div class="row">
                                 
                                 <div class="col-md-12 text-center">
-									<h1>Edit Profile</h1>
+									<h1>Profile</h1>
                                 </div>
                                 <div class="clearfix"></div>
                             </div>
@@ -222,6 +215,7 @@
                     <div class="row">
                         <div class="col-lg-8 offset-lg-2">
                             <form id="form-create-item" class="form-border" method="post" action="email.php">
+                            <input type="hidden" id="user_id" name="user_id" value="<?php echo htmlspecialchars($user_id); ?>">
                             <div class="de_tab tab_simple">
                             
                                 <ul class="de_nav">
@@ -265,8 +259,24 @@
 
                                                         <div class="spacer-20"></div>
 
+
                                                         <h5><i class="fa fa-instagram"></i> Instagram username</h5>
                                                         <input type="text" name="instagram_username" id="instagram_username" class="form-control" placeholder="Enter Instagram username" />
+
+                                                        <div class="spacer-20"></div>
+
+                                                        <h5><i class="fa fa-youtube"></i> YouTube Channel</h5>
+                                                        <input type="text" name="youtube_username" id="youtube_username" class="form-control" placeholder="Enter YouTube Channel" />
+
+                                                        <div class="spacer-20"></div>
+
+                                                        <h5><i class="fa fa-linkedin"></i> LinkedIn URL</h5>
+                                                        <input type="text" name="linkedin_username" id="linkedin_username" class="form-control" placeholder="Enter LinkedIn URL" />
+
+                                                        <div class="spacer-20"></div>
+
+                                                        <h5><i class="fa fa-snapchat-ghost"></i> Snapchat username</h5>
+                                                        <input type="text" name="snapchat_username" id="snapchat_username" class="form-control" placeholder="Enter Snapchat username" />
 
                                                     </div>
                                             </div>
@@ -274,13 +284,13 @@
                                             <div id="sidebar" class="col-lg-4">
                                                 <h5>Profile image <i class="fa fa-info-circle id-color-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Recommend 400 x 400. Max size: 50MB. Click the image to upload."></i></h5>
 
-                                                <img src="images/author_single/author_thumbnail.jpg" id="click_profile_img" class="d-profile-img-edit img-fluid" alt="">
+                                                <img src="../assets/images/author_single/author_thumbnail.jpg" id="click_profile_img" class="d-profile-img-edit img-fluid" alt="">
                                                 <input type="file" id="upload_profile_img"> 
 
                                                 <div class="spacer-30"></div>
 
                                                 <h5>Profile banner <i class="fa fa-info-circle id-color-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Recommend 1500 x 500. Max size: 50MB. Click the image to upload."></i></h5>
-                                                <img src="images/author_single/author_banner.jpg" id="click_banner_img" class="d-banner-img-edit img-fluid" alt="">
+                                                <img src="" id="click_banner_img" class="d-banner-img-edit img-fluid" alt="">
                                                 <input type="file" id="upload_banner_img"> 
 
                                             </div>                                         
@@ -507,22 +517,9 @@
     
     <!-- Javascript Files
     ================================================== -->
-    <script src="js/jquery.min.js"></script>
-    <script src="js/bootstrap.min.js"></script>
-    <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="js/wow.min.js"></script>
-    <script src="js/jquery.isotope.min.js"></script>
-    <script src="js/easing.js"></script>
-    <script src="js/owl.carousel.js"></script>
-    <script src="js/validation.js"></script>
-    <script src="js/jquery.magnific-popup.min.js"></script>
-    <script src="js/enquire.min.js"></script>
-    <script src="js/jquery.plugin.js"></script>
-    <script src="js/jquery.countTo.js"></script>
-    <script src="js/jquery.countdown.js"></script>
-    <script src="js/jquery.lazy.min.js"></script>
-    <script src="js/jquery.lazy.plugins.min.js"></script>
-    <script src="js/designesia.js"></script>
+    <?php include('../components/jslinks.php'); ?>
+    <script src="../components/qr/qrcode.min.js"></script>
+    <script src="./custom_js/custom_profile.js"></script>
 
 
 </body>

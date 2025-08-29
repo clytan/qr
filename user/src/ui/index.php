@@ -93,6 +93,11 @@
 
 
         </div>
+        
+        <!-- Profile begins -->
+        
+        <!-- Profile ends-->
+         <?php include('./profile.php'); ?>
         <!-- content close -->
 
         <a href="#" id="back-to-top"></a>
