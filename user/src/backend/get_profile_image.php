@@ -1,6 +1,6 @@
 <?php
 // get_profile_image.php
-require_once('../../backend/dbconfig/connection.php');
+require_once('./dbconfig/connection.php');
 
 $user_id = isset($_POST['user_id']) ? intval($_POST['user_id']) : 0;
 $response = ['status' => false, 'src' => ''];

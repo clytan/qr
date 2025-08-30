@@ -16752,3 +16752,29 @@ img {
         top: -21px;
     }
 }
+    .input-group-append {
+        display: flex;
+        align-items: center;
+    }
+    .public-toggle[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        margin: 0 4px 0 0;
+        accent-color: #007bff;
+        vertical-align: middle;
+        background: #fff !important;
+        border: 1px solid #888 !important;
+        box-shadow: none !important;
+        appearance: auto;
+        -webkit-appearance: checkbox;
+    }
+    .public-label {
+        font-size: 14px;
+        margin-bottom: 0;
+        color: #222;
+        background: transparent;
+        cursor: pointer;
+    }
+    .input-group.mb-2 {
+        margin-bottom: 10px;
+    }

@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			$user_id = $conn->insert_id;
 			$now = date('Y-m-d H:i:s');
 			// Set created_by and updated_by to the user's own id, and timestamps
-			$sqlUpdate = "UPDATE user_user SET is_deleted = 0 ,created_by = ?, updated_by = ?, created_on = ?, updated_on = ? WHERE id = ?";
+			$sqlUpdate = "UPDATE user_user SET is_deleted = 0, user_email_verified = 1, created_by = ?, updated_by = ?, created_on = ?, updated_on = ? WHERE id = ?";
 			$stmtUpdate = $conn->prepare($sqlUpdate);
 			if ($stmtUpdate) {
 				$stmtUpdate->bind_param('sssss', $user_id, $user_id, $now, $now, $user_id);
