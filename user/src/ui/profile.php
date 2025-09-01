@@ -194,7 +194,7 @@ $user_qr = isset($_SESSION['user_qr_id']) ? $_SESSION['user_qr_id'] : '' ;
             <div id="top"></div>
             
             <!-- section begin -->
-            <section id="subheader">
+            <!-- <section id="subheader">
                     <div class="center-y relative text-center">
                         <div class="container">
                             <div class="row">
@@ -206,7 +206,7 @@ $user_qr = isset($_SESSION['user_qr_id']) ? $_SESSION['user_qr_id'] : '' ;
                             </div>
                         </div>
                     </div>
-            </section>
+            </section> -->
             <!-- section close -->
 
             <!-- section begin -->

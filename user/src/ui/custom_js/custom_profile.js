@@ -60,19 +60,19 @@ var eventHandler={
             };
             // Socials
             ['twitter','instagram','youtube','linkedin','snapchat'].forEach(function(type) {
-                links[type] = {
+                links[ type + '_username'] = {
                     value: $('#' + type + '_username').val(),
                     is_public: $('#public_' + type + '_username').is(':checked') ? 1 : 0
                 };
             });
             formData.links = links;
             // Also send public/private status for each field
-            var publicFields = {};
+            var fields = [];
             $('.public-toggle').each(function() {
                 var target = $(this).data('target');
-                publicFields[target] = $(this).is(':checked') ? 1 : 0;
+                fields.push(target)
             });
-            formData.public_fields = publicFields;
+            formData.fields = fields;
             // Send via AJAX
             $.ajax({
                 url: '../backend/save_profile_data.php',
@@ -101,9 +101,7 @@ var profileFunction={
         // If PUBLIC_PROFILE is set, make all fields readonly/disabled
         if (window.PUBLIC_PROFILE) {
             qrId = (new URLSearchParams(window.location.search)).get('qr');
-            profileFunction.getProfileData(qrId)
-            profileFunction.setAllFieldsReadOnly();
-            profileFunction.showOnlyPublicFields();   
+            profileFunction.getProfileData(qrId)  
         }
         else{
             profileFunction.getProfileData();
@@ -113,17 +111,45 @@ var profileFunction={
 
     },
     showOnlyPublicFields:function(){
+        // Hide all input groups initially
+        $('.input-group.mb-2').hide();
+        // Remove any previously created dynamic container
+        $('#public-profile-links').remove();
+
+        // Create a new container for public fields
+        var $container = $('<div id="public-profile-links"></div>');
+
+        // For each public-toggle, if checked, clone its group and append to container with a spacer before each
         $('.public-toggle').each(function() {
-            var target = $(this).data('target');
             var isPublic = $(this).is(':checked');
+            var target = $(this).data('target');
             var $input = $('#' + target);
             var $group = $input.closest('.input-group.mb-2');
-            if (isPublic) {
-                $group.show();
-            } else {
-                $group.hide();
+            if (isPublic && $group.length) {
+                $container.append('<div class="spacer-20"></div>');
+                $container.append($group.clone().show());
             }
         });
+
+        // Insert the container after the email address field's spacer
+        var $emailSpacer = $('#email_address').closest('.spacer-20');
+        if ($emailSpacer.length) {
+            $emailSpacer.after($container);
+        } else {
+            // fallback: after email field
+            $('#email_address').after($container);
+        }
+
+        // Hide the address field if not public, else show it
+        var $address = $('#address');
+        var addressPublic = $('#public_address').is(':checked');
+        if (!addressPublic) {
+            $address.hide();
+            $address.next('div').hide();
+        } else {
+            $address.show();
+            $address.next('div').show();
+        }
     },
     initQRCode:function(){
         // Generate QR code with current location and user_qr from hidden input
@@ -175,16 +201,16 @@ var profileFunction={
                         }
                     });
                 }
+                if (window.PUBLIC_PROFILE) {
+                    profileFunction.setAllFieldsReadOnly();
+                    profileFunction.showOnlyPublicFields(); 
+                }
+
             }
         });
 
     },
     setAllFieldsReadOnly:function(){
-        // Change the profile title to 'Public Profile'
-        var $title = $('#profile-title');
-        if ($title.length) {
-            $title.text('Public Profile');
-        }
         $('input, select').each(function() {
             var $el = $(this);
             var type = $el.attr('type');
@@ -200,6 +226,8 @@ var profileFunction={
             var label = $("label[for='" + $(this).attr('id') + "']");
             label.hide();
         });
+        // Hide the submit button in public profile mode
+        $('#form-create-item input[type="submit"], #form-create-item button[type="submit"]').hide();
     },
     checkForProfileImage: function(userId) {
         // Check for existing profile image
@@ -226,8 +254,8 @@ var profileFunction={
             var tempDiv = document.createElement('div');
             new QRCode(tempDiv, {
                 text: data,
-                width: 128,
-                height: 128,
+                width: 192,
+                height: 192,
                 colorDark : "#000000",
                 colorLight : "#ffffff",
                 correctLevel : QRCode.CorrectLevel.H
@@ -244,8 +272,8 @@ var profileFunction={
             $('#' + elementId).empty();
             new QRCode(el, {
                 text: data,
-                width: 128,
-                height: 128,
+                width: 192,
+                height: 192,
                 colorDark : "#000000",
                 colorLight : "#ffffff",
                 correctLevel : QRCode.CorrectLevel.H

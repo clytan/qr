@@ -47,6 +47,18 @@ $user_data = $user_result->fetch_assoc();
 $user_stmt->close();
 
 
+
+// Map DB type names to frontend keys
+$typeMap = [
+    'website' => 'Website',
+    'twitter' => 'Twitter',
+    'instagram' => 'Instagram',
+    'youtube' => 'Youtube',
+    'linkedin' => 'LinkedIn',
+    'snapchat' => 'SnapChat',
+];
+$reverseTypeMap = array_flip($typeMap); // e.g., 'LinkedIn' => 'linkedin_username'
+
 // Fetch profile links joined with link type, filter is_deleted=0, include is_public
 $links_sql = "SELECT plt.link as link_value, plt.is_public, lkt.name as link_type_name FROM user_profile_links plt JOIN user_profile_links_type lkt ON plt.link_type = lkt.id WHERE plt.user_id = ? AND plt.is_deleted = 0";
 $links_stmt = $conn->prepare($links_sql);
@@ -60,7 +72,8 @@ $links_result = $links_stmt->get_result();
 $links = [];
 while ($row = $links_result->fetch_assoc()) {
     if (!empty($row['link_type_name'])) {
-        $links[$row['link_type_name']] = [
+        $frontendKey = isset($reverseTypeMap[$row['link_type_name']]) ? $reverseTypeMap[$row['link_type_name']] : $row['link_type_name'];
+        $links[$frontendKey] = [
             'value' => $row['link_value'],
             'is_public' => isset($row['is_public']) ? (int)$row['is_public'] : 0
         ];
