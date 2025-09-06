@@ -183,7 +183,7 @@ var eventHandler = {
             registerFunction.updateSubmitState();
         });
         // Password match check
-        $('#confirm_password').on('input', function() {
+        $('#confirmpassword').on('input', function() {
             registerFunction.checkPasswordMatch();
             registerFunction.updateSubmitState();
         });
@@ -203,16 +203,34 @@ var eventHandler = {
             }
             
             // Check password match
-            if ($('#password').val().trim() !== $('#confirm_password').val().trim()) {
+            if ($('#password').val().trim() !== $('#confirmpassword').val().trim()) {
                 alert('Passwords do not match.');
                 return;
             }
             
             // Collect form data
+            var selectedUserType = registerFunction.getSelectedUserType();
+            var userTypeValue = selectedUserType[0];
+            var userTagValue = selectedUserType[1];
+            
+            // Logic: Gold and Silver are Individual users with premium tags
+            var finalUserType = userTypeValue;
+            var finalUserTag = userTagValue;
+            
+            // If Gold (4) or Silver (5) is selected, convert to Individual (1) with respective tag
+            if (userTypeValue === '4' || userTypeValue === '5') {
+                finalUserType = '1'; // Convert to Individual
+                // finalUserTag remains as 'gold' or 'silver'
+            } else {
+                // For Individual, Creator, Business - no tag
+                finalUserTag = '';
+            }
+            
             var formData = {
                 email: $('#email').val().trim(),
                 password: $('#password').val().trim(),
-                user_type: registerFunction.getSelectedUserType()[0],
+                user_type: finalUserType,
+                user_tag: finalUserTag,
                 user_slab: $('#user_slab').val(),
                 reference_code: $('#has_reference').is(':checked') ? $('#reference_code').val().trim() : '',
                 referred_by_user_id: registerFunction.referredByUserId || null
@@ -421,11 +439,24 @@ var registerFunction = {
     isFormComplete:()=>{
         var email = $.trim($('#email').val());
         var password = $.trim($('#password').val());
-        var confirmPassword = $.trim($('#confirm_password').val());
+        var confirmPassword = $.trim($('#confirmpassword').val());
         var userType = registerFunction.getSelectedUserType()[0];
         var userSlab = $('#user_slab').val();
         var hasReference = $('#has_reference').is(':checked');
         var referenceCode = $.trim($('#reference_code').val());
+        
+        // Debug logging to help troubleshoot
+        console.log('Form validation debug:', {
+            email: email !== '',
+            password: password !== '',
+            confirmPassword: confirmPassword !== '',
+            passwordsMatch: password === confirmPassword,
+            emailVerified: registerFunction.emailVerified,
+            userType: userType !== null,
+            userSlab: userSlab !== '',
+            hasReference: hasReference,
+            referenceCode: referenceCode
+        });
         
         // Basic validation
         var isValid = (
@@ -438,11 +469,10 @@ var registerFunction = {
             userSlab !== ''
         );
         
-        // Reference validation
-        if (hasReference) {
-            isValid = isValid && referenceCode !== '' && registerFunction.referenceValid;
-        }
+        // Reference validation - references are optional, so no validation required
+        // Users can proceed with or without a reference code
         
+        console.log('Form is valid:', isValid);
         return isValid;
     },
     updateSubmitState:()=>{
@@ -451,7 +481,7 @@ var registerFunction = {
     },
     checkPasswordMatch: function() {
         var password = $('#password').val().trim();
-        var confirmPassword = $('#confirm_password').val().trim();
+        var confirmPassword = $('#confirmpassword').val().trim();
         if (password !== '' && confirmPassword !== '') {
             if (password !== confirmPassword) {
                 $('#password-match-status').text('Passwords do not match').css('color', 'red');
