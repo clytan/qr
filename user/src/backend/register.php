@@ -8,10 +8,14 @@ require_once('./dbconfig/connection.php');
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$email = isset($_POST['email']) ? trim($_POST['email']) : '';
 	$user_type = isset($_POST['user_type']) ? $_POST['user_type'] : '';
+	$user_tag = isset($_POST['user_tag']) ? trim($_POST['user_tag']) : '';
 	$password = isset($_POST['password']) ? trim($_POST['password']) : '';
 	$user_slab = isset($_POST['user_slab']) ? $_POST['user_slab'] : '';
 	$reference_code = isset($_POST['reference_code']) ? trim($_POST['reference_code']) : '';
 	$referred_by_user_id = isset($_POST['referred_by_user_id']) ? $_POST['referred_by_user_id'] : null;
+	
+	// Convert empty user_tag to NULL for database
+	$user_tag = empty($user_tag) ? null : $user_tag;
 
 	// Basic input validation
 	if ($email === '' || $user_type === '' || $password === '' || $user_slab === '') {
@@ -71,13 +75,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		} while ($exists);
 
 		// Insert new user with user_qr_id and new fields
-		$sqlInsert = "INSERT INTO user_user(user_email, user_password, user_user_type, user_slab_id, user_qr_id, referred_by_user_id) VALUES (?, ?, ?, ?, ?, ?)";
+		$sqlInsert = "INSERT INTO user_user(user_email, user_password, user_user_type, user_tag, user_slab_id, user_qr_id, referred_by_user_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
 		$stmtInsert = $conn->prepare($sqlInsert);
 		if (!$stmtInsert) {
 			echo json_encode(['status' => false, 'message' => 'Database error: ' . $conn->error, 'data' => []]);
 			exit();
 		}
-		$stmtInsert->bind_param('ssissi', $email, $password, $user_type, $user_slab, $user_qr_id, $referred_by_user_id);
+		$stmtInsert->bind_param('ssisssi', $email, $password, $user_type, $user_tag, $user_slab, $user_qr_id, $referred_by_user_id);
 		$success = $stmtInsert->execute();
 		$stmtInsert->close();
 
