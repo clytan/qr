@@ -141,11 +141,12 @@ $headers .= 'From: support@codersdek.com';
 
 // send the email
 if (!$mail->Send()) {
-    $sentmail = ['status' => false, 'message' => 'OTP sending failed', 'data' => $inserted_id ? ['id' => $inserted_id] : []];
+    $otpId = $inserted_id ? $inserted_id : ($updated_id ? $updated_id : null);
+    $sentmail = ['status' => false, 'message' => 'OTP sending failed', 'data' => ['id' => $otpId], 'otp_id' => $otpId];
     error_log($mail->ErrorInfo);
-    echo $mail->ErrorInfo; // Or echo it for immediate feedback (for debugging only)
 } else {
-    $sentmail = ['status' => true, 'message' => 'OTP sent successfully', 'data' => $inserted_id ? ['id' => $inserted_id] : ($updated_id ? ['id' => $updated_id] : [])];
+    $otpId = $inserted_id ? $inserted_id : ($updated_id ? $updated_id : null);
+    $sentmail = ['status' => true, 'message' => 'OTP sent successfully', 'data' => ['id' => $otpId], 'otp_id' => $otpId];
 }
 
 echo json_encode($sentmail);

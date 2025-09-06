@@ -11,13 +11,15 @@
     <!-- CSS Files
     ================================================== -->
     <?php include('../components/csslinks.php') ?>
+    <!-- Registration Form CSS -->
+    <link rel="stylesheet" href="../assets/css/register-form.css">
 </head>
 
 <body>
     <div id="wrapper">
 
         <!-- header begin -->
-        <header class="transparent">
+        <header class="transparent d-none">
             <div class="container">
                 <div class="row">
                     <div class="col-md-12">
@@ -72,52 +74,127 @@
                                         <form name="registerForm" id='register_form' class="form-border" method="post"
                                             action=''>
 
-                                            <div class="field-set">
-                                                <input type='text' name='email' id='email' class="form-control"
-                                                    placeholder="Email Address">
-                                                <span id="verify-email-section" style="display:none; margin-left:10px;">
-                                                    <a href="#" id="verify-email-link">Verify Email</a>
-                                                    <span id="email-verified-status" style="margin-left:8px;"></span>
-                                                </span>
-                                            </div>
-
-                                            <div class="field-set">
-                                                <input type='password' name='password' id='password'
-                                                    class="form-control" placeholder="Password">
-                                            </div>
-
-                                            <div class="field-set">
-                                                <input type='password' name='confirm_password' id='confirm_password'
-                                                    class="form-control" placeholder="Confirm Password">
-                                                <span id="password-match-status" style="margin-left:8px;"></span>
-                                            </div>
-
-                                            <div class="field-set" style="margin-bottom:10%;">
-                                                <label style="margin-bottom:8px;display:block;font-weight:500;">Register
-                                                    as:</label>
-                                                <div style="display:flex;gap:10px;flex-wrap:wrap;">
-                                                    <label><input type="radio" name="user_type" value="1" required>
-                                                        Individual</label>
-                                                    <label><input type="radio" name="user_type" value="2">
-                                                        Creator</label>
-                                                    <label><input type="radio" name="user_type" value="3">
-                                                        Business</label>
-                                                    <label><input type="radio" name="user_type" value="1"
-                                                            data-tag="gold"> <span
-                                                            style="color:gold;font-weight:bold;">Gold
-                                                            Member</span></label>
-                                                    <label><input type="radio" name="user_type" value="1"
-                                                            data-tag="silver"><span
-                                                            style="color:silver;font-weight:bold;">Silver
-                                                            Member</span></label>
+                                            <!-- Email Field with Cool Design -->
+                                            <div class="field-set" style="position:relative; margin-bottom:20px;">
+                                                <input type='text' name='email' id='email' 
+                                                       placeholder="✉️ Email Address"
+                                                       class="form-input">
+                                                <div id="verify-email-section" style="display:none; margin-top:8px;">
+                                                    <a href="#" id="verify-email-link" class="verify-email-btn">
+                                                        🔐 Verify Email
+                                                    </a>
+                                                    <span id="email-verified-status" style="margin-left:15px; font-weight:600; font-size:14px;"></span>
                                                 </div>
                                             </div>
 
-
-
+                                            <!-- Password Field -->
                                             <div class="field-set">
-                                                <input type='submit' id='register_user_form' value='Submit'
-                                                    class="btn btn-main btn-fullwidth color-2" disabled>
+                                                <input type='password' name='password' id='password'
+                                                       placeholder="🔒 Password"
+                                                       class="form-input">
+                                            </div>
+
+                                            <!-- Confirm Password Field -->
+                                            <div class="field-set">
+                                                <input type='password' name='confirmpassword' id='confirmpassword'
+                                                       placeholder="🔐 Confirm Password"
+                                                       class="form-input">
+                                                <span id="password-match-status" style="margin-left:8px; margin-top:8px; display:block; font-weight:600;"></span>
+                                            </div>
+
+                                            <!-- User Slab Selection with Cool Design -->
+                                            <div class="field-set" style="margin-top: -5%;">
+                                                <label style="margin-bottom:12px;display:block;font-weight:600;color:#2c3e50;font-size:14px;">💎 Select Your Plan</label>
+                                                <select name="user_slab" id="user_slab" required class="form-select">
+                                                    <option value="" style="background:#fff;color:#666;">🎯 Select your plan...</option>
+                                                </select>
+                                            </div>
+
+                                            <!-- Register As Section with Better Responsive Design -->
+                                            <div class="field-set" style="margin-bottom:8%;">
+                                                <label style="margin-bottom:20px;display:block;font-weight:600;color:#2c3e50;font-size:16px;">👤 Register as</label>
+                                                
+                                                <!-- Basic User Types - Compact grid layout -->
+                                                <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:15px;" class="basic-user-types">
+                                                    
+                                                    <!-- Individual Card -->
+                                                    <label class="user-type-card" data-type="individual">
+                                                        <input type="radio" name="user_type" value="1" required style="display:none;">
+                                                        <div class="card-icon">
+                                                            <span style="font-size:18px;">👤</span>
+                                                        </div>
+                                                        <span class="card-text">Individual</span>
+                                                    </label>
+
+                                                    <!-- Creator Card -->
+                                                    <label class="user-type-card" data-type="creator">
+                                                        <input type="radio" name="user_type" value="2" style="display:none;">
+                                                        <div class="card-icon">
+                                                            <span style="font-size:18px;">🎨</span>
+                                                        </div>
+                                                        <span class="card-text">Creator</span>
+                                                    </label>
+
+                                                    <!-- Business Card -->
+                                                    <label class="user-type-card" data-type="business">
+                                                        <input type="radio" name="user_type" value="3" style="display:none;">
+                                                        <div class="card-icon">
+                                                            <span style="font-size:18px;">🏢</span>
+                                                        </div>
+                                                        <span class="card-text">Business</span>
+                                                    </label>
+                                                </div>
+
+                                                <!-- Premium Membership Cards -->
+                                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;" class="premium-types">
+                                                     
+                                                    <!-- Gold Member Card -->
+                                                    <label class="user-type-card" data-type="gold">
+                                                        <input type="radio" name="user_type" value="1" data-tag="gold" style="display:none;">
+                                                        <div class="card-icon">
+                                                            <span style="font-size:16px;">✨</span>
+                                                        </div>
+                                                        <span class="card-text">Gold</span>
+                                                    </label>
+
+                                                    <!-- Silver Member Card -->
+                                                    <label class="user-type-card" data-type="silver">
+                                                        <input type="radio" name="user_type" value="1" data-tag="silver" style="display:none;">
+                                                        <div class="card-icon">
+                                                            <span style="font-size:16px;">🥈</span>
+                                                        </div>
+                                                        <span class="card-text">Silver</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+
+                                            <!-- Reference Code Section with Modern Toggle -->
+                                            <div class="field-set" style="margin-bottom:20px;">
+                                                <div class="reference-section">
+                                                    <label style="display:flex;align-items:center;font-weight:600;cursor:pointer;color:#333;margin-bottom:0;gap:15px;">
+                                                        <div style="position:relative;">
+                                                            <input type="checkbox" id="has_reference" name="has_reference" 
+                                                                   style="width:24px;height:24px;cursor:pointer;opacity:0;position:absolute;">
+                                                            <div class="reference-checkbox" id="checkbox_visual">
+                                                                <span style="color:#74b9ff;font-size:16px;font-weight:bold;opacity:0;transition:opacity 0.3s ease;" id="check_mark">✓</span>
+                                                            </div>
+                                                        </div>
+                                                        <span style="font-size:17px;font-weight:600;color:#333;">🎯 Do you have a reference code?</span>
+                                                    </label>
+                                                    
+                                                    <div id="reference_section" style="display:none;margin-top:20px;animation:slideDown 0.3s ease;">
+                                                        <input type="text" name="reference_code" id="reference_code" class="reference-input" 
+                                                               placeholder="🔗 Enter your reference code">
+                                                        <span id="reference-status" style="margin-left:0px; margin-top:10px; display:block; font-size:14px; font-weight:600;"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Submit Button -->
+                                            <div class="field-set" style="margin-top:25px;">
+                                                <button type='submit' id='register_user_form' disabled class="btn btn-main btn-fullwidth color-2">
+                                                    🚀 Create Account
+                                                </button>
                                             </div>
 
 
@@ -166,7 +243,9 @@
         <!-- content close -->
 
         <!-- footer begin -->
-        <?php include('../components/footer.php'); ?>
+        <?php 
+        //include('../components/footer.php'); 
+        ?>
         <!-- footer close -->
 
     </div>
@@ -176,6 +255,8 @@
     <!-- Javascript Files
     ================================================== -->
     <?php include('../components/jslinks.php'); ?>
+    <!-- Registration Form JavaScript -->
+    <script src="../assets/js/register-form.js"></script>
     <script src="./custom_js/custom_register.js"></script>
 
 
