@@ -1,5 +1,4 @@
-<?php
-// Assuming user_id is stored in session as 'user_id' after login
+<?php 
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : '';
 $user_qr = isset($_SESSION['user_qr_id']) ? $_SESSION['user_qr_id'] : '' ;
 $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type'] : '' ;

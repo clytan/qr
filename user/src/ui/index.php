@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="zxx">
-
+<?php
+    include '../backend/dbconfig/connection.php';
+    session_start();
+?>
 <head>
     <title>ZQR</title>
     <link rel="icon" href="../assets/../assets/images/icon-red.png" type="image/gif" sizes="16x16">
