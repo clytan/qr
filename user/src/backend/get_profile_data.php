@@ -56,6 +56,8 @@ $typeMap = [
     'youtube' => 'Youtube',
     'linkedin' => 'LinkedIn',
     'snapchat' => 'SnapChat',
+    'whatsapp_link' => 'WhatsApp',
+    'telegram_link' => 'Telegram',
 ];
 $reverseTypeMap = array_flip($typeMap); // e.g., 'LinkedIn' => 'linkedin_username'
 

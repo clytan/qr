@@ -1,0 +1,39 @@
+<?php
+// follow_user.php
+header('Content-Type: application/json');
+require_once './dbconfig/connection.php';
+$data = json_decode(file_get_contents('php://input'), true);
+$qr_id = isset($data['qr_id']) ? $data['qr_id'] : '';
+$followers_id = isset($data['followers_id']) ? $data['followers_id'] : '';
+if ($qr_id === '' || $followers_id === '') {
+    echo json_encode(['status' => false, 'message' => 'Missing parameters.']);
+    exit;
+}
+// Get user_id from qr_id
+$stmt = $conn->prepare('SELECT id FROM user_user WHERE user_qr_id = ? LIMIT 1');
+if (!$stmt) {
+    echo json_encode(['status' => false, 'message' => 'DB error.']);
+    exit;
+}
+$stmt->bind_param('s', $qr_id);
+$stmt->execute();
+$stmt->bind_result($user_id);
+if ($stmt->fetch() && $user_id) {
+    $stmt->close();
+    // Insert into user_followers (user_id, followers_id, created_on, updated_on, created_by, updated_by)
+    $stmt2 = $conn->prepare('INSERT IGNORE INTO user_followers (user_id, followers_id, created_on, updated_on, created_by, updated_by) VALUES (?, ?, NOW(), NOW(), ?, ?)');
+    if (!$stmt2) {
+        echo json_encode(['status' => false, 'message' => 'DB error.']);
+        exit;
+    }
+    $stmt2->bind_param('ssss', $user_id, $followers_id, $followers_id, $followers_id);
+    if ($stmt2->execute()) {
+        echo json_encode(['status' => true, 'message' => 'Followed successfully.']);
+    } else {
+        echo json_encode(['status' => false, 'message' => 'Insert failed.']);
+    }
+    $stmt2->close();
+} else {
+    $stmt->close();
+    echo json_encode(['status' => false, 'message' => 'User not found.']);
+}

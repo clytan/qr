@@ -38,6 +38,8 @@ $typeMap = [
     'youtube_username' => 'Youtube',
     'linkedin_username' => 'LinkedIn',
     'snapchat_username' => 'SnapChat',
+    'whatsapp_link' => 'WhatsApp',
+    'telegram_link' => 'Telegram',
 ];
 
 foreach ($fields as $type) {
