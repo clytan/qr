@@ -1,4 +1,7 @@
-<?php 
+<?php // Start the session to access session variables (must be first line, before any output)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : '';
 $user_qr = isset($_SESSION['user_qr_id']) ? $_SESSION['user_qr_id'] : '' ;
 $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type'] : '' ;

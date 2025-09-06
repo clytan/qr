@@ -21,7 +21,7 @@ $stmt->bind_result($user_id);
 if ($stmt->fetch() && $user_id) {
     $stmt->close();
     // Insert into user_followers (user_id, followers_id, created_on, updated_on, created_by, updated_by)
-    $stmt2 = $conn->prepare('INSERT IGNORE INTO user_followers (user_id, followers_id, created_on, updated_on, created_by, updated_by) VALUES (?, ?, NOW(), NOW(), ?, ?)');
+    $stmt2 = $conn->prepare('INSERT INTO user_followers (user_id, followers_id, created_on, updated_on, created_by, updated_by) VALUES (?, ?, NOW(), NOW(), ?, ?)');
     if (!$stmt2) {
         echo json_encode(['status' => false, 'message' => 'DB error.']);
         exit;
@@ -30,8 +30,9 @@ if ($stmt->fetch() && $user_id) {
     if ($stmt2->execute()) {
         echo json_encode(['status' => true, 'message' => 'Followed successfully.']);
     } else {
-        echo json_encode(['status' => false, 'message' => 'Insert failed.']);
+        echo json_encode(['status' => false, 'message' => 'Insert failed.', 'error' => $stmt2->error]);
     }
+
     $stmt2->close();
 } else {
     $stmt->close();

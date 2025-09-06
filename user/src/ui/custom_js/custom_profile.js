@@ -54,8 +54,7 @@ var eventHandler={
                 success: function(res) {
                     if (res.status) {
                         alert('Followed successfully!');
-                        $('#follow-icon').text('✓');
-                        $('#follow-btn').prop('disabled', true);
+                        profileFunction.getFollowersCount(qr_id,followers_id) // Refresh button state
                         
                     } else {
                         alert(res.message || 'Could not follow.');
@@ -212,6 +211,31 @@ var profileFunction={
         profileFunction.checkForProfileImage();
 
     },
+    getFollowersCount: function(userId, followerId) {
+        $.ajax({
+            url: '../backend/get_followers_count.php',
+            type: 'POST',
+            data: JSON.stringify({ qr_id: qrId, follower_id: followerId }),
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function(resp) {
+                console.log(resp);
+                
+                if (typeof resp.total_count !== 'undefined') {
+                    $('#followers-count').text('Followers: ' + resp.total_count);
+                    if(resp.following){
+                        $('#follow-icon').text('✓');
+                        $('#follow-btn').prop('disabled', true);
+                    }
+                } else {
+                    $('#followers-count').text('Followers: 0');
+                }
+            },
+            error: function() {
+                $('#followers-count').text('Followers: 0');
+            }
+        });
+    },
     getFollowButtonDetails: function(qrId) {
         var followerId = $('#user_id').val();
         if (qrId) {
@@ -239,27 +263,9 @@ var profileFunction={
                         var $container = $('#follow-btn-container');
                         $container.append(countSpan).append(btn);
                         // Fetch followers count
-                        $.ajax({
-                            url: '../backend/get_followers_count.php',
-                            type: 'POST',
-                            data: JSON.stringify({ qr_id: qrId, follower_id: followerId }),
-                            contentType: 'application/json',
-                            dataType: 'json',
-                            success: function(resp) {
-                                if (typeof resp.total_count !== 'undefined') {
-                                    $('#followers-count').text('Followers: ' + resp.total_count);
-                                    if(resp.following){
-                                        $('#follow-icon').text('✓');
-                                        $('#follow-btn').prop('disabled', true);
-                                    }
-                                } else {
-                                    $('#followers-count').text('Followers: 0');
-                                }
-                            },
-                            error: function() {
-                                $('#followers-count').text('Followers: 0');
-                            }
-                        });
+                        profileFunction.getFollowersCount(qrId, followerId);
+                        
+
                         if ($('#follow-btn-style').length === 0) {
                             var style = $('<style>', { id: 'follow-btn-style', type: 'text/css' });
                             style.html(
