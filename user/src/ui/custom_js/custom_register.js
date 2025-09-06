@@ -93,7 +93,17 @@ var eventHandler = {
             $('#email-otp-modal').removeAttr('data-otp-id');
             console.log('Starting OTP process for email:', email);
             
-            registerFunction.sendOtp(email);
+            // Debug: Check if registerFunction exists
+            console.log('registerFunction exists:', typeof registerFunction);
+            console.log('sendOtp function exists:', typeof registerFunction.sendOtp);
+            
+            if (typeof registerFunction !== 'undefined' && typeof registerFunction.sendOtp === 'function') {
+                console.log('Calling registerFunction.sendOtp...');
+                registerFunction.sendOtp(email);
+            } else {
+                console.error('registerFunction or sendOtp not available!');
+                $('#otp-status-msg').css('color','red').text('Error: OTP function not available. Please refresh the page.');
+            }
         });
         // Close modal
         $('#close-otp-modal').on('click', function(){
@@ -110,24 +120,39 @@ var eventHandler = {
                 return;
             }
             
-            // Get OTP ID with multiple fallback methods
-            var otp_id = $('#email-otp-modal').attr('data-otp-id') || 
-                         $('#email-otp-modal').data('otp-id') || 
-                         window.currentOtpId || '';
+            console.log('=== OTP VERIFICATION ATTEMPT ===');
+            console.log('Email:', email);
+            console.log('OTP entered:', otp);
             
-            console.log('OTP ID retrieved for verification:', otp_id); // Debug log
-            console.log('OTP entered:', otp); // Debug log
-            console.log('Modal attributes:', $('#email-otp-modal')[0].attributes); // Debug log
+            // Get OTP ID with multiple fallback methods
+            var otp_id_attr = $('#email-otp-modal').attr('data-otp-id');
+            var otp_id_data = $('#email-otp-modal').data('otp-id');
+            var otp_id_window = window.currentOtpId;
+            
+            console.log('OTP ID from attr:', otp_id_attr, 'Type:', typeof otp_id_attr);
+            console.log('OTP ID from data:', otp_id_data, 'Type:', typeof otp_id_data);
+            console.log('OTP ID from window:', otp_id_window, 'Type:', typeof otp_id_window);
+            console.log('Modal element exists:', $('#email-otp-modal').length > 0);
+            console.log('Modal attributes:', $('#email-otp-modal')[0] ? $('#email-otp-modal')[0].attributes : 'no element');
+            
+            // Choose the first valid OTP ID
+            var otp_id = otp_id_attr || otp_id_data || otp_id_window || '';
+            
+            console.log('Final selected OTP ID:', otp_id, 'Type:', typeof otp_id);
+            console.log('OTP ID is valid?', otp_id !== '' && otp_id !== undefined && otp_id !== 'undefined' && otp_id !== null);
+            console.log('================================');
             
             if(otp_id !== '' && otp_id !== undefined && otp_id !== 'undefined' && otp_id !== null){
-                console.log('Proceeding with OTP verification'); // Debug log
+                console.log('Proceeding with OTP verification for ID:', otp_id);
                 registerFunction.verifyOtp(otp_id, otp);
             }
             else{
-                console.log('OTP ID is missing, expired, or invalid:', otp_id); // Debug log
-                console.log('Attempting to retrieve OTP ID from window:', window.currentOtpId); // Debug log
+                console.log('OTP ID is missing, expired, or invalid. All methods returned:', {
+                    attr: otp_id_attr,
+                    data: otp_id_data,
+                    window: otp_id_window
+                });
                 $('#otp-status-msg').css('color','red').text('OTP session expired. Please click "Resend OTP" to get a new code.');
-                // Don't auto-resend, let user manually resend
             }
         });
         // Resend OTP
@@ -215,6 +240,22 @@ var eventHandler = {
 };
 
 var registerFunction = {
+    // Add debug test function
+    debugTest: function() {
+        console.log('=== DEBUG TEST FUNCTION ===');
+        console.log('jQuery version:', $.fn.jquery);
+        console.log('Modal element exists:', $('#email-otp-modal').length);
+        console.log('Modal HTML:', $('#email-otp-modal').length > 0 ? $('#email-otp-modal')[0].outerHTML.substring(0, 200) + '...' : 'No modal found');
+        console.log('Window object has currentOtpId property:', 'currentOtpId' in window);
+        console.log('Current window.currentOtpId value:', window.currentOtpId);
+        
+        // Test setting and getting attributes
+        $('#email-otp-modal').attr('data-test', 'test123');
+        var testResult = $('#email-otp-modal').attr('data-test');
+        console.log('Test attribute set/get result:', testResult);
+        $('#email-otp-modal').removeAttr('data-test');
+        console.log('========================');
+    },
     emailVerified: false,
     referenceValid: true,
     referredByUserId: null,
@@ -273,38 +314,24 @@ var registerFunction = {
         window.currentOtpId = null;
         
         $.ajax({
-            url: '../mailer/email_templates/sendemailotp.php',
+            url: '../backend/send_otp_production.php',
             type: 'POST',
             data: { email: email, resend: resend ? 1 : 0 },
             dataType: 'json',
+            timeout: 15000,
             success: function(response){
-                console.log('OTP Send Response:', response); // Debug log
                 if(response.status){
-                    var otp_id = response.data?.id || response.otp_id || '';
-                    console.log('Setting OTP ID:', otp_id); // Debug log
+                    // Extract OTP ID from response
+                    var otp_id = response.data?.id || response.otp_id || null;
                     
-                    if(otp_id && otp_id !== '' && otp_id !== 'undefined'){
+                    if(otp_id){
                         // Store OTP ID in multiple ways for reliability
-                        $('#email-otp-modal').attr('data-otp-id', otp_id);
-                        $('#email-otp-modal').data('otp-id', otp_id);
-                        window.currentOtpId = otp_id;
+                        $('#email-otp-modal').attr('data-otp-id', String(otp_id));
+                        $('#email-otp-modal').data('otp-id', String(otp_id));
+                        window.currentOtpId = String(otp_id);
                         
                         $('#otp-status-msg').css('color','green').text('OTP sent to your email. Please check your inbox.');
-                        
-                        // Verify the attribute was set correctly with multiple checks
-                        setTimeout(function() {
-                            var checkId = $('#email-otp-modal').attr('data-otp-id');
-                            var checkData = $('#email-otp-modal').data('otp-id');
-                            var checkWindow = window.currentOtpId;
-                            console.log('OTP ID verification - attr:', checkId, 'data:', checkData, 'window:', checkWindow); // Debug log
-                            
-                            if(!checkId && !checkData && !checkWindow) {
-                                console.error('Failed to set OTP ID properly in any storage method');
-                                $('#otp-status-msg').css('color','red').text('Error setting up OTP session. Please try again.');
-                            }
-                        }, 100);
                     } else {
-                        console.error('Invalid OTP ID received:', otp_id);
                         $('#otp-status-msg').css('color','red').text('Invalid OTP response. Please try again.');
                     }
                 }else{
@@ -312,8 +339,15 @@ var registerFunction = {
                 }
             },
             error: function(xhr, status, error){
-                console.log('OTP Send Error:', error); // Debug log
-                $('#otp-status-msg').css('color','red').text('Error sending OTP. Please try again.');
+                if (xhr.status === 0) {
+                    $('#otp-status-msg').css('color','red').text('Network error. Please check your connection.');
+                } else if (xhr.status === 404) {
+                    $('#otp-status-msg').css('color','red').text('Server file not found. Please contact support.');
+                } else if (xhr.status === 500) {
+                    $('#otp-status-msg').css('color','red').text('Server error. Please try again.');
+                } else {
+                    $('#otp-status-msg').css('color','red').text('Error sending OTP. Please try again.');
+                }
             }
         });
     },
