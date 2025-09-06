@@ -5,6 +5,59 @@ var eventHandler = {
         eventHandler.submitEvent();
         eventHandler.emailInputEvents();
         eventHandler.emailVerifyEvents();
+        eventHandler.referenceEvents();
+        eventHandler.loadUserSlabs();
+    },
+    loadUserSlabs:()=>{
+        $.ajax({
+            url: '../backend/get_user_slabs.php',
+            type: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.status && response.data) {
+                    var options = '<option value="">Select a slab...</option>';
+                    response.data.forEach(function(slab) {
+                        options += '<option value="' + slab.id + '">' + slab.name + '</option>';
+                    });
+                    $('#user_slab').html(options);
+                } else {
+                    console.error('Failed to load user slabs');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Error loading user slabs:', error);
+            }
+        });
+    },
+    referenceEvents:()=>{
+        $('#has_reference').on('change', function() {
+            if ($(this).is(':checked')) {
+                $('#reference_section').show();
+                $('#reference_code').focus();
+            } else {
+                $('#reference_section').hide();
+                $('#reference_code').val('');
+                $('#reference-status').text('');
+                registerFunction.setReferenceValid(true); // Reset validation when hidden
+            }
+            registerFunction.updateSubmitState();
+        });
+        
+        $('#reference_code').on('input', function() {
+            var code = $(this).val().trim();
+            if (code === '') {
+                $('#reference-status').text('');
+                registerFunction.setReferenceValid(true);
+                registerFunction.updateSubmitState();
+                return;
+            }
+            
+            // Debounce validation
+            clearTimeout(registerFunction.referenceTimeout);
+            registerFunction.referenceTimeout = setTimeout(function() {
+                registerFunction.validateReference(code);
+            }, 500);
+        });
     },
     emailInputEvents:()=>{
         // Show verify link if email is not empty
@@ -73,30 +126,53 @@ var eventHandler = {
         });
         $('input[name="user_type"]').on('change', function() {
             registerFunction.updateSubmitText();
-            registerFunction.updateSubmitState($('#name'), $('#email'), $('#phone'), $('#register_user_form'));
+            registerFunction.updateSubmitState();
+        });
+        
+        $('#user_slab').on('change', function() {
+            registerFunction.updateSubmitState();
         });
     },
     onInput:()=>{
-        $('#name, #email, #phone').on('input', function() {
-            registerFunction.updateSubmitState($('#name'), $('#email'), $('#phone'), $('#register_user_form'));
+        $('#email').on('input', function() {
+            registerFunction.updateSubmitState();
         });
         // Password match check
         $('#confirm_password').on('input', function() {
             registerFunction.checkPasswordMatch();
+            registerFunction.updateSubmitState();
         });
         $('#password').on('input', function() {
             registerFunction.checkPasswordMatch();
+            registerFunction.updateSubmitState();
         });
     },
     submitEvent:() =>{
         $('#register_form').on('submit', function(e) {
             e.preventDefault();
+            
+            // Final validation before submit
+            if (!registerFunction.isFormComplete()) {
+                alert('Please complete all required fields and verify your email.');
+                return;
+            }
+            
+            // Check password match
+            if ($('#password').val().trim() !== $('#confirm_password').val().trim()) {
+                alert('Passwords do not match.');
+                return;
+            }
+            
             // Collect form data
             var formData = {
                 email: $('#email').val().trim(),
                 password: $('#password').val().trim(),
-                user_type: registerFunction.getSelectedUserType()
+                user_type: registerFunction.getSelectedUserType()[0],
+                user_slab: $('#user_slab').val(),
+                reference_code: $('#has_reference').is(':checked') ? $('#reference_code').val().trim() : '',
+                referred_by_user_id: registerFunction.referredByUserId || null
             };
+            
             $.ajax({
                 url: '../backend/register.php',
                 type: 'POST',
@@ -120,6 +196,9 @@ var eventHandler = {
 
 var registerFunction = {
     emailVerified: false,
+    referenceValid: true,
+    referredByUserId: null,
+    referenceTimeout: null,
     setEmailVerified: function(val){
         registerFunction.emailVerified = val;
         if(val){
@@ -130,6 +209,36 @@ var registerFunction = {
             $('#verify-email-link').show();
         }
         registerFunction.updateSubmitState();
+    },
+    setReferenceValid: function(val) {
+        registerFunction.referenceValid = val;
+        registerFunction.updateSubmitState();
+    },
+    validateReference: function(code) {
+        $('#reference-status').text('Validating...').css('color', 'orange');
+        
+        $.ajax({
+            url: '../backend/validate_reference.php',
+            type: 'POST',
+            data: { user_qr_id: code },
+            dataType: 'json',
+            success: function(response) {
+                if (response.status) {
+                    $('#reference-status').text('Valid reference').css('color', 'green');
+                    registerFunction.referredByUserId = response.data.referred_by_user_id;
+                    registerFunction.setReferenceValid(true);
+                } else {
+                    $('#reference-status').text(response.message || 'Invalid reference').css('color', 'red');
+                    registerFunction.referredByUserId = null;
+                    registerFunction.setReferenceValid(false);
+                }
+            },
+            error: function() {
+                $('#reference-status').text('Error validating reference').css('color', 'red');
+                registerFunction.referredByUserId = null;
+                registerFunction.setReferenceValid(false);
+            }
+        });
     },
     validateEmail: function(email){
         // Simple email regex
@@ -217,21 +326,36 @@ var registerFunction = {
             $('#register_user_form').val('Pay 2000');
         }
     },
-    isFormComplete:($name, $email, $phone)=>{
-        // Only require email verification for registration
-        return (
-            $.trim($email.val()) !== '' &&
+    isFormComplete:()=>{
+        var email = $.trim($('#email').val());
+        var password = $.trim($('#password').val());
+        var confirmPassword = $.trim($('#confirm_password').val());
+        var userType = registerFunction.getSelectedUserType()[0];
+        var userSlab = $('#user_slab').val();
+        var hasReference = $('#has_reference').is(':checked');
+        var referenceCode = $.trim($('#reference_code').val());
+        
+        // Basic validation
+        var isValid = (
+            email !== '' &&
+            password !== '' &&
+            confirmPassword !== '' &&
+            password === confirmPassword &&
             registerFunction.emailVerified &&
-            registerFunction.getSelectedUserType()[0] !== null
+            userType !== null &&
+            userSlab !== ''
         );
+        
+        // Reference validation
+        if (hasReference) {
+            isValid = isValid && referenceCode !== '' && registerFunction.referenceValid;
+        }
+        
+        return isValid;
     },
-    updateSubmitState:($name, $email, $phone, $submit)=>{
-        // Use default selectors if arguments are not provided
-        $name = $name || $('#name');
-        $email = $email || $('#email');
-        $phone = $phone || $('#phone');
-        $submit = $submit || $('#register_user_form');
-        $submit.prop('disabled', !registerFunction.isFormComplete($name, $email, $phone));
+    updateSubmitState:()=>{
+        var $submit = $('#register_user_form');
+        $submit.prop('disabled', !registerFunction.isFormComplete());
     },
     checkPasswordMatch: function() {
         var password = $('#password').val().trim();
