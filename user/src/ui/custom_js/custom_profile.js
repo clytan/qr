@@ -449,6 +449,8 @@ var profileFunction={
             success: function(res) {
                 var colorDark = res.colorDark || '#000000';
                 var colorLight = res.colorLight || '#ffffff';
+                $('#qr-color-light').val(colorLight)
+                $('#qr-color-dark').val(colorDark)
                 profileFunction.generateQRCode(qrUrl, 'click_banner_img', colorDark, colorLight);
             },
             error: function() {
