@@ -7,13 +7,37 @@ require_once('./dbconfig/connection.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$email = isset($_POST['email']) ? trim($_POST['email']) : '';
-	$user_type = isset($_POST['user_type']) ? $_POST['user_type'] : [];
+	$user_type = isset($_POST['user_type']) ? $_POST['user_type'] : '';
 	$password = isset($_POST['password']) ? trim($_POST['password']) : '';
+	$user_slab = isset($_POST['user_slab']) ? $_POST['user_slab'] : '';
+	$reference_code = isset($_POST['reference_code']) ? trim($_POST['reference_code']) : '';
+	$referred_by_user_id = isset($_POST['referred_by_user_id']) ? $_POST['referred_by_user_id'] : null;
 
 	// Basic input validation
-	if ($email === '' || count($user_type) == 0 || $password === '') {
-		echo json_encode(['status' => false, 'message' => 'All fields are required', 'data' => []]);
+	if ($email === '' || $user_type === '' || $password === '' || $user_slab === '') {
+		echo json_encode(['status' => false, 'message' => 'All required fields must be filled', 'data' => []]);
 		exit();
+	}
+
+	// Validate reference code if provided
+	if (!empty($reference_code)) {
+		if (empty($referred_by_user_id)) {
+			echo json_encode(['status' => false, 'message' => 'Invalid reference code', 'data' => []]);
+			exit();
+		}
+		
+		// Double-check the reference exists
+		$sqlCheckRef = "SELECT id FROM user_user WHERE id = ? AND user_qr_id = ? AND is_deleted = 0";
+		$stmtCheckRef = $conn->prepare($sqlCheckRef);
+		$stmtCheckRef->bind_param('is', $referred_by_user_id, $reference_code);
+		$stmtCheckRef->execute();
+		$resultCheckRef = $stmtCheckRef->get_result();
+		if ($resultCheckRef->num_rows === 0) {
+			$stmtCheckRef->close();
+			echo json_encode(['status' => false, 'message' => 'Invalid reference code', 'data' => []]);
+			exit();
+		}
+		$stmtCheckRef->close();
 	}
 
 	// Check if user already exists (by username or email or phone)
@@ -46,16 +70,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			$stmtCheckQr->close();
 		} while ($exists);
 
-		// Insert new user with user_qr_id
-		$sqlInsert = "INSERT INTO user_user(user_email, user_password, user_user_type, user_tag, user_qr_id) VALUES (?, ?, ?, ?, ?)";
+		// Insert new user with user_qr_id and new fields
+		$sqlInsert = "INSERT INTO user_user(user_email, user_password, user_user_type, user_slab_id, user_qr_id, referred_by_user_id) VALUES (?, ?, ?, ?, ?, ?)";
 		$stmtInsert = $conn->prepare($sqlInsert);
 		if (!$stmtInsert) {
 			echo json_encode(['status' => false, 'message' => 'Database error: ' . $conn->error, 'data' => []]);
 			exit();
 		}
-		$user_type_0 = isset($user_type[0]) ? $user_type[0] : '';
-		$user_type_1 = isset($user_type[1]) ? $user_type[1] : '';
-		$stmtInsert->bind_param('sssss', $email, $password, $user_type_0, $user_type_1, $user_qr_id);
+		$stmtInsert->bind_param('ssissi', $email, $password, $user_type, $user_slab, $user_qr_id, $referred_by_user_id);
 		$success = $stmtInsert->execute();
 		$stmtInsert->close();
 
