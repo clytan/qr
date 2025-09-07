@@ -17,7 +17,7 @@
     <div id="wrapper">
 
         <!-- header begin -->
-        <header class="transparent">
+        <header class="transparent d-none">
             <div class="container">
                 <div class="row">
                     <div class="col-md-12">
@@ -65,8 +65,6 @@
                                 <div class="col-lg-5 text-light wow fadeInRight" data-wow-delay=".5s">
                                     <div class="spacer-10"></div>
                                     <h1>Create, sell or collect digital items.</h1>
-                                    <p class="lead">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-                                        eiusmod tempor incididunt ut labore et dolore magna aliqua ut enim.</p>
                                 </div>
 
                                 <div class="col-lg-4 offset-lg-2 wow fadeIn" data-wow-delay=".5s">
@@ -104,7 +102,7 @@
         <!-- content close -->
 
         <!-- footer begin -->
-        <?php include('../components/footer.php'); ?>
+        <?php //include('../components/footer.php'); ?>
         <!-- footer close -->
 
     </div>
