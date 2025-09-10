@@ -26,176 +26,11 @@ $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type
 <body class="dark-scheme de-grey">
     <div id="wrapper">
 
-            <!-- header begin -->
-            <header class="transparent">
-                <div class="container">
-                <div class="row">
-                    <div class="col-md-12">
-                        <div class="de-flex sm-pt10">
-                            <div class="de-flex-col">
-                                <div class="de-flex-col">
-                                    <!-- logo begin -->
-                                    <div id="logo">
-                                        <a href="03_grey-index.html">
-                                            <img alt="" src="images/logo-3.png" />
-                                        </a>
-                                    </div>
-                                    <!-- logo close -->
-                                </div>
-                                <div class="de-flex-col">
-                                    <input id="quick_search" class="xs-hide" name="quick_search" placeholder="search item here..." type="text" />
-                                </div>
-                            </div>
-                            <div class="de-flex-col header-col-mid">
-                                <!-- mainmenu begin -->
-                                <ul id="mainmenu">
-                                    <li>
-                                        <a href="03_grey-index.html">Home<span></span></a>
-                                        <ul>
-                                            <li><a href="03_grey-index.html">Homepage 1</a></li>
-                                            <li><a href="03_grey-index-2.html">Homepage 2</a></li>
-                                            <li><a href="03_grey-index-3.html">Homepage 3</a></li>
-                                            <li><a href="03_grey-index-4.html">Homepage 4</a></li>
-                                        </ul>
-                                    </li>
-                                    <li>
-                                        <a href="03_grey-explore.html">Explore<span></span></a>
-                                        <ul>
-                                            <li><a href="03_grey-explore.html">Explore</a></li>
-                                            <li><a href="03_grey-explore-2.html">Explore 2</a></li>
-                                            <li><a href="03_grey-explore-music-nft.html">New: Music NFT</a></li>
-                                            <li><a href="03_grey-collection.html">Collections</a></li>
-                                            <li><a href="03_grey-live-auction.html">Live Auction</a></li>
-                                            <li><a href="03_grey-item-details.html">Item Details</a></li>
-                                            <li><a href="03_grey-help-center.html">Help Center</a></li>
-                                        </ul>
-                                    </li>
-                                    <li>
-                                        <a href="03_grey-author.html">Author<span></span></a>
-                                        <ul>
-                                            <li><a href="03_grey-author.html">Author</a></li>
-                                            <li><a href="03_grey-profile.html">Profile</a></li>
-                                            <li><a href="03_grey-wallet.html">Wallet</a></li>
-                                            <li><a href="03_grey-create-options.html">Create</a></li>
-                                            <li><a href="03_grey-login.html">Login</a></li>
-                                        </ul>
-                                    </li>                                    
-                                    <li>
-                                        <a href="#">Stats<span></span></a>
-                                        <ul>
-                                            <li><a href="03_grey-activity.html">Activity</a></li>
-                                            <li><a href="03_grey-rankings.html">Rankings</a></li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                                <!-- mainmenu close -->
-                                <div class="menu_side_area">
-                                    <div class="de-login-menu">
-                                        <a href="03_grey-create-options.html" class="btn-main btn-wallet"><i class="icon_wallet_alt"></i><span>Create</span></a>
 
-                                        <span id="de-click-menu-notification" class="de-menu-notification">
-                                            <span class="d-count">8</span>
-                                            <i class="fa fa-bell"></i>
-                                        </span>
-
-                                        <span id="de-click-menu-profile" class="de-menu-profile">                           
-                                            <img src="images/author_single/author_thumbnail.jpg" class="img-fluid" alt="">
-                                        </span>
-
-                                        <div id="de-submenu-notification" class="de-submenu">
-                                            <div class="de-flex">
-                                                <div><h4>Notifications</h4></div>
-                                                <a href="#">Show all</a>
-                                            </div>
-
-                                            <ul>
-                                                <li>
-                                                    <a href="#">
-                                                        <img class="lazy" src="images/author/author-2.jpg" alt="">
-                                                        <div class="d-desc">
-                                                            <span class="d-name"><b>Mamie Barnett</b> started following you</span>
-                                                            <span class="d-time">1 hour ago</span>
-                                                        </div>
-                                                    </a>  
-                                                </li>
-                                                <li>
-                                                    <a href="#">
-                                                        <img class="lazy" src="images/author/author-3.jpg" alt="">
-                                                        <div class="d-desc">
-                                                            <span class="d-name"><b>Nicholas Daniels</b> liked your item</span>
-                                                            <span class="d-time">2 hours ago</span>
-                                                        </div>
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="#">
-                                                        <img class="lazy" src="images/author/author-4.jpg" alt="">
-                                                        <div class="d-desc">
-                                                            <span class="d-name"><b>Lori Hart</b> started following you</span>
-                                                            <span class="d-time">18 hours ago</span>
-                                                        </div>
-                                                    </a>    
-                                                </li>
-                                                <li>
-                                                    <a href="#">
-                                                        <img class="lazy" src="images/author/author-5.jpg" alt="">
-                                                        <div class="d-desc">
-                                                            <span class="d-name"><b>Jimmy Wright</b> liked your item</span>
-                                                            <span class="d-time">1 day ago</span>
-                                                        </div>
-                                                    </a>
-                                                </li>
-                                                <li>
-                                                    <a href="#">
-                                                        <img class="lazy" src="images/author/author-6.jpg" alt="">
-                                                        <div class="d-desc">
-                                                            <span class="d-name"><b>Karla Sharp</b> started following you</span>
-                                                            <span class="d-time">3 days ago</span>
-                                                        </div>
-                                                    </a>    
-                                                </li>
-                                            </ul>
-                                        </div>
-
-                                        <div id="de-submenu-profile" class="de-submenu">
-                                            <div class="d-name">
-                                                <h4>Monica Lucas</h4>
-                                                <a href="03_grey-profile.html">Set display name</a>
-                                            </div>
-                                            <div class="spacer-10"></div>
-                                            <div class="d-balance">
-                                                <h4>Balance</h4>
-                                                12.858 ETH
-                                            </div>
-                                            <div class="spacer-10"></div>
-                                            <div class="d-wallet">
-                                                <h4>My Wallet</h4>
-                                                <span id="wallet" class="d-wallet-address">DdzFFzCqrhshMSxb9oW3mRo4MJrQkusV3fGFSTwaiu4wPBqMryA9DYVJCkW9n7twCffG5f5wX2sSkoDXGiZB1HPa7K7f865Kk4LqnrME</span>
-                                                <button id="btn_copy" title="Copy Text">Copy</button>
-                                            </div>
-
-                                            <div class="d-line"></div>
-
-                                            <ul class="de-submenu-profile">
-                                                <li><a href="03_grey-author.html"><i class="fa fa-user"></i> My profile</a>
-                                                <li><a href="03_grey-profile.html"><i class="fa fa-pencil"></i> Edit profile</a>
-                                                <li><a href="#"><i class="fa fa-sign-out"></i> Sign out</a>
-                                            </ul>
-                                        </div>
-                                        <span id="menu-btn"></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            </header>
-            <!-- header close -->
         <!-- content begin -->
         <div class="no-bottom no-top" id="content">
             <div id="top"></div>
-        
+
 
             <!-- section begin -->
             <section id="section-main" aria-label="section">
@@ -203,146 +38,196 @@ $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type
                     <div class="row">
                         <div class="col-lg-8 offset-lg-2">
                             <form id="form-create-item" class="form-border" method="post">
-                                <input type="hidden" id="user_id" name="user_id" value="<?php echo htmlspecialchars($user_id); ?>">
-                                <input type="hidden" id="user_qr" name="user_qr" value="<?php echo htmlspecialchars($user_qr); ?>">
+                                <input type="hidden" id="user_id" name="user_id"
+                                    value="<?php echo htmlspecialchars($user_id); ?>">
+                                <input type="hidden" id="user_qr" name="user_qr"
+                                    value="<?php echo htmlspecialchars($user_qr); ?>">
                                 <div class="de_tab tab_simple">
-                                
-                                    <ul class="de_nav">
-                                        <li class="active"><span><i class="fa fa-user"></i>Profile</span></li>
-                                        <li><span><i class="fa fa-exclamation-circle"></i>Notifications</span></li>
-                                        <li><span><i class="fa fa-paint-brush"></i>Appearance</span></li>
-                                    </ul>
-                                    
-                                    <div class="de_tab_content">                            
+
+                                    <div class="de_tab_content">
                                         <div class="tab-1">
                                             <div class="row wow fadeIn">
                                                 <div class="col-lg-8 mb-sm-20">
-                                                        <div class="field-set">
+                                                    <div class="field-set">
 
-                                                            <!-- Follow button -->
-                                                            <div id="follow-btn-container" style="margin-bottom:10px;"></div>
-                                                            <input type="text" name="full_name" id="full_name" class="form-control" placeholder="Enter Full Name" />
-
-                                                            <div class="spacer-20"></div>
-
-                                                            
-                                                            <input type="text" name="phone_number" id="phone_number" class="form-control" placeholder="Enter your Phone Number" />
-                                                                
-                                                            
-
-                                                            <div class="spacer-20"></div>
-                                                            
-
-                                                            
-                                                            <input type="text" name="email_address" id="email_address" class="form-control" placeholder="Enter email" />
-                                                                
-                                                            
-
-                                                            <div class="spacer-20"></div>
-
-
-                                                            
-                                                            <input type="text" name="address" id="address" class="form-control" placeholder="Enter Address" />
-                                                                
-                                                            
-
-                                                            <div class="spacer-20"></div>
-
-
-                                                            <div class="input-group mb-2">
-                                                                <input type="text" name="website" id="website" class="form-control" placeholder="Enter Website URL" />
-                                                                <div class="input-group-append ms-2">
-                                                                    <input type="checkbox" id="public_website" class="public-toggle" data-target="website" name="public_website">
-                                                                    <label for="public_website" class="public-label ms-1">Public</label>
-                                                                </div>  
-                                                            </div>
-                                                            <div class="spacer-20"></div>
-                                                            <div class="input-group mb-2">
-                                                                <input type="text" name="whatsapp_link" id="whatsapp_link" class="form-control" placeholder="Enter WhatsApp Number or link " />
-                                                                <div class="input-group-append ms-2">
-                                                                    <input type="checkbox" id="public_whatsapp_link" class="public-toggle" data-target="whatsapp_link" name="public_whatsapp_link">
-                                                                    <label for="public_whatsapp_link" class="public-label ms-1">Public</label>
-                                                                </div>
-                                                            </div>
-                                                            <div class="spacer-20"></div>
-                                                            <div class="input-group mb-2">
-                                                                <input type="text" name="telegram_link" id="telegram_link" class="form-control" placeholder="Enter Telegram Link " />
-                                                                <div class="input-group-append ms-2">
-                                                                    <input type="checkbox" id="public_telegram_link" class="public-toggle" data-target="telegram_link" name="public_telegram_link">
-                                                                    <label for="public_telegram_link" class="public-label ms-1">Public</label>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="spacer-20"></div>
-
-
-                                                            <div class="input-group mb-2">
-                                                                <input type="text" name="twitter_username" id="twitter_username" class="form-control" placeholder="Enter Twitter username" />
-                                                                <div class="input-group-append ms-2">
-                                                                            <input type="checkbox" id="public_twitter_username" class="public-toggle" data-target="twitter_username" name="public_twitter_username">
-                                                                    <label for="public_twitter_username" class="public-label ms-1">Public</label>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="spacer-20"></div>
-
-
-
-                                                            <div class="input-group mb-2">
-                                                                <input type="text" name="instagram_username" id="instagram_username" class="form-control" placeholder="Enter Instagram username" />
-                                                                <div class="input-group-append ms-2">
-                                                                            <input type="checkbox" id="public_instagram_username" class="public-toggle" data-target="instagram_username" name="public_instagram_username">
-                                                                    <label for="public_instagram_username" class="public-label ms-1">Public</label>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="spacer-20"></div>
-
-
-                                                            <div class="input-group mb-2">
-                                                                <input type="text" name="youtube_username" id="youtube_username" class="form-control" placeholder="Enter YouTube Channel" />
-                                                                <div class="input-group-append ms-2">
-                                                                            <input type="checkbox" id="public_youtube_username" class="public-toggle" data-target="youtube_username" name="public_youtube_username">
-                                                                    <label for="public_youtube_username" class="public-label ms-1">Public</label>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="spacer-20"></div>
-
-
-                                                            <div class="input-group mb-2">
-                                                                <input type="text" name="linkedin_username" id="linkedin_username" class="form-control" placeholder="Enter LinkedIn URL" />
-                                                                <div class="input-group-append ms-2">
-                                                                            <input type="checkbox" id="public_linkedin_username" class="public-toggle" data-target="linkedin_username" name="public_linkedin_username">
-                                                                    <label for="public_linkedin_username" class="public-label ms-1">Public</label>
-                                                                </div>
-                                                            </div>
-
-                                                            <div class="spacer-20"></div>
-
-
-                                                            <div class="input-group mb-2">
-                                                                <input type="text" name="snapchat_username" id="snapchat_username" class="form-control" placeholder="Enter Snapchat username" />
-                                                                <div class="input-group-append ms-2">
-                                                                            <input type="checkbox" id="public_snapchat_username" class="public-toggle" data-target="snapchat_username" name="public_snapchat_username">
-                                                                    <label for="public_snapchat_username" class="public-label ms-1">Public</label>
-                                                                </div>
-                                                            </div>
-
+                                                        <!-- Follow button -->
+                                                        <div id="follow-btn-container" style="margin-bottom:10px;">
                                                         </div>
-                                                </div>
-                                                
-                                                <div id="sidebar" class="col-lg-4">
-                                                    <h5>Profile image <i class="fa fa-info-circle id-color-2" data-bs-toggle="tooltip" data-bs-placement="top" title="Recommend 400 x 400. Max size: 50MB. Click the image to upload."></i></h5>
+                                                        <input type="text" name="full_name" id="full_name"
+                                                            class="form-control" placeholder="Enter Full Name" />
 
-                                                    <img src="../assets/images/author_single/author_thumbnail.jpg" id="click_profile_img" class="d-profile-img-edit img-fluid" alt="">
-                                                    <input type="file" id="upload_profile_img"> 
+                                                        <div class="spacer-20"></div>
+
+
+                                                        <input type="text" name="phone_number" id="phone_number"
+                                                            class="form-control"
+                                                            placeholder="Enter your Phone Number" />
+
+
+
+                                                        <div class="spacer-20"></div>
+
+
+
+                                                        <input type="text" name="email_address" id="email_address"
+                                                            class="form-control" placeholder="Enter email" />
+
+
+
+                                                        <div class="spacer-20"></div>
+
+
+
+                                                        <input type="text" name="address" id="address"
+                                                            class="form-control" placeholder="Enter Address" />
+
+
+
+                                                        <div class="spacer-20"></div>
+
+
+                                                        <div class="input-group mb-2">
+                                                            <input type="text" name="website" id="website"
+                                                                class="form-control" placeholder="Enter Website URL" />
+                                                            <div class="input-group-append ms-2">
+                                                                <input type="checkbox" id="public_website"
+                                                                    class="public-toggle" data-target="website"
+                                                                    name="public_website">
+                                                                <label for="public_website"
+                                                                    class="public-label ms-1">Public</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="spacer-20"></div>
+                                                        <div class="input-group mb-2">
+                                                            <input type="text" name="whatsapp_link" id="whatsapp_link"
+                                                                class="form-control"
+                                                                placeholder="Enter WhatsApp Number or link " />
+                                                            <div class="input-group-append ms-2">
+                                                                <input type="checkbox" id="public_whatsapp_link"
+                                                                    class="public-toggle" data-target="whatsapp_link"
+                                                                    name="public_whatsapp_link">
+                                                                <label for="public_whatsapp_link"
+                                                                    class="public-label ms-1">Public</label>
+                                                            </div>
+                                                        </div>
+                                                        <div class="spacer-20"></div>
+                                                        <div class="input-group mb-2">
+                                                            <input type="text" name="telegram_link" id="telegram_link"
+                                                                class="form-control"
+                                                                placeholder="Enter Telegram Link " />
+                                                            <div class="input-group-append ms-2">
+                                                                <input type="checkbox" id="public_telegram_link"
+                                                                    class="public-toggle" data-target="telegram_link"
+                                                                    name="public_telegram_link">
+                                                                <label for="public_telegram_link"
+                                                                    class="public-label ms-1">Public</label>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="spacer-20"></div>
+
+
+                                                        <div class="input-group mb-2">
+                                                            <input type="text" name="twitter_username"
+                                                                id="twitter_username" class="form-control"
+                                                                placeholder="Enter Twitter username" />
+                                                            <div class="input-group-append ms-2">
+                                                                <input type="checkbox" id="public_twitter_username"
+                                                                    class="public-toggle" data-target="twitter_username"
+                                                                    name="public_twitter_username">
+                                                                <label for="public_twitter_username"
+                                                                    class="public-label ms-1">Public</label>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="spacer-20"></div>
+
+
+
+                                                        <div class="input-group mb-2">
+                                                            <input type="text" name="instagram_username"
+                                                                id="instagram_username" class="form-control"
+                                                                placeholder="Enter Instagram username" />
+                                                            <div class="input-group-append ms-2">
+                                                                <input type="checkbox" id="public_instagram_username"
+                                                                    class="public-toggle"
+                                                                    data-target="instagram_username"
+                                                                    name="public_instagram_username">
+                                                                <label for="public_instagram_username"
+                                                                    class="public-label ms-1">Public</label>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="spacer-20"></div>
+
+
+                                                        <div class="input-group mb-2">
+                                                            <input type="text" name="youtube_username"
+                                                                id="youtube_username" class="form-control"
+                                                                placeholder="Enter YouTube Channel" />
+                                                            <div class="input-group-append ms-2">
+                                                                <input type="checkbox" id="public_youtube_username"
+                                                                    class="public-toggle" data-target="youtube_username"
+                                                                    name="public_youtube_username">
+                                                                <label for="public_youtube_username"
+                                                                    class="public-label ms-1">Public</label>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="spacer-20"></div>
+
+
+                                                        <div class="input-group mb-2">
+                                                            <input type="text" name="linkedin_username"
+                                                                id="linkedin_username" class="form-control"
+                                                                placeholder="Enter LinkedIn URL" />
+                                                            <div class="input-group-append ms-2">
+                                                                <input type="checkbox" id="public_linkedin_username"
+                                                                    class="public-toggle"
+                                                                    data-target="linkedin_username"
+                                                                    name="public_linkedin_username">
+                                                                <label for="public_linkedin_username"
+                                                                    class="public-label ms-1">Public</label>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="spacer-20"></div>
+
+
+                                                        <div class="input-group mb-2">
+                                                            <input type="text" name="snapchat_username"
+                                                                id="snapchat_username" class="form-control"
+                                                                placeholder="Enter Snapchat username" />
+                                                            <div class="input-group-append ms-2">
+                                                                <input type="checkbox" id="public_snapchat_username"
+                                                                    class="public-toggle"
+                                                                    data-target="snapchat_username"
+                                                                    name="public_snapchat_username">
+                                                                <label for="public_snapchat_username"
+                                                                    class="public-label ms-1">Public</label>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+
+                                                <div id="sidebar" class="col-lg-4">
+                                                    <h5>Profile image <i class="fa fa-info-circle id-color-2"
+                                                            data-bs-toggle="tooltip" data-bs-placement="top"
+                                                            title="Recommend 400 x 400. Max size: 50MB. Click the image to upload."></i>
+                                                    </h5>
+
+                                                    <img src="../assets/images/author_single/author_thumbnail.jpg"
+                                                        id="click_profile_img" class="d-profile-img-edit img-fluid"
+                                                        alt="">
+                                                    <input type="file" id="upload_profile_img">
 
                                                     <div class="spacer-30"></div>
 
                                                     <h5>Profile banner </h5>
-                                                    <img src="" id="click_banner_img" class="d-banner-img-edit img-fluid" alt="">
-                                                     <?php
+                                                    <img src="" id="click_banner_img"
+                                                        class="d-banner-img-edit img-fluid" alt="">
+                                                    <?php
                                                         $qr_id_display = '';
                                                         if (isset($_GET['qr']) && $_GET['qr'] !== '') {
                                                                 $qr_id_display = $_GET['qr'];
@@ -351,139 +236,42 @@ $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type
                                                         }
                                                         if ($qr_id_display !== ''):
                                                     ?>
-                                                        <div id="public-qr-id" style="margin-top:10px; font-weight:bold; word-break:break-all;">QR ID: <?php echo htmlspecialchars($qr_id_display); ?></div>
+                                                    <div id="public-qr-id"
+                                                        style="margin-top:10px; font-weight:bold; word-break:break-all;">
+                                                        QR ID: <?php echo htmlspecialchars($qr_id_display); ?></div>
                                                     <?php endif; ?>
 
                                                     <?php if (empty($_GET['qr'])): ?>
-                                                        <div id="qr-color-controls">
-                                                            <div class="mt-3 mb-2">
-                                                                <label for="qr-color-dark" style="font-weight:600;">QR Foreground Color:</label>
-                                                                <input type="color" id="qr-color-dark" name="qr-color-dark" value="#000000" style="width:36px; height:36px; border:none; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.10); cursor:pointer; outline:none; transition:box-shadow 0.2s;">
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="qr-color-light" style="font-weight:600;">QR Background Color:</label>
-                                                                <input type="color" id="qr-color-light" name="qr-color-light" value="#ffffff" style="width:36px; height:36px; border:none; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.10); cursor:pointer; outline:none; transition:box-shadow 0.2s;">
-                                                            </div>
-                                                            <button type="button" class="btn btn-gradient d-flex align-items-center gap-2 shadow-sm px-4 py-2" id="save-qr-color" style="background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%); color: #fff; border: none; border-radius: 30px; font-weight: 600; font-size: 1rem; transition: box-shadow 0.2s;">
-                                                                <span>Save QR Colors</span>
-                                                            </button>
+                                                    <div id="qr-color-controls">
+                                                        <div class="mt-3 mb-2">
+                                                            <label for="qr-color-dark" style="font-weight:600;">QR
+                                                                Foreground Color:</label>
+                                                            <input type="color" id="qr-color-dark" name="qr-color-dark"
+                                                                value="#000000"
+                                                                style="width:36px; height:36px; border:none; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.10); cursor:pointer; outline:none; transition:box-shadow 0.2s;">
                                                         </div>
+                                                        <div class="mb-3">
+                                                            <label for="qr-color-light" style="font-weight:600;">QR
+                                                                Background Color:</label>
+                                                            <input type="color" id="qr-color-light"
+                                                                name="qr-color-light" value="#ffffff"
+                                                                style="width:36px; height:36px; border:none; border-radius:6px; box-shadow:0 2px 8px rgba(0,0,0,0.10); cursor:pointer; outline:none; transition:box-shadow 0.2s;">
+                                                        </div>
+                                                        <button type="button"
+                                                            class="btn btn-gradient d-flex align-items-center gap-2 shadow-sm px-4 py-2"
+                                                            id="save-qr-color"
+                                                            style="background: linear-gradient(90deg, #6a11cb 0%, #2575fc 100%); color: #fff; border: none; border-radius: 30px; font-weight: 600; font-size: 1rem; transition: box-shadow 0.2s;">
+                                                            <span>Save QR Colors</span>
+                                                        </button>
+                                                    </div>
                                                     <?php endif; ?>
-                                                </div>                                         
-                                            </div>
-                                        </div>
-
-                                        <div class="tab-2">
-                                            <div class="row wow fadeIn">
-                                                <div class="col-md-6 mb-sm-20">
-                                                    <div class="switch-with-title s2">
-                                                        <h5>Item Sold</h5>
-                                                        <div class="de-switch">
-                                                        <input type="checkbox" id="notif-item-sold" class="checkbox">
-                                                        <label for="notif-item-sold"></label>
-                                                        </div>
-                                                        <div class="clearfix"></div>
-                                                        <p class="p-info">When someone purhased your item.</p>
-                                                    </div>
-
-                                                    <div class="spacer-20"></div>
-
-                                                    <div class="switch-with-title s2">
-                                                        <h5>Bid Activity</h5>
-                                                        <div class="de-switch">
-                                                        <input type="checkbox" id="notif-bid-activity" class="checkbox">
-                                                        <label for="notif-bid-activity"></label>
-                                                        </div>
-                                                        <div class="clearfix"></div>
-                                                        <p class="p-info">When someone purhased your item.</p>
-                                                    </div>
-
-                                                    <div class="spacer-20"></div>
-
-                                                    <div class="switch-with-title s2">
-                                                        <h5>Price Change</h5>
-                                                        <div class="de-switch">
-                                                        <input type="checkbox" id="notif-price-change" class="checkbox">
-                                                        <label for="notif-price-change"></label>
-                                                        </div>
-                                                        <div class="clearfix"></div>
-                                                        <p class="p-info">When an item you made an offer on changes in price.</p>
-                                                    </div>
-
-                                                </div>
-
-                                                <div class="col-md-6">
-                                                    <div class="switch-with-title s2">
-                                                        <h5>Auction Expiration</h5>
-                                                        <div class="de-switch">
-                                                        <input type="checkbox" id="notif-auction-expiration" class="checkbox">
-                                                        <label for="notif-auction-expiration"></label>
-                                                        </div>
-                                                        <div class="clearfix"></div>
-                                                        <p class="p-info">When an auction you created ends.</p>
-                                                    </div>
-
-                                                    <div class="spacer-20"></div>
-
-                                                    <div class="switch-with-title s2">
-                                                        <h5>Outbid</h5>
-                                                        <div class="de-switch">
-                                                        <input type="checkbox" id="notif-outbid" class="checkbox">
-                                                        <label for="notif-outbid"></label>
-                                                        </div>
-                                                        <div class="clearfix"></div>
-                                                        <p class="p-info">When an offer you placed is exceeded by another user.</p>
-                                                    </div>
-
-                                                    <div class="spacer-20"></div>
-
-                                                    <div class="switch-with-title s2">
-                                                        <h5>Successful Purchase</h5>
-                                                        <div class="de-switch">
-                                                        <input type="checkbox" id="notif-successful-purchase" class="checkbox">
-                                                        <label for="notif-successful-purchase"></label>
-                                                        </div>
-                                                        <div class="clearfix"></div>
-                                                        <p class="p-info">When you successfully buy an item.</p>
-                                                    </div>
-
                                                 </div>
                                             </div>
                                         </div>
 
-                                        <div class="tab-3">
-                                            <div class="row wow fadeIn">
-                                                <div class="col-md-6 mb-sm-30">
-                                                    <h5>Language</h5>
-                                                    <p class="p-info">Select your prefered language.</p>
-                                                    <div id="select_lang" class="dropdown fullwidth">
-                                                        <a href="#" class="btn-selector">English</a>
-                                                        <ul>
-                                                            <li class="active"><span>English</span></li>
-                                                            <li><span>France</span></li>
-                                                            <li><span>German</span></li>
-                                                            <li><span>Japan</span></li>
-                                                            <li><span>Italy</span></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
 
-                                                <div class="col-md-6">
-                                                    <h5>Scheme</h5>
-                                                    <p class="p-info">Customize how Gigaland looks for you.</p>
-                                                    <div id="select_scheme" class="dropdown fullwidth">
-                                                        <a href="#" class="btn-selector">Default scheme</a>
-                                                        <ul>
-                                                            <li class="active"><span>Default scheme</span></li>
-                                                            <li><span>Light scheme</span></li>
-                                                            <li><span>Dark scheme</span></li>
-                                                            <li><span>Grey scheme</span></li>
-                                                            <li><span>Retro scheme</span></li>
-                                                        </ul>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
+
+
 
                                     </div>
                                 </div>
@@ -500,97 +288,12 @@ $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type
         <!-- content close -->
 
         <a href="#" id="back-to-top"></a>
-        
-        <!-- footer begin -->
-        <footer>
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-3 col-sm-6 col-xs-1">
-                        <div class="widget">
-                            <h5>Marketplace</h5>
-                            <ul>
-                                <li><a href="#">All NFTs</a></li>
-                                <li><a href="#">Art</a></li>
-                                <li><a href="#">Music</a></li>
-                                <li><a href="#">Domain Names</a></li>
-                                <li><a href="#">Virtual World</a></li>
-                                <li><a href="#">Collectibles</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-6 col-xs-1">
-                        <div class="widget">
-                            <h5>Resources</h5>
-                            <ul>
-                                <li><a href="#">Help Center</a></li>
-                                <li><a href="#">Partners</a></li>
-                                <li><a href="#">Suggestions</a></li>
-                                <li><a href="#">Discord</a></li>
-                                <li><a href="#">Docs</a></li>
-                                <li><a href="#">Newsletter</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-6 col-xs-1">
-                        <div class="widget">
-                            <h5>Community</h5>
-                            <ul>
-                                <li><a href="#">Community</a></li>
-                                <li><a href="#">Documentation</a></li>
-                                <li><a href="#">Brand Assets</a></li>
-                                <li><a href="#">Blog</a></li>
-                                <li><a href="#">Forum</a></li>
-                                <li><a href="#">Mailing List</a></li>
-                            </ul>
-                        </div>
-                    </div>
-                    <div class="col-md-3 col-sm-6 col-xs-1">
-                        <div class="widget">
-                            <h5>Newsletter</h5>
-                            <p>Signup for our newsletter to get the latest news in your inbox.</p>
-                            <form action="blank.php" class="row form-dark" id="form_subscribe" method="post" name="form_subscribe">
-                                <div class="col text-center">
-                                    <input class="form-control" id="txt_subscribe" name="txt_subscribe" placeholder="enter your email" type="text" /> <a href="#" id="btn-subscribe"><i class="arrow_right bg-color-secondary"></i></a>
-                                    <div class="clearfix"></div>
-                                </div>
-                            </form>
-                            <div class="spacer-10"></div>
-                            <small>Your email is safe with us. We don't spam.</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="subfooter">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="de-flex">
-                                <div class="de-flex-col">
-                                    <a href="03_grey-index.html">
-                                        <span class="copy">&copy; Copyright 2022 - Gigaland by FAWAZ</span>
-                                    </a>
-                                </div>
-                                <div class="de-flex-col">
-                                    <div class="social-icons">
-                                        <a href="#"><i class="fa fa-facebook fa-lg"></i></a>
-                                        <a href="#"><i class="fa fa-twitter fa-lg"></i></a>
-                                        <a href="#"><i class="fa fa-linkedin fa-lg"></i></a>
-                                        <a href="#"><i class="fa fa-pinterest fa-lg"></i></a>
-                                        <a href="#"><i class="fa fa-rss fa-lg"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </footer>
-        <!-- footer close -->
-        
+
+
     </div>
 
 
-    
+
     <!-- Javascript Files
     ================================================== -->
     <?php include('../components/jslinks.php'); ?>
