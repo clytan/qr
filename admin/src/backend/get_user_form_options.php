@@ -4,7 +4,7 @@ require_once('./dbconfig/connection.php');
 
 try {
     // Prepare slab query (no user input here, but good practice)
-    $slab_sql = "SELECT id, name FROM user_slab";
+    $slab_sql = "SELECT id, name FROM user_slab WHERE is_deleted=0";
     $slab_result = $conn->query($slab_sql);
 
     if (!$slab_result) {
@@ -17,7 +17,7 @@ try {
     }
 
     // Prepare user types query
-    $type_sql = "SELECT id, user_type_name FROM user_user_type";
+    $type_sql = "SELECT id, user_type_name FROM user_user_type WHERE is_deleted=0";
     $type_result = $conn->query($type_sql);
 
     if (!$type_result) {

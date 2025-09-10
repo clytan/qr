@@ -22,6 +22,7 @@ try {
             uu.sub_end_date,
             uu.referred_by_user_id
         FROM user_user uu
+        WHERE uu.is_deleted=0
         LEFT JOIN user_user_type uut ON uu.user_user_type = uut.id
         LEFT JOIN user_slab us ON uu.user_slab_id = us.id
     ";

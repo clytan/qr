@@ -25,7 +25,8 @@ try {
         sub_end_date = ?, 
         referred_by_user_id = ?, 
         user_tag = ? 
-        WHERE id = ?";
+        updated_on = NOW()
+        WHERE id = ? AND is_deleted=0" ;
 
     $stmt = $conn->prepare($sql);
 
