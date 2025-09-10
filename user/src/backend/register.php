@@ -175,6 +175,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	}
 
 	if ($success) {
+		// Invoice creation logic
+		// 1. Get registration amount from user_slab
+		$slab_id = $selected_slab !== '' ? $selected_slab : $default_slab_id;
+		$sqlSlab = "SELECT subscription_amount FROM user_slab WHERE id = ?";
+		$stmtSlab = $conn->prepare($sqlSlab);
+		$stmtSlab->bind_param('i', $slab_id);
+		$stmtSlab->execute();
+		$resultSlab = $stmtSlab->get_result();
+		$amount = 0;
+		if ($resultSlab->num_rows > 0) {
+			$rowSlab = $resultSlab->fetch_assoc();
+			$amount = floatval($rowSlab['subscription_amount']);
+		}
+		$stmtSlab->close();
+		// 2. Calculate GST (example: 18% split as 9% CGST, 9% SGST)
+		$cgst = $amount * 0.09;
+		$sgst = $amount * 0.09;
+		$igst = 0.00;
+		$gst_total = $cgst + $sgst + $igst;
+		$total_amount = $amount + $gst_total;
+		// 3. Generate invoice number (simple example)
+		$invoice_number = 'INV' . date('Ymd') . '-' . str_pad($user_id, 3, '0', STR_PAD_LEFT);
+		$order_number = 'ORD' . date('Ymd') . '-' . str_pad($user_id, 3, '0', STR_PAD_LEFT);
+		$status = 'Paid'; // or 'Pending' if you want to mark as unpaid
+		$now = date('Y-m-d H:i:s');
+		$sqlInvoice = "INSERT INTO user_invoice (user_id, invoice_number, invoice_type, amount, cgst, sgst, igst, gst_total, total_amount, status, payment_mode, payment_reference, created_on, updated_on, is_deleted) VALUES (?, ?, 'registration', ?, ?, ?, ?, ?, ?, ?, '', '', ?, ?, 0)";
+		$stmtInvoice = $conn->prepare($sqlInvoice);
+		$stmtInvoice->bind_param('issddddddsss', $user_id, $invoice_number, $amount, $cgst, $sgst, $igst, $gst_total, $total_amount, $status, $now, $now);
+		$stmtInvoice->execute();
+		$stmtInvoice->close();
 		echo json_encode(['status' => true, 'message' => 'Registration successful', 'data' => []]);
 		exit();
 	} else {
