@@ -57,6 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	}
 	$stmtCheck->close();
 
+
 	// Generate a 10-digit unique id for user_qr_id
 	do {
 		$user_qr_id = strval(mt_rand(1000000000, 9999999999));
@@ -98,7 +99,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		$sqlUpdate = "UPDATE user_user SET is_deleted = 0, user_email_verified = 1, created_by = ?, updated_by = ?, created_on = ?, updated_on = ? WHERE id = ?";
 		$stmtUpdate = $conn->prepare($sqlUpdate);
 		if ($stmtUpdate) {
-			$stmtUpdate->bind_param('isssi', $user_id, $user_id, $now, $now, $user_id);
+			$stmtUpdate->bind_param('sssss', $user_id, $user_id, $now, $now, $user_id);
 			$stmtUpdate->execute();
 			$stmtUpdate->close();
 		}
@@ -145,14 +146,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 					$wallet_id = $rowWallet['id'];
 					$sqlUpdateWallet = "UPDATE user_wallet SET balance = ?, updated_by = ?, updated_on = ? WHERE id = ?";
 					$stmtUpdateWallet = $conn->prepare($sqlUpdateWallet);
-					$stmtUpdateWallet->bind_param('disi', $new_balance, $referrer_id, $now, $wallet_id);
+					$stmtUpdateWallet->bind_param('diss', $new_balance, $referrer_id, $now, $wallet_id);
 					$stmtUpdateWallet->execute();
 					$stmtUpdateWallet->close();
 					error_log("Referral debug: Updated wallet for referrer_id=$referrer_id, new_balance=$new_balance");
 				} else {
 					$sqlInsertWallet = "INSERT INTO user_wallet (user_id, balance, created_by, created_on, updated_by, updated_on, is_deleted) VALUES (?, ?, ?, ?, ?, ?, 0)";
 					$stmtInsertWallet = $conn->prepare($sqlInsertWallet);
-					$stmtInsertWallet->bind_param('idisis', $referrer_id, $commission_amount, $referrer_id, $now, $referrer_id, $now);
+					$stmtInsertWallet->bind_param('idisss', $referrer_id, $commission_amount, $referrer_id, $now, $referrer_id, $now);
 					$stmtInsertWallet->execute();
 					$stmtInsertWallet->close();
 					error_log("Referral debug: Created wallet for referrer_id=$referrer_id, balance=$commission_amount, created_on=$now");
@@ -162,7 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 				$description = "You referred a new user and earned a commission.";
 				$sqlTrans = "INSERT INTO user_wallet_transaction (user_id, amount, transaction_type, description, created_by, updated_by, updated_on, is_deleted, created_on) VALUES (?, ?, 'Referral', ?, ?, ?, ?, 0, ?)";
 				$stmtTrans = $conn->prepare($sqlTrans);
-				$stmtTrans->bind_param('idssiiss', $referrer_id, $commission_amount, $description, $referrer_id, $referrer_id, $now, $now);
+				$stmtTrans->bind_param('idssiss', $referrer_id, $commission_amount, $description, $referrer_id, $referrer_id, $now, $now);
 				$stmtTrans->execute();
 				$stmtTrans->close();
 				error_log("Referral debug: Inserted transaction for referrer_id=$referrer_id, amount=$commission_amount, created_on=$now");
@@ -174,12 +175,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	}
 
 	if ($success) {
-		// Invoice creation logic - FIXED: Use a default amount since subscription_amount column doesn't exist
+		// Invoice creation logic
+		// 1. Get registration amount from user_slab
 		$slab_id = $selected_slab !== '' ? $selected_slab : $default_slab_id;
-
-		// Option 1: Use a default amount
-		$amount = 100.00; // Set your default registration amount here
-
+		$sqlSlab = "SELECT subscription_amount FROM user_slab WHERE id = ?";
+		$stmtSlab = $conn->prepare($sqlSlab);
+		$stmtSlab->bind_param('i', $slab_id);
+		$stmtSlab->execute();
+		$resultSlab = $stmtSlab->get_result();
+		$amount = 0;
+		if ($resultSlab->num_rows > 0) {
+			$rowSlab = $resultSlab->fetch_assoc();
+			$amount = floatval($rowSlab['subscription_amount']);
+		}
+		$stmtSlab->close();
 		// 2. Calculate GST (example: 18% split as 9% CGST, 9% SGST)
 		$cgst = $amount * 0.09;
 		$sgst = $amount * 0.09;
@@ -193,7 +202,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		$now = date('Y-m-d H:i:s');
 		$sqlInvoice = "INSERT INTO user_invoice (user_id, invoice_number, invoice_type, amount, cgst, sgst, igst, gst_total, total_amount, status, payment_mode, payment_reference, created_on, updated_on, is_deleted) VALUES (?, ?, 'registration', ?, ?, ?, ?, ?, ?, ?, '', '', ?, ?, 0)";
 		$stmtInvoice = $conn->prepare($sqlInvoice);
-		$stmtInvoice->bind_param('isddddddsss', $user_id, $invoice_number, $amount, $cgst, $sgst, $igst, $gst_total, $total_amount, $status, $now, $now);
+		$stmtInvoice->bind_param('issddddddsss', $user_id, $invoice_number, $amount, $cgst, $sgst, $igst, $gst_total, $total_amount, $status, $now, $now);
 		$stmtInvoice->execute();
 		$stmtInvoice->close();
 		echo json_encode(['status' => true, 'message' => 'Registration successful', 'data' => []]);

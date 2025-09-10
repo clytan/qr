@@ -26,7 +26,10 @@ if ($resultInvoice->num_rows > 0) {
     $stmtUser->execute();
     $resultUser = $stmtUser->get_result();
     $billed_to = [
-        'name' => '', 'address' => '', 'email' => '', 'phone' => ''
+        'name' => '',
+        'address' => '',
+        'email' => '',
+        'phone' => ''
     ];
     if ($resultUser->num_rows > 0) {
         $user = $resultUser->fetch_assoc();

@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const invoiceBox = document.getElementById('invoice-box');
     if (!invoiceBox) return;
 
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         <tbody>
                             ${invoice.items.map((item, i) => `
                                 <tr>
-                                    <td class="text-center">${String(i+1).padStart(2, '0')}</td>
+                                    <td class="text-center">${String(i + 1).padStart(2, '0')}</td>
                                     <td><strong>${item.name}</strong><br><span style="font-size:0.95em;color:#888;">${item.desc}</span></td>
                                     <td>₹ ${item.price.toFixed(2)}</td>
                                     <td class="text-center">${item.qty}</td>

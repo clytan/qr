@@ -88,113 +88,112 @@ if ($user_id) {
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <meta content="ZQR Invoice" name="description" />
     <style>
-        .invoice-box {
-            background: #fff;
-            border-radius: 8px;
-            padding: 32px 24px;
-            margin: 32px 0;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-            font-size: 16px;
-        }
+    .invoice-box {
+        background: #fff;
+        border-radius: 8px;
+        padding: 32px 24px;
+        margin: 32px 0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
+        font-size: 16px;
+    }
 
-        .invoice-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 16px;
-        }
+    .invoice-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 16px;
+    }
 
-        .invoice-title {
-            font-size: 2rem;
-            font-weight: 700;
-            color: #333;
-        }
+    .invoice-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #333;
+    }
 
-        .invoice-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
+    .invoice-status {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
 
-        .badge-paid {
-            background: #27ae60;
-            color: #fff;
-            border-radius: 4px;
-            padding: 4px 12px;
-            font-size: 1rem;
-        }
+    .badge-paid {
+        background: #27ae60;
+        color: #fff;
+        border-radius: 4px;
+        padding: 4px 12px;
+        font-size: 1rem;
+    }
 
-        .invoice-section {
-            margin-top: 24px;
-        }
+    .invoice-section {
+        margin-top: 24px;
+    }
 
-        .invoice-section strong {
-            font-size: 1.1rem;
-        }
+    .invoice-section strong {
+        font-size: 1.1rem;
+    }
 
-        .order-summary {
-            margin-top: 32px;
-        }
+    .order-summary {
+        margin-top: 32px;
+    }
 
-        .order-summary table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+    .order-summary table {
+        width: 100%;
+        border-collapse: collapse;
+    }
 
-        .order-summary th,
-        .order-summary td {
-            border-bottom: 1px solid #eee;
-            padding: 8px 6px;
-            text-align: left;
-        }
+    .order-summary th,
+    .order-summary td {
+        border-bottom: 1px solid #eee;
+        padding: 8px 6px;
+        text-align: left;
+    }
 
-        .order-summary th {
-            background: #fafafa;
-        }
+    .order-summary th {
+        background: #fafafa;
+    }
 
-        .order-summary tfoot td {
-            font-weight: 600;
-        }
+    .order-summary tfoot td {
+        font-weight: 600;
+    }
 
-        .text-right {
-            text-align: right;
-        }
+    .text-right {
+        text-align: right;
+    }
 
-        .text-center {
-            text-align: center;
-        }
+    .text-center {
+        text-align: center;
+    }
 
-        .mt-2 {
-            margin-top: 12px;
-        }
+    .mt-2 {
+        margin-top: 12px;
+    }
 
-        .mt-4 {
-            margin-top: 24px;
-        }
+    .mt-4 {
+        margin-top: 24px;
+    }
 
-        .btn {
-            display: inline-block;
-            padding: 8px 18px;
-            border-radius: 4px;
-            background: #27ae60;
-            color: #fff;
-            border: none;
-            font-size: 1rem;
-            cursor: pointer;
-            margin-right: 8px;
-        }
+    .btn {
+        display: inline-block;
+        padding: 8px 18px;
+        border-radius: 4px;
+        background: #27ae60;
+        color: #fff;
+        border: none;
+        font-size: 1rem;
+        cursor: pointer;
+        margin-right: 8px;
+    }
 
-        .btn-secondary {
-            background: #3498db;
-        }
+    .btn-secondary {
+        background: #3498db;
+    }
     </style>
     <?php include('../components/csslinks.php') ?>
 </head>
 
 <body class="dark-scheme de-grey">
     <div id="wrapper">
-        <?php include('../components/header.php') ?>
         <div class="no-bottom no-top" id="content">
             <div id="top"></div>
             <div class="container">
@@ -206,7 +205,6 @@ if ($user_id) {
             </div>
         </div>
     </div>
-    <?php include('../components/footer.php'); ?>
     </div>
     <?php include('../components/jslinks.php'); ?>
     <script src="custom_js/custom_invoice.js"></script>
