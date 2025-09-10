@@ -3,48 +3,50 @@ require('./dbconfig/connection.php');
 
 header('Content-Type: application/json');
 
-// Decode incoming JSON
+// Decode and sanitize incoming JSON
 $data = json_decode(file_get_contents("php://input"), true);
 
-// Sanitize and validate inputs
 $requestId = isset($data['id']) ? intval($data['id']) : 0;
 $userId = isset($data['user_id']) ? intval($data['user_id']) : 0;
 $status = isset($data['status']) ? trim($data['status']) : '';
 $comment = isset($data['comment']) ? trim($data['comment']) : '';
 
+// Validate input
 if (!in_array($status, ['Approved', 'Rejected']) || empty($comment) || !$requestId || !$userId) {
     echo json_encode(['success' => false, 'message' => 'Invalid input']);
     exit;
 }
 
-// Step 1: Update the user_request table
-$updateRequestQuery = "
+// Step 1: Update user_request table with status and comment
+$updateRequestSQL = "
     UPDATE user_request 
     SET status = ?, admin_comment = ?, updated_on = NOW()
     WHERE id = ? AND is_deleted = 0
 ";
-if ($stmt = $conn->prepare($updateRequestQuery)) {
+
+if ($stmt = $conn->prepare($updateRequestSQL)) {
     $stmt->bind_param("ssi", $status, $comment, $requestId);
     if (!$stmt->execute()) {
-        echo json_encode(['success' => false, 'message' => 'Failed to update request']);
+        echo json_encode(['success' => false, 'message' => 'Failed to update user request']);
         $stmt->close();
         exit;
     }
     $stmt->close();
 } else {
-    echo json_encode(['success' => false, 'message' => 'Database error: ' . $conn->error]);
+    echo json_encode(['success' => false, 'message' => 'Database prepare error (request update): ' . $conn->error]);
     exit;
 }
 
-// Step 2: If approved, update user_user slab
+// Step 2: If Approved, update user_user slab
 if ($status === 'Approved') {
-    // Get requested slab ID
-    $slabQuery = "
+    // Get requested_slab_id
+    $getSlabSQL = "
         SELECT requested_slab_id 
         FROM user_request 
         WHERE id = ? AND is_deleted = 0
     ";
-    if ($stmt = $conn->prepare($slabQuery)) {
+
+    if ($stmt = $conn->prepare($getSlabSQL)) {
         $stmt->bind_param("i", $requestId);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -56,33 +58,33 @@ if ($status === 'Approved') {
         }
 
         $row = $result->fetch_assoc();
-        $requestedSlabId = $row['requested_slab_id'];
+        $requestedSlabId = intval($row['requested_slab_id']);
         $stmt->close();
+    } else {
+        echo json_encode(['success' => false, 'message' => 'Database prepare error (get slab): ' . $conn->error]);
+        exit;
+    }
 
-        // Update user slab
-        $updateUserQuery = "
-            UPDATE user_user 
-            SET user_slab_id = ?, updated_on = NOW() 
-            WHERE id = ? AND is_deleted = 0
-        ";
-        if ($stmt = $conn->prepare($updateUserQuery)) {
-            $stmt->bind_param("ii", $requestedSlabId, $userId);
-            if (!$stmt->execute()) {
-                echo json_encode(['success' => false, 'message' => 'Failed to update user slab']);
-                $stmt->close();
-                exit;
-            }
+    // Update user slab in user_user table
+    $updateUserSQL = "
+        UPDATE user_user 
+        SET user_slab_id = ?, updated_on = NOW()
+        WHERE id = ? AND is_deleted = 0
+    ";
+
+    if ($stmt = $conn->prepare($updateUserSQL)) {
+        $stmt->bind_param("ii", $requestedSlabId, $userId);
+        if (!$stmt->execute()) {
+            echo json_encode(['success' => false, 'message' => 'Failed to update user slab']);
             $stmt->close();
-        } else {
-            echo json_encode(['success' => false, 'message' => 'Database error: ' . $conn->error]);
             exit;
         }
-
+        $stmt->close();
     } else {
-        echo json_encode(['success' => false, 'message' => 'Database error: ' . $conn->error]);
+        echo json_encode(['success' => false, 'message' => 'Database prepare error (user update): ' . $conn->error]);
         exit;
     }
 }
 
-// Final response
+// Success response
 echo json_encode(['success' => true]);
