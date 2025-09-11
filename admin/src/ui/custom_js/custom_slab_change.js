@@ -72,6 +72,7 @@ var userSlabRequestManager = {
             const action = $(this).data('action');
             const statusText = action === 'approve' ? 'Approve' : 'Reject';
             const swalIcon = action === 'approve' ? 'question' : 'warning';
+            const adminId = $('#admin_user_id').val();
 
             Swal.fire({
                 title: `Confirm ${statusText}`,
@@ -100,7 +101,8 @@ var userSlabRequestManager = {
                             id: requestId,
                             user_id: userId,
                             status: action === 'approve' ? 'Approved' : 'Rejected',
-                            comment: comment
+                            comment: comment,
+                            admin_id:adminId
                         })
                     })
                         .then(response => response.json())

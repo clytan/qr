@@ -1,7 +1,3 @@
-<?php 
-    session_start();
-    $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : '';
-?>
 <!DOCTYPE html>
 <html lang="en">
 <?php include('../components/head.php') ?>
@@ -58,26 +54,26 @@
             Content body start
         ***********************************-->
         <div class="content-body">
-            <div class="container-fluid">
-              <input type="hidden" id="admin_user_id" value="<?php echo htmlspecialchars($user_id); ?>">
-              <h4 class="mb-4">Slab Change Request List</h4>
-              <table id="userTable" class="table table-hover table-bordered table-striped align-middle">
+        <div class="container-fluid">
+            <input type="hidden" id="admin_user_id" value="<?php echo htmlspecialchars($user_id); ?>">
+            <h4 class="mb-4">Invoice List</h4>
+            <table id="ordersTable" class="table table-hover table-bordered table-striped align-middle">
                 <thead class="table-primary">
-                  <tr>
-                    <th>Id</th>
-                    <th>Full Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>User QR ID</th>
-                    <th>Current Slab</th>
-                    <th>Requested Slab</th>
-                    <th class="text-center">Options</th>
-                  </tr>
+                    <tr>
+                        <th>ID</th>
+                        <th>Full Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>QR ID</th>
+                        <th>Invoice Type</th>
+                        <th>Invoice Number</th>
+                        <th>Amount</th>
+                        <th>Status</th>
+                    </tr>
                 </thead>
                 <tbody></tbody>
-              </table>
-            </div>
-
+            </table>
+        </div>
         </div>
 
         <!--**********************************
@@ -109,10 +105,7 @@
     ***********************************-->
     <!-- Required vendors -->
     <?php include('../components/scripts.php') ?>
-    <script src="./custom_js/custom_slab_change.js"></script>
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
+    <script src="./custom_js/custom_orders.js"></script>
 
 </body>
 

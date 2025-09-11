@@ -1,3 +1,7 @@
+<?php 
+    session_start();
+    $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : '';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <?php include('../components/head.php') ?>
@@ -55,6 +59,7 @@
         ***********************************-->
         <div class="content-body">
             <div class="container-fluid">
+                <input type="hidden" id="admin_user_id" value="<?php echo htmlspecialchars($user_id); ?>">
                 <h4 class="mb-4">User List</h4>
                 <table id="userTable" class="table table-hover table-bordered table-striped align-middle">
                     <thead class="table-primary">

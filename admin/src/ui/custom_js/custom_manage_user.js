@@ -180,12 +180,20 @@ var userManager = {
 
         $('#saveProfileBtn').addClass('d-none');
         $('#editProfileBtn').html('<i class="fas fa-edit me-1"></i> Edit Profile');
+        
+        const adminId = $('#admin_user_id').val();
+
+        // 👇 Prepare data to send including admin ID
+        const requestData = Object.assign(
+            { id: this.currentUser.id, admin_id: adminId },
+            this.getUpdatedData()
+        );
 
         // AJAX call to save updated data
         $.ajax({
           url: '../backend/save_user_details.php',
           method: 'POST',
-          data: Object.assign({ id: this.currentUser.id }, this.getUpdatedData()),
+          data: requestData,
           dataType: 'json',  // explicitly expect JSON response
           success: (res) => {
               if (res.status) {
