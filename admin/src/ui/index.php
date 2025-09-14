@@ -1,3 +1,7 @@
+<?php 
+    session_start();
+    $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : '';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <?php include('../components/head.php') ?>
