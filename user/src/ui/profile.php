@@ -56,7 +56,7 @@ $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type
                                                         <input type="text" name="full_name" id="full_name"
                                                             class="form-control" placeholder="Enter Full Name" />
 
-                                                        <div class="spacer-20"></div>
+
 
 
                                                         <input type="text" name="phone_number" id="phone_number"
@@ -65,7 +65,7 @@ $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type
 
 
 
-                                                        <div class="spacer-20"></div>
+
 
 
 
@@ -74,7 +74,7 @@ $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type
 
 
 
-                                                        <div class="spacer-20"></div>
+
 
 
 
@@ -83,7 +83,7 @@ $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type
 
 
 
-                                                        <div class="spacer-20"></div>
+
 
 
                                                         <div class="input-group mb-2">
@@ -97,7 +97,7 @@ $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type
                                                                     class="public-label ms-1">Public</label>
                                                             </div>
                                                         </div>
-                                                        <div class="spacer-20"></div>
+
                                                         <div class="input-group mb-2">
                                                             <input type="text" name="whatsapp_link" id="whatsapp_link"
                                                                 class="form-control"
@@ -110,7 +110,7 @@ $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type
                                                                     class="public-label ms-1">Public</label>
                                                             </div>
                                                         </div>
-                                                        <div class="spacer-20"></div>
+
                                                         <div class="input-group mb-2">
                                                             <input type="text" name="telegram_link" id="telegram_link"
                                                                 class="form-control"
@@ -124,7 +124,7 @@ $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type
                                                             </div>
                                                         </div>
 
-                                                        <div class="spacer-20"></div>
+
 
 
                                                         <div class="input-group mb-2">
@@ -140,7 +140,7 @@ $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type
                                                             </div>
                                                         </div>
 
-                                                        <div class="spacer-20"></div>
+
 
 
 
@@ -158,7 +158,7 @@ $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type
                                                             </div>
                                                         </div>
 
-                                                        <div class="spacer-20"></div>
+
 
 
                                                         <div class="input-group mb-2">
@@ -174,7 +174,7 @@ $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type
                                                             </div>
                                                         </div>
 
-                                                        <div class="spacer-20"></div>
+
 
 
                                                         <div class="input-group mb-2">
@@ -191,7 +191,7 @@ $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type
                                                             </div>
                                                         </div>
 
-                                                        <div class="spacer-20"></div>
+
 
 
                                                         <div class="input-group mb-2">
