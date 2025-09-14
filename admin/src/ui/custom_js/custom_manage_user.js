@@ -4,6 +4,7 @@ var userManager = {
     currentUser: null,
     isEditing: false,
     table: null,
+
     fieldMap: [
         { display: "#modalFullNameDisplay", input: "#modalFullNameInput", key: "user_full_name" },
         { display: "#modalPhoneDisplay", input: "#modalPhoneInput", key: "user_phone" },
@@ -18,45 +19,45 @@ var userManager = {
         { display: "#modalTagDisplay", input: "#modalTagInput", key: "user_tag" }
     ],
 
-    init: function() {
+    init: function () {
         this.loadDropdownOptions();
         this.initDataTable();
         this.bindEvents();
     },
 
-    loadDropdownOptions: function() {
-      var self = this;
-      $.getJSON('../backend/get_user_form_options.php', function(data) {
-          if (data.status) {
-              self.slabOptions = data.slabs;
-              self.userTypeOptions = data.types;
-          } else {
-              alert('Failed to load options: ' + (data.message || 'Unknown error'));
-          }
-      }).fail(function(jqxhr, textStatus, error) {
-          alert('Error loading options: ' + error);
-      });
+    loadDropdownOptions: function () {
+        var self = this;
+        $.getJSON('../backend/get_user_form_options.php', function (data) {
+            if (data.status) {
+                self.slabOptions = data.slabs;
+                self.userTypeOptions = data.types;
+            } else {
+                alert('Failed to load options: ' + (data.message || 'Unknown error'));
+            }
+        }).fail(function (jqxhr, textStatus, error) {
+            alert('Error loading options: ' + error);
+        });
     },
 
-    initDataTable: function() {
+    initDataTable: function () {
         var self = this;
         this.table = $('#userTable').DataTable({
             ajax: {
                 url: '../backend/get_users_details.php',
-                dataSrc: function(json) {
+                dataSrc: function (json) {
                     if (json.status) {
-                        return json.data; // return the user array if successful
+                        return json.data;
                     } else {
                         alert(json.message || 'Failed to load user data');
-                        return []; // return empty array to show no data
+                        return [];
                     }
                 }
             },
             columns: [
                 {
                     data: 'id',
-                    render: function(data, type, row) {
-                        return `<a href="#" class="user-id" data-user='${JSON.stringify(row)}'>${data}</a>`;
+                    render: function (data, type, row) {
+                        return `<a href="#" class="user-id">${data}</a>`;
                     }
                 },
                 { data: 'user_full_name' },
@@ -78,26 +79,32 @@ var userManager = {
         });
     },
 
-    bindEvents: function() {
+    bindEvents: function () {
         var self = this;
 
-        $('#userTable tbody').on('click', '.user-id', function(e) {
+        $('#userTable tbody').on('click', '.user-id', function (e) {
             e.preventDefault();
-            self.currentUser = $(this).data('user');
+            const rowData = self.table.row($(this).parents('tr')).data();
+            if (!rowData) {
+                console.warn('Could not find row data. Possibly a responsive child row.');
+                return;
+            }
+
+            self.currentUser = rowData;
             self.fillModalFields();
             $('#userModal').modal('show');
         });
 
-        $('#editProfileBtn').on('click', function() {
+        $('#editProfileBtn').on('click', function () {
             self.toggleEditMode();
         });
 
-        $('#saveProfileBtn').on('click', function() {
+        $('#saveProfileBtn').on('click', function () {
             self.saveProfile();
         });
     },
 
-    fillModalFields: function() {
+    fillModalFields: function () {
         var self = this;
         this.fieldMap.forEach(({ display, input, key }) => {
             let value = self.currentUser[key] || '';
@@ -123,13 +130,24 @@ var userManager = {
                 $(input).prop('checked', isVerified);
                 $(display).text(isVerified ? 'Yes' : 'No');
 
-            } else {
-                if (key === 'sub_end_date' && value) {
-                    const formattedDate = new Date(value).toISOString().split('T')[0];
-                    $(input).val(formattedDate);
+            } else if (key === 'sub_end_date') {
+                if (value && value !== '0000-00-00') {
+                    const date = new Date(value);
+                    if (!isNaN(date.getTime())) {
+                        const formattedDate = date.toISOString().split('T')[0];
+                        $(input).val(formattedDate);
+                        $(display).text(formattedDate);
+                    } else {
+                        $(input).val('');
+                        $(display).text('');
+                    }
                 } else {
-                    $(input).val(value);
+                    $(input).val('');
+                    $(display).text('');
                 }
+
+            } else {
+                $(input).val(value);
                 $(display).text(value);
             }
         });
@@ -138,7 +156,7 @@ var userManager = {
         $('#profileImage').attr('src', imagePath);
     },
 
-    toggleEditMode: function() {
+    toggleEditMode: function () {
         this.isEditing = !this.isEditing;
 
         this.fieldMap.forEach(({ display, input }) => {
@@ -153,10 +171,9 @@ var userManager = {
             : '<i class="fas fa-edit me-1"></i> Edit Profile');
     },
 
-    saveProfile: function() {
+    saveProfile: function () {
         var self = this;
 
-        // Update display with input values
         this.fieldMap.forEach(({ display, input, key }) => {
             let displayValue = '';
 
@@ -164,6 +181,14 @@ var userManager = {
                 displayValue = $(input).find('option:selected').text();
             } else if (key === 'user_email_verified') {
                 displayValue = $(input).prop('checked') ? 'Yes' : 'No';
+            } else if (key === 'sub_end_date') {
+                const rawDate = $(input).val();
+                const date = new Date(rawDate);
+                if (rawDate && !isNaN(date.getTime())) {
+                    displayValue = date.toISOString().split('T')[0];
+                } else {
+                    displayValue = '';
+                }
             } else {
                 displayValue = $(input).val();
             }
@@ -171,46 +196,34 @@ var userManager = {
             $(display).text(displayValue);
         });
 
-        // Switch off edit mode
-        this.isEditing = false;
-        this.fieldMap.forEach(({ display, input }) => {
-            $(display).removeClass('d-none');
-            $(input).addClass('d-none');
-        });
+        this.toggleEditMode();
 
-        $('#saveProfileBtn').addClass('d-none');
-        $('#editProfileBtn').html('<i class="fas fa-edit me-1"></i> Edit Profile');
-        
         const adminId = $('#admin_user_id').val();
-
-        // 👇 Prepare data to send including admin ID
         const requestData = Object.assign(
             { id: this.currentUser.id, admin_id: adminId },
             this.getUpdatedData()
         );
 
-        // AJAX call to save updated data
         $.ajax({
-          url: '../backend/save_user_details.php',
-          method: 'POST',
-          data: requestData,
-          dataType: 'json',  // explicitly expect JSON response
-          success: (res) => {
-              if (res.status) {
-                  alert(res.message || 'User updated successfully');
-                  this.table.ajax.reload();
-              } else {
-                  alert('Update failed: ' + (res.message || 'Unknown error'));
-              }
-          },
-          error: (xhr, status, error) => {
-              alert('An error occurred: ' + error);
-          }
-      });
-
+            url: '../backend/save_user_details.php',
+            method: 'POST',
+            data: requestData,
+            dataType: 'json',
+            success: (res) => {
+                if (res.status) {
+                    alert(res.message || 'User updated successfully');
+                    this.table.ajax.reload(null, false);
+                } else {
+                    alert('Update failed: ' + (res.message || 'Unknown error'));
+                }
+            },
+            error: (xhr, status, error) => {
+                alert('An error occurred: ' + error);
+            }
+        });
     },
 
-    getUpdatedData: function() {
+    getUpdatedData: function () {
         var data = {};
 
         this.fieldMap.forEach(({ input, key }) => {
@@ -218,6 +231,10 @@ var userManager = {
                 data[key] = $(input).find('option:selected').val();
             } else if (key === 'user_email_verified') {
                 data[key] = $(input).prop('checked') ? 1 : 0;
+            } else if (key === 'sub_end_date') {
+                const rawDate = $(input).val();
+                const date = new Date(rawDate);
+                data[key] = (rawDate && !isNaN(date.getTime())) ? date.toISOString().split('T')[0] : '';
             } else {
                 data[key] = $(input).val();
             }
@@ -227,7 +244,6 @@ var userManager = {
     }
 };
 
-
-$(document).ready(function() {
-  userManager.init();
+$(document).ready(function () {
+    userManager.init();
 });
