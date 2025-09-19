@@ -20,10 +20,16 @@ try {
             uu.user_address,
             us.name AS user_slab_id, 
             uu.sub_end_date,
-            uu.referred_by_user_id
+            uu.referred_by_user_id,
+            uuc.user_full_name AS created_by,
+            uu.created_on,
+            uup.user_full_name AS updated_by,
+            uu.updated_on
         FROM user_user uu
         LEFT JOIN user_user_type uut ON uu.user_user_type = uut.id
         LEFT JOIN user_slab us ON uu.user_slab_id = us.id
+        LEFT JOIN user_user uuc ON uu.created_by = uuc.id
+        LEFT JOIN user_user uup ON uu.updated_by = uup.id
         WHERE uu.is_deleted=0
     ";
 
