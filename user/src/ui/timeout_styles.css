@@ -1,0 +1,11 @@
+.user-status.timeout {
+    background: rgba(255, 152, 0, 0.1);
+    color: #ff9800;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid rgba(255, 152, 0, 0.2);
+}
