@@ -57,6 +57,7 @@
         <div class="container-fluid">
             <input type="hidden" id="admin_user_id" value="<?php echo htmlspecialchars($user_id); ?>">
             <h4 class="mb-4">Invoice List</h4>
+            <div id="ordersTableControls" style="display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 8px;"></div>
             <table id="ordersTable" class="table table-hover table-bordered table-striped align-middle">
                 <thead class="table-primary">
                     <tr>
@@ -73,6 +74,25 @@
                 </thead>
                 <tbody></tbody>
             </table>
+
+            <!-- Export Columns Modal -->
+            <div class="modal fade" id="exportOrdersColumnsModal" tabindex="-1" aria-labelledby="exportOrdersColumnsModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title fw-bold" id="exportOrdersColumnsModalLabel">Select Columns to Export</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body" id="exportOrdersColumnSelectorModal">
+                            <!-- JS will dynamically insert checkboxes here -->
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="button" class="btn btn-primary" id="exportOrdersSelectedBtnModal">Export Selected</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         </div>
 
