@@ -11,7 +11,7 @@ function closeReportModal() {
 
 function submitReport(event) {
     event.preventDefault();
-    
+
     const messageId = document.getElementById('reportMessageId').value;
     const reason = document.getElementById('reportReason').value;
 
@@ -25,17 +25,17 @@ function submitReport(event) {
             reason: reason
         })
     })
-    .then(response => response.json())
-    .then(data => {
-        if (data.status) {
-            alert('Message reported successfully');
-            closeReportModal();
-        } else {
-            alert(data.message || 'Failed to report message');
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Failed to report message');
-    });
+        .then(response => response.json())
+        .then(data => {
+            if (data.status) {
+                alert('Message reported successfully');
+                closeReportModal();
+            } else {
+                alert(data.message || 'Failed to report message');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to report message');
+        });
 }

@@ -25,11 +25,11 @@ switch ($action) {
             echo json_encode(['status' => false, 'message' => 'Missing timeout parameters']);
             exit();
         }
-        
+
         $duration = intval($data['duration']); // duration in minutes
         $reason = $data['reason'];
         $end_time = date('Y-m-d H:i:s', strtotime("+{$duration} minutes"));
-        
+
         $sql = "INSERT INTO user_penalties (user_id, community_id, penalty_type, reason, end_time, applied_by) 
                 VALUES (?, ?, 'timeout', ?, ?, ?)";
         $stmt = $conn->prepare($sql);
@@ -41,9 +41,9 @@ switch ($action) {
             echo json_encode(['status' => false, 'message' => 'Missing ban reason']);
             exit();
         }
-        
+
         $reason = $data['reason'];
-        
+
         $sql = "INSERT INTO user_penalties (user_id, community_id, penalty_type, reason, applied_by) 
                 VALUES (?, ?, 'ban', ?, ?)";
         $stmt = $conn->prepare($sql);

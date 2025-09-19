@@ -18,604 +18,604 @@ $user_id = $_SESSION['user_id'];
     <meta content="ZQR Community" name="description" />
     <?php include('../components/csslinks.php') ?>
     <style>
-    /* Reddit-like styles */
-    :root {
-        --reddit-bg: #1A1A1B;
-        --reddit-card: #272729;
-        --reddit-accent: #8364E2;
-        --reddit-text: #D7DADC;
-        --reddit-border: #343536;
-        --reddit-hover: #2D2D2E;
-    }
+        /* Reddit-like styles */
+        :root {
+            --reddit-bg: #1A1A1B;
+            --reddit-card: #272729;
+            --reddit-accent: #8364E2;
+            --reddit-text: #D7DADC;
+            --reddit-border: #343536;
+            --reddit-hover: #2D2D2E;
+        }
 
-    .btn-attachment {
-        padding: 8px;
-        cursor: pointer;
-        color: var(--reddit-text);
-        transition: color 0.2s ease;
-        opacity: 0.8;
-    }
+        .btn-attachment {
+            padding: 8px;
+            cursor: pointer;
+            color: var(--reddit-text);
+            transition: color 0.2s ease;
+            opacity: 0.8;
+        }
 
-    .btn-attachment:hover {
-        opacity: 1;
-    }
+        .btn-attachment:hover {
+            opacity: 1;
+        }
 
-    .attachment-preview {
-        padding: 8px 12px;
-        background: var(--reddit-hover);
-        border: 1px solid var(--reddit-border);
-        border-radius: 4px;
-        margin-top: 8px;
-    }
+        .attachment-preview {
+            padding: 8px 12px;
+            background: var(--reddit-hover);
+            border: 1px solid var(--reddit-border);
+            border-radius: 4px;
+            margin-top: 8px;
+        }
 
-    .preview-content {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        font-size: 0.9em;
-    }
+        .preview-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.9em;
+        }
 
-    .btn-remove {
-        background: none;
-        border: none;
-        color: rgba(255, 255, 255, 0.7);
-        cursor: pointer;
-        font-size: 1.2em;
-        padding: 0 5px;
-    }
+        .btn-remove {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            font-size: 1.2em;
+            padding: 0 5px;
+        }
 
-    .btn-remove:hover {
-        color: white;
-    }
+        .btn-remove:hover {
+            color: white;
+        }
 
-    .message-attachment {
-        margin-top: 8px;
-        width: 100%;
-        max-width: 450px;
-        border-radius: 4px;
-        overflow: hidden;
-    }
-
-    .message-attachment.file {
-        padding: 8px;
-        background: var(--reddit-hover);
-        border: 1px solid var(--reddit-border);
-        border-radius: 4px;
-        width: auto;
-    }
-
-    .message-attachment img {
-        width: 100%;
-        height: 250px;
-        /* Fixed height */
-        object-fit: contain;
-        /* Maintain aspect ratio */
-        background: var(--reddit-bg);
-        border-radius: 4px;
-        border: 1px solid var(--reddit-border);
-    }
-
-    @media (max-width: 768px) {
         .message-attachment {
-            max-width: 100%;
+            margin-top: 8px;
+            width: 100%;
+            max-width: 450px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .message-attachment.file {
+            padding: 8px;
+            background: var(--reddit-hover);
+            border: 1px solid var(--reddit-border);
+            border-radius: 4px;
+            width: auto;
         }
 
         .message-attachment img {
-            height: 200px;
-            /* Slightly smaller height on mobile */
+            width: 100%;
+            height: 250px;
+            /* Fixed height */
+            object-fit: contain;
+            /* Maintain aspect ratio */
+            background: var(--reddit-bg);
+            border-radius: 4px;
+            border: 1px solid var(--reddit-border);
         }
-    }
 
-    .message-attachment a {
-        color: #8364E2;
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        font-size: 0.9em;
-    }
+        @media (max-width: 768px) {
+            .message-attachment {
+                max-width: 100%;
+            }
 
-    .message-attachment i {
-        margin-right: 5px;
-    }
+            .message-attachment img {
+                height: 200px;
+                /* Slightly smaller height on mobile */
+            }
+        }
 
-    .message-footer {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin-top: 8px;
-        padding-top: 8px;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
-        font-size: 0.9em;
-    }
+        .message-attachment a {
+            color: #8364E2;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            font-size: 0.9em;
+        }
 
-    .reactions-group {
-        display: flex;
-        gap: 6px;
-    }
+        .message-attachment i {
+            margin-right: 5px;
+        }
 
-    .btn-reaction {
-        background: rgba(255, 255, 255, 0.08);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        padding: 6px 12px;
-        border-radius: 20px;
-        color: rgba(255, 255, 255, 0.7);
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        transition: all 0.2s ease;
-        font-size: 0.9em;
-        backdrop-filter: blur(5px);
-    }
+        .message-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 0.9em;
+        }
 
-    .btn-reaction:hover {
-        background: rgba(255, 255, 255, 0.15);
-        color: white;
-        transform: translateY(-1px);
-    }
+        .reactions-group {
+            display: flex;
+            gap: 6px;
+        }
 
-    .btn-reaction.active {
-        background: linear-gradient(135deg, #8364E2 0%, #6F4ED4 100%);
-        color: white;
-        border-color: transparent;
-        box-shadow: 0 2px 4px rgba(131, 100, 226, 0.3);
-    }
+        .btn-reaction {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 6px 12px;
+            border-radius: 20px;
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+            font-size: 0.9em;
+            backdrop-filter: blur(5px);
+        }
 
-    .btn-reaction i {
-        font-size: 0.9em;
-    }
+        .btn-reaction:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            transform: translateY(-1px);
+        }
 
-    .reaction-count {
-        font-weight: 600;
-        min-width: 20px;
-        text-align: center;
-    }
+        .btn-reaction.active {
+            background: linear-gradient(135deg, #8364E2 0%, #6F4ED4 100%);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 2px 4px rgba(131, 100, 226, 0.3);
+        }
 
-    .timestamp {
-        margin-top: 8px;
-        margin-left: 15px;
-        font-size: 0.8em;
-        color: rgba(255, 255, 255, 0.5);
-    }
+        .btn-reaction i {
+            font-size: 0.9em;
+        }
 
-    .community-tabs {
-        overflow-x: auto;
-        white-space: nowrap;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: thin;
-        -ms-overflow-style: auto;
-        padding: 15px 0;
-        margin-bottom: -5px;
-        /* Compensate for scrollbar space */
-    }
+        .reaction-count {
+            font-weight: 600;
+            min-width: 20px;
+            text-align: center;
+        }
 
-    .community-tabs::-webkit-scrollbar {
-        height: 4px;
-        display: block;
-    }
+        .timestamp {
+            margin-top: 8px;
+            margin-left: 15px;
+            font-size: 0.8em;
+            color: rgba(255, 255, 255, 0.5);
+        }
 
-    .community-tabs::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 2px;
-    }
-
-    .community-tabs::-webkit-scrollbar-thumb {
-        background: rgba(131, 100, 226, 0.3);
-        border-radius: 2px;
-        transition: background 0.2s ease;
-    }
-
-    .community-tabs::-webkit-scrollbar-thumb:hover {
-        background: rgba(131, 100, 226, 0.5);
-    }
-
-    .community-tab {
-        display: inline-block;
-        padding: 10px 20px;
-        margin: 0 5px;
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 8px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .community-tab.active {
-        background: #8364E2;
-        color: white;
-    }
-
-    .chat-container {
-        height: calc(100vh - 200px);
-        min-height: 400px;
-        background: var(--reddit-bg);
-        border: 1px solid var(--reddit-border);
-        border-radius: 4px;
-        margin: 20px 0;
-        display: flex;
-        flex-direction: column;
-    }
-
-    .chat-messages {
-        flex-grow: 1;
-        overflow-y: auto;
-        padding: 16px;
-        scrollbar-width: thin;
-        scrollbar-color: rgba(131, 100, 226, 0.3) transparent;
-        -ms-overflow-style: auto;
-    }
-
-    /* Webkit scrollbar styling (Chrome, Safari, newer Edge) */
-    .chat-messages::-webkit-scrollbar {
-        width: 4px;
-        display: block;
-    }
-
-    .chat-messages::-webkit-scrollbar-track {
-        background: transparent;
-    }
-
-    .chat-messages::-webkit-scrollbar-thumb {
-        background: rgba(131, 100, 226, 0.3);
-        border-radius: 4px;
-        transition: background 0.2s ease;
-    }
-
-    .chat-messages::-webkit-scrollbar-thumb:hover {
-        background: rgba(131, 100, 226, 0.5);
-    }
-
-    /* Firefox scrollbar styling */
-    @supports (scrollbar-color: auto) {
-        .chat-messages {
+        .community-tabs {
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
             scrollbar-width: thin;
-            scrollbar-color: rgba(131, 100, 226, 0.3) transparent;
+            -ms-overflow-style: auto;
+            padding: 15px 0;
+            margin-bottom: -5px;
+            /* Compensate for scrollbar space */
         }
-    }
 
-    /* For Edge support */
-    @supports (-ms-overflow-style: none) {
-        .chat-messages {
-            -ms-overflow-style: -ms-autohiding-scrollbar;
+        .community-tabs::-webkit-scrollbar {
+            height: 4px;
+            display: block;
         }
-    }
 
-    .message {
-        margin: 8px 0;
-        padding: 12px;
-        border-radius: 4px;
-        width: fit-content;
-        max-width: min(600px, 80%);
-        background: var(--reddit-card);
-        border: 1px solid var(--reddit-border);
-        transition: background 0.2s ease;
-    }
+        .community-tabs::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+        }
 
-    .message:hover {
-        background: var(--reddit-hover);
-    }
+        .community-tabs::-webkit-scrollbar-thumb {
+            background: rgba(131, 100, 226, 0.3);
+            border-radius: 2px;
+            transition: background 0.2s ease;
+        }
 
-    .message.sent {
-        margin-left: auto;
-        background: var(--reddit-card);
-    }
+        .community-tabs::-webkit-scrollbar-thumb:hover {
+            background: rgba(131, 100, 226, 0.5);
+        }
 
-    .message.received {
-        margin-right: auto;
-        background: var(--reddit-card);
-    }
+        .community-tab {
+            display: inline-block;
+            padding: 10px 20px;
+            margin: 0 5px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
 
-    @media (max-width: 768px) {
-        .message {
-            max-width: 95%;
+        .community-tab.active {
+            background: #8364E2;
+            color: white;
         }
 
         .chat-container {
-            height: calc(100vh - 180px);
-            margin: 10px 0;
+            height: calc(100vh - 200px);
+            min-height: 400px;
+            background: var(--reddit-bg);
+            border: 1px solid var(--reddit-border);
+            border-radius: 4px;
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
         }
-    }
 
-    .message-sender {
-        font-weight: 600;
-        margin-bottom: 5px;
-        color: rgba(255, 255, 255, 0.9);
-    }
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 16px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(131, 100, 226, 0.3) transparent;
+            -ms-overflow-style: auto;
+        }
 
-    .message-content {
-        line-height: 1.4;
-        color: rgba(255, 255, 255, 0.8);
-    }
+        /* Webkit scrollbar styling (Chrome, Safari, newer Edge) */
+        .chat-messages::-webkit-scrollbar {
+            width: 4px;
+            display: block;
+        }
 
-    .chat-input {
-        padding: 12px;
-        border-top: 1px solid var(--reddit-border);
-        display: flex;
-        gap: 8px;
-        background: var(--reddit-card);
-        align-items: center;
-    }
+        .chat-messages::-webkit-scrollbar-track {
+            background: transparent;
+        }
 
-    .chat-input input {
-        flex-grow: 1;
-        background: var(--reddit-bg);
-        border: 1px solid var(--reddit-border);
-        padding: 8px 12px;
-        border-radius: 4px;
-        color: var(--reddit-text);
-        font-size: 14px;
-        min-height: 38px;
-    }
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: rgba(131, 100, 226, 0.3);
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
 
-    .chat-input input:focus {
-        border-color: var(--reddit-accent);
-        outline: none;
-    }
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: rgba(131, 100, 226, 0.5);
+        }
 
-    .btn-main {
-        background: var(--reddit-accent);
-        border: none;
-        padding: 8px 16px;
-        border-radius: 4px;
-        color: white;
-        font-weight: 600;
-        cursor: pointer;
-        transition: opacity 0.2s ease;
-        height: 38px;
-    }
+        /* Firefox scrollbar styling */
+        @supports (scrollbar-color: auto) {
+            .chat-messages {
+                scrollbar-width: thin;
+                scrollbar-color: rgba(131, 100, 226, 0.3) transparent;
+            }
+        }
 
-    .btn-main:hover {
-        opacity: 0.9;
-    }
+        /* For Edge support */
+        @supports (-ms-overflow-style: none) {
+            .chat-messages {
+                -ms-overflow-style: -ms-autohiding-scrollbar;
+            }
+        }
 
-    @media (max-width: 768px) {
+        .message {
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 4px;
+            width: fit-content;
+            max-width: min(600px, 80%);
+            background: var(--reddit-card);
+            border: 1px solid var(--reddit-border);
+            transition: background 0.2s ease;
+        }
+
+        .message:hover {
+            background: var(--reddit-hover);
+        }
+
+        .message.sent {
+            margin-left: auto;
+            background: var(--reddit-card);
+        }
+
+        .message.received {
+            margin-right: auto;
+            background: var(--reddit-card);
+        }
+
+        @media (max-width: 768px) {
+            .message {
+                max-width: 95%;
+            }
+
+            .chat-container {
+                height: calc(100vh - 180px);
+                margin: 10px 0;
+            }
+        }
+
+        .message-sender {
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .message-content {
+            line-height: 1.4;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
         .chat-input {
-            padding: 8px;
+            padding: 12px;
+            border-top: 1px solid var(--reddit-border);
+            display: flex;
+            gap: 8px;
+            background: var(--reddit-card);
+            align-items: center;
+        }
+
+        .chat-input input {
+            flex-grow: 1;
+            background: var(--reddit-bg);
+            border: 1px solid var(--reddit-border);
+            padding: 8px 12px;
+            border-radius: 4px;
+            color: var(--reddit-text);
+            font-size: 14px;
+            min-height: 38px;
+        }
+
+        .chat-input input:focus {
+            border-color: var(--reddit-accent);
+            outline: none;
         }
 
         .btn-main {
-            padding: 8px 12px;
+            background: var(--reddit-accent);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s ease;
+            height: 38px;
         }
-    }
 
-    .members-list {
-        background: rgba(255, 255, 255, 0.05);
-        border-radius: 12px;
-        padding: 20px;
-        margin-left: 10px;
-        margin-top: 4.5%;
-        overflow-y: auto;
-        max-height: calc(100vh - 200px);
-        scrollbar-width: thin;
-        scrollbar-color: rgba(131, 100, 226, 0.3) transparent;
-    }
+        .btn-main:hover {
+            opacity: 0.9;
+        }
 
-    .members-list::-webkit-scrollbar {
-        width: 4px;
-        display: block;
-    }
+        @media (max-width: 768px) {
+            .chat-input {
+                padding: 8px;
+            }
 
-    .members-list::-webkit-scrollbar-track {
-        background: transparent;
-    }
+            .btn-main {
+                padding: 8px 12px;
+            }
+        }
 
-    .members-list::-webkit-scrollbar-thumb {
-        background: rgba(131, 100, 226, 0.3);
-        border-radius: 4px;
-        transition: background 0.2s ease;
-    }
+        .members-list {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-left: 10px;
+            margin-top: 4.5%;
+            overflow-y: auto;
+            max-height: calc(100vh - 200px);
+            scrollbar-width: thin;
+            scrollbar-color: rgba(131, 100, 226, 0.3) transparent;
+        }
 
-    .members-list::-webkit-scrollbar-thumb:hover {
-        background: rgba(131, 100, 226, 0.5);
-    }
+        .members-list::-webkit-scrollbar {
+            width: 4px;
+            display: block;
+        }
 
-    .member-item {
-        display: flex;
-        align-items: center;
-        padding: 10px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    }
+        .members-list::-webkit-scrollbar-track {
+            background: transparent;
+        }
 
-    .member-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        margin-right: 15px;
-    }
+        .members-list::-webkit-scrollbar-thumb {
+            background: rgba(131, 100, 226, 0.3);
+            border-radius: 4px;
+            transition: background 0.2s ease;
+        }
 
-    .timestamp {
-        font-size: 0.8em;
-        opacity: 0.6;
-    }
+        .members-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(131, 100, 226, 0.5);
+        }
 
-    /* Image Modal Styles */
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.9);
-        justify-content: center;
-        align-items: center;
-    }
+        .member-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-    .modal.active {
-        display: flex;
-    }
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
 
-    .modal img {
-        max-width: 90%;
-        max-height: 90vh;
-        object-fit: contain;
-        border-radius: 8px;
-    }
+        .timestamp {
+            font-size: 0.8em;
+            opacity: 0.6;
+        }
 
-    .modal .close {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        color: white;
-        font-size: 28px;
-        cursor: pointer;
-        width: 40px;
-        height: 40px;
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        transition: all 0.3s ease;
-    }
+        /* Image Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+        }
 
-    .modal .close:hover {
-        background: rgba(255, 255, 255, 0.2);
-        transform: rotate(90deg);
-    }
+        .modal.active {
+            display: flex;
+        }
 
-    /* Reply Button Style */
-    .btn-reply {
-        color: rgba(255, 255, 255, 0.7);
-        border: none;
-        background: none;
-        padding: 4px 8px;
-        font-size: 0.85em;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        transition: all 0.2s ease;
-        border-radius: 4px;
-    }
+        .modal img {
+            max-width: 90%;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 8px;
+        }
 
-    .btn-reply:hover {
-        color: white;
-        background: rgba(255, 255, 255, 0.1);
-    }
+        .modal .close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
 
-    .btn-reply i {
-        font-size: 0.9em;
-    }
+        .modal .close:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
 
-    /* Make reactions more compact */
-    .btn-reaction {
-        padding: 4px 8px;
-        font-size: 0.8em;
-    }
+        /* Reply Button Style */
+        .btn-reply {
+            color: rgba(255, 255, 255, 0.7);
+            border: none;
+            background: none;
+            padding: 4px 8px;
+            font-size: 0.85em;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.2s ease;
+            border-radius: 4px;
+        }
 
-    .reaction-count {
-        min-width: 16px;
-        font-size: 0.9em;
-    }
+        .btn-reply:hover {
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+        }
 
-    /* Report button styling */
-    .btn-report {
-        color: rgba(255, 255, 255, 0.5);
-        background: none;
-        border: none;
-        font-size: 0.8em;
-        padding: 4px 8px;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-        opacity: 0;
-        transition: all 0.2s ease;
-    }
+        .btn-reply i {
+            font-size: 0.9em;
+        }
 
-    .message:hover .btn-report {
-        opacity: 1;
-    }
+        /* Make reactions more compact */
+        .btn-reaction {
+            padding: 4px 8px;
+            font-size: 0.8em;
+        }
 
-    .btn-report:hover {
-        color: #ff4444;
-        background: rgba(255, 68, 68, 0.1);
-        border-radius: 4px;
-    }
+        .reaction-count {
+            min-width: 16px;
+            font-size: 0.9em;
+        }
 
-    /* Report Modal */
-    .report-modal {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.8);
-        z-index: 1000;
-        justify-content: center;
-        align-items: center;
-    }
+        /* Report button styling */
+        .btn-report {
+            color: rgba(255, 255, 255, 0.5);
+            background: none;
+            border: none;
+            font-size: 0.8em;
+            padding: 4px 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            opacity: 0;
+            transition: all 0.2s ease;
+        }
 
-    .report-modal.active {
-        display: flex;
-    }
+        .message:hover .btn-report {
+            opacity: 1;
+        }
 
-    .report-modal-content {
-        background: var(--reddit-card);
-        border: 1px solid var(--reddit-border);
-        border-radius: 8px;
-        padding: 20px;
-        width: 90%;
-        max-width: 500px;
-    }
+        .btn-report:hover {
+            color: #ff4444;
+            background: rgba(255, 68, 68, 0.1);
+            border-radius: 4px;
+        }
 
-    .report-modal-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-    }
+        /* Report Modal */
+        .report-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
 
-    .report-modal-title {
-        font-size: 1.2em;
-        font-weight: bold;
-        color: #fff;
-    }
+        .report-modal.active {
+            display: flex;
+        }
 
-    .report-modal-close {
-        background: none;
-        border: none;
-        color: rgba(255, 255, 255, 0.5);
-        font-size: 1.5em;
-        cursor: pointer;
-    }
+        .report-modal-content {
+            background: var(--reddit-card);
+            border: 1px solid var(--reddit-border);
+            border-radius: 8px;
+            padding: 20px;
+            width: 90%;
+            max-width: 500px;
+        }
 
-    .report-modal-close:hover {
-        color: #fff;
-    }
+        .report-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
 
-    .report-form textarea {
-        width: 100%;
-        background: var(--reddit-bg);
-        border: 1px solid var(--reddit-border);
-        color: #fff;
-        padding: 10px;
-        border-radius: 4px;
-        margin-bottom: 15px;
-        min-height: 100px;
-        resize: vertical;
-    }
+        .report-modal-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #fff;
+        }
 
-    .report-form textarea:focus {
-        border-color: #8364E2;
-        outline: none;
-    }
+        .report-modal-close {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 1.5em;
+            cursor: pointer;
+        }
 
-    .report-form button {
-        background: #ff4444;
-        color: white;
-        border: none;
-        padding: 8px 16px;
-        border-radius: 4px;
-        cursor: pointer;
-        font-weight: 500;
-    }
+        .report-modal-close:hover {
+            color: #fff;
+        }
 
-    .report-form button:hover {
-        background: #ff2020;
-    }
+        .report-form textarea {
+            width: 100%;
+            background: var(--reddit-bg);
+            border: 1px solid var(--reddit-border);
+            color: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .report-form textarea:focus {
+            border-color: #8364E2;
+            outline: none;
+        }
+
+        .report-form button {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        .report-form button:hover {
+            background: #ff2020;
+        }
     </style>
 </head>
 
