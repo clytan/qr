@@ -60,22 +60,42 @@
         <div class="content-body">
             <div class="container-fluid">
               <input type="hidden" id="admin_user_id" value="<?php echo htmlspecialchars($user_id); ?>">
-              <h4 class="mb-4">Slab Change Request List</h4>
-              <table id="userTable" class="table table-hover table-bordered table-striped align-middle">
-                <thead class="table-primary">
-                  <tr>
-                    <th>Id</th>
-                    <th>Full Name</th>
-                    <th>Email</th>
-                    <th>Phone</th>
-                    <th>User QR ID</th>
-                    <th>Current Slab</th>
-                    <th>Requested Slab</th>
-                    <th class="text-center">Options</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
+                            <h4 class="mb-4">Slab Change Request List</h4>
+                            <div id="slabChangeTableControls" style="display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 8px;"></div>
+                            <table id="userTable" class="table table-hover table-bordered table-striped align-middle">
+                                <thead class="table-primary">
+                                    <tr>
+                                        <th>Id</th>
+                                        <th>Full Name</th>
+                                        <th>Email</th>
+                                        <th>Phone</th>
+                                        <th>User QR ID</th>
+                                        <th>Current Slab</th>
+                                        <th>Requested Slab</th>
+                                        <th class="text-center">Options</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+
+                            <!-- Export Columns Modal -->
+                            <div class="modal fade" id="exportSlabChangeColumnsModal" tabindex="-1" aria-labelledby="exportSlabChangeColumnsModalLabel" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title fw-bold" id="exportSlabChangeColumnsModalLabel">Select Columns to Export</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body" id="exportSlabChangeColumnSelectorModal">
+                                            <!-- JS will dynamically insert checkboxes here -->
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                            <button type="button" class="btn btn-primary" id="exportSlabChangeSelectedBtnModal">Export Selected</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
             </div>
 
         </div>
