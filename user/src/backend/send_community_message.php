@@ -8,6 +8,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 include_once('./dbconfig/connection.php');
+require_once('check_user_penalties.php');
 $user_id = $_SESSION['user_id'];
 
 // Get POST data and file
@@ -54,7 +55,7 @@ if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ER
     }
 }
 
-// Verify user belongs to this community
+// Verify user belongs to this community and isn't banned/timed out
 $sqlCheck = "SELECT 1 FROM community_members WHERE user_id = ? AND community_id = ? AND is_deleted = 0";
 $stmtCheck = $conn->prepare($sqlCheck);
 $stmtCheck->bind_param('ii', $user_id, $community_id);
@@ -67,6 +68,13 @@ if ($resultCheck->num_rows === 0) {
     exit();
 }
 $stmtCheck->close();
+
+// Check if user is banned or in timeout
+$penaltyCheck = checkUserPenalties($user_id, $community_id, $conn);
+if (!$penaltyCheck['status']) {
+    echo json_encode(['status' => false, 'message' => $penaltyCheck['message']]);
+    exit();
+}
 
 // Insert message
 $now = date('Y-m-d H:i:s');

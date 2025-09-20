@@ -1,8 +1,10 @@
 // Community JavaScript functions
 document.addEventListener('DOMContentLoaded', function () {
     loadCommunities();
-    // Auto-refresh chat every 5 seconds
-    setInterval(loadMessages, 5000);
+    // Regular updates for new messages
+    setInterval(() => loadMessages(false), 5000);
+    // Full refresh every 30 seconds to check timeout status
+    setInterval(() => loadMessages(true), 30000);
 });
 
 let currentCommunityId = null;
@@ -38,11 +40,7 @@ function loadCommunities() {
                     }
                     loadMessages();
                     loadMembers();
-                }                // Store user's communities for reference
-                window.userCommunities = data.communities.reduce((acc, comm) => {
-                    acc[comm.id] = comm.is_user_community;
-                    return acc;
-                }, {});
+                }
             }
         })
         .catch(error => console.error('Error:', error));
@@ -52,6 +50,9 @@ function loadCommunities() {
 function renderMessage(msg) {
     // Get current community membership status
     const isMember = window.userCommunities[currentCommunityId] || false;
+
+    // Add data attribute for user ID to help with updates
+    const dataAttributes = `data-message-id="${msg.id}" data-user-id="${msg.user_id}"`;
 
     // Function to determine if a file is an image
     const isImageFile = (filename) => {
@@ -81,8 +82,18 @@ function renderMessage(msg) {
 
     return `
         <div class="message ${msg.is_own ? 'sent' : 'received'}" data-message-id="${msg.id}">
-            <div class="message-sender">${msg.user_name}</div>
-            <div class="message-content">${msg.message}</div>
+            <div class="message-header">
+                <div class="message-sender" style="margin-right: 10px;">
+                    ${msg.user_name}
+                    ${msg.is_moderator ? `
+                        <span class="moderator-badge">
+                            <i class="fa fa-shield"></i> Mod
+                        </span>
+                    ` : ''}
+                </div>
+                <div class="timestamp">${formatDate(msg.created_on)}</div>
+            </div>
+            <div class="message-content" style="word-break: break-word; overflow-wrap: break-word; white-space: pre-wrap; max-width: 100%;">${msg.message}</div>
             ${renderAttachment()}
             <div class="message-footer">
                 <div class="d-flex align-items-center">
@@ -91,7 +102,6 @@ function renderMessage(msg) {
                             <i class="fa fa-reply"></i>Reply
                         </button>
                     ` : ``}
-                    <div class="timestamp">${formatDate(msg.created_on)}</div>
                 </div>
                 <div class="d-flex align-items-center gap-3">
                     <div class="reactions-group">
@@ -122,6 +132,28 @@ function renderMessage(msg) {
                             <i class="fa fa-flag"></i> Report
                         </button>
                     ` : ''}
+                    ${msg.is_current_user_moderator && !msg.is_own ? `
+                        <div class="moderator-actions" style="display: flex !important; gap: 2px !important; margin: 2px 0 !important; flex-wrap: wrap !important;">
+                            ${msg.is_banned ? `
+                                <span class="user-status banned" style="display: inline-flex !important; align-items: center !important; padding: 2px 6px !important; background: #ff4444 !important; color: white !important; border-radius: 3px !important; font-size: 11px !important; justify-content: center !important; line-height: 1.2 !important;">
+                                    <i class="fa fa-ban" style="margin-right: 3px !important;"></i> Banned
+                                </span>
+                            ` : msg.is_timed_out ? `
+                                <span class="user-status timeout" style="display: inline-flex !important; align-items: center !important; padding: 2px 6px !important; background: #ffa500 !important; color: white !important; border-radius: 3px !important; font-size: 11px !important; justify-content: center !important; line-height: 1.2 !important;">
+                                    <i class="fa fa-clock-o" style="margin-right: 3px !important;"></i> Timed Out
+                                </span>
+                            ` : `
+                                <button class="btn-timeout" onclick="timeoutUser(${msg.user_id}, ${msg.id})"
+                                    style="background: #ffa500 !important;">
+                                    <i class="fa fa-clock-o"></i> Time out
+                                </button>
+                                <button class="btn-ban" onclick="banUser(${msg.user_id}, ${msg.id})"
+                                    style="background: #ff4444 !important;">
+                                    <i class="fa fa-ban"></i> Ban
+                                </button>
+                            `}
+                        </div>
+                    ` : ''}
                 </div>
             </div>
         </div>
@@ -129,7 +161,7 @@ function renderMessage(msg) {
 }
 
 // Load messages for current community
-function loadMessages() {
+function loadMessages(forceRefresh = false) {
     if (!currentCommunityId) return;
 
     const chatMessages = document.getElementById('chatMessages');
@@ -138,45 +170,143 @@ function loadMessages() {
     const currentScrollPos = chatMessages.scrollTop;
     const previousScrollHeight = chatMessages.scrollHeight;
 
-    const params = lastMessageTime ? `?since=${lastMessageTime}` : '';
+    // If forcing refresh, clear the lastMessageTime to get all messages
+    const params = forceRefresh ? '' : (lastMessageTime ? `?since=${lastMessageTime}` : '');
+
     fetch(`../backend/get_community_messages.php?community_id=${currentCommunityId}${params}`)
-        .then(response => response.json())
-        .then(data => {
-            if (data.status) {
-                // On first load or community change
-                if (!lastMessageTime) {
-                    const messagesHtml = data.messages.map(msg => renderMessage(msg)).join('');
-                    chatMessages.innerHTML = messagesHtml;
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                } else {
-                    // For updates
+        .then(function (response) {
+            return response.json();
+        })
+        .then(function (data) {
+            const chatInput = document.querySelector('.chat-input');
+
+            // Handle error state
+            if (!data.status) {
+                chatMessages.innerHTML = `<div class="system-message error">
+                    <div class="system-message-content">
+                        <i class="fa fa-exclamation-circle"></i>
+                        ${data.message}
+                    </div>
+                </div>`;
+                if (chatInput) {
+                    chatInput.style.display = 'none';
+                }
+                return;
+            }
+
+            // Handle chat input visibility based on timeout state
+            if (data.isTimedOut) {
+                if (chatInput) {
+                    chatInput.style.display = 'none';
+                }
+            } else if (chatInput) {
+                chatInput.style.display = 'flex';
+            }
+
+            // Handle initial load
+            if (!lastMessageTime) {
+                let content = '';
+
+                // Add messages if available
+                if (data.messages && data.messages.length > 0) {
+                    content = data.messages.map(msg => renderMessage(msg)).join('');
+                    // Update last message time
+                    lastMessageTime = data.messages[data.messages.length - 1].created_on;
+                }
+
+                chatMessages.innerHTML = content;
+
+                // Add timeout warning if user is timed out
+                if (data.isTimedOut) {
+                    const warningHtml = `
+                        <div class="system-message warning sticky">
+                            <div class="system-message-content">
+                                <i class="fa fa-clock-o"></i>
+                                ${data.timeoutMessage}
+                            </div>
+                        </div>`;
+                    chatMessages.insertAdjacentHTML('afterbegin', warningHtml);
+                }
+
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            } else {
+                // Handle updates
+                const warningElement = document.querySelector('.system-message.warning.sticky');
+
+                // Update timeout warning status
+                if (data.isTimedOut && !warningElement) {
+                    const warningHtml = `
+                        <div class="system-message warning sticky">
+                            <div class="system-message-content">
+                                <i class="fa fa-clock-o"></i>
+                                ${data.timeoutMessage}
+                            </div>
+                        </div>`;
+                    chatMessages.insertAdjacentHTML('afterbegin', warningHtml);
+                } else if (!data.isTimedOut && warningElement) {
+                    warningElement.remove();
+                }
+
+                // Update messages
+                if (data.messages && data.messages.length > 0) {
                     let hasNewMessages = false;
                     data.messages.forEach(msg => {
-                        if (!document.querySelector(`[data-message-id="${msg.id}"]`)) {
+                        const existingMessage = document.querySelector(`[data-message-id="${msg.id}"]`);
+                        if (!existingMessage) {
                             chatMessages.insertAdjacentHTML('beforeend', renderMessage(msg));
                             hasNewMessages = true;
                         } else {
+                            // Update reactions
                             updateMessageReactions(msg);
+
+                            // Update moderator actions if present
+                            const modActions = existingMessage.querySelector('.moderator-actions');
+                            if (modActions && msg.is_current_user_moderator && !msg.is_own) {
+                                // Determine the current status and update UI accordingly
+                                if (msg.is_banned) {
+                                    modActions.innerHTML = `
+                                        <span class="user-status banned" style="display: inline-flex !important; align-items: center !important; padding: 2px 6px !important; background: #ff4444 !important; color: white !important; border-radius: 3px !important; font-size: 11px !important; justify-content: center !important; line-height: 1.2 !important;">
+                                            <i class="fa fa-ban" style="margin-right: 3px !important;"></i> Banned
+                                        </span>`;
+                                } else if (msg.is_timed_out) {
+                                    modActions.innerHTML = `
+                                        <span class="user-status timeout" style="display: inline-flex !important; align-items: center !important; padding: 2px 6px !important; background: #ffa500 !important; color: white !important; border-radius: 3px !important; font-size: 11px !important; justify-content: center !important; line-height: 1.2 !important;">
+                                            <i class="fa fa-clock-o" style="margin-right: 3px !important;"></i> Timed Out
+                                        </span>`;
+                                } else {
+                                    // No active penalties, show mod buttons
+                                    modActions.innerHTML = `
+                                        <button class="btn-timeout" onclick="timeoutUser(${msg.user_id}, ${msg.id})"
+                                            style="background: #ffa500 !important;">
+                                            <i class="fa fa-clock-o"></i> Time out 
+                                        </button>
+                                        <button class="btn-ban" onclick="banUser(${msg.user_id}, ${msg.id})"
+                                            style="background: #ff4444 !important;">
+                                            <i class="fa fa-ban"></i> Ban
+                                        </button>`;
+                                }
+                            }
                         }
                     });
 
-                    // Only auto-scroll if user was already near bottom or it's a new message from the user
+                    // Handle scrolling
                     if (hasNewMessages) {
-                        if (isNearBottom) {
+                        if (isAtBottom) {
                             chatMessages.scrollTop = chatMessages.scrollHeight;
                         } else {
                             // Maintain scroll position when new content is loaded
                             chatMessages.scrollTop = currentScrollPos + (chatMessages.scrollHeight - previousScrollHeight);
                         }
                     }
-                }
 
-                if (data.messages.length > 0) {
+                    // Update last message time
                     lastMessageTime = data.messages[data.messages.length - 1].created_on;
                 }
             }
         })
-        .catch(error => console.error('Error:', error));
+        .catch(function (error) {
+            console.error('Error loading messages:', error);
+        });
 }
 
 // Load members of current community
@@ -304,7 +434,6 @@ function updateMessageReactions(msg) {
     }
 }
 
-// Helper function to format dates
 // Handle message reactions
 function reactToMessage(messageId, reactionType) {
     fetch('../backend/react_to_message.php', {
@@ -343,6 +472,7 @@ function reactToMessage(messageId, reactionType) {
         .catch(error => console.error('Error:', error));
 }
 
+// Helper function to format dates
 function formatDate(dateStr) {
     const date = new Date(dateStr);
     return date.toLocaleString('en-IN', {
@@ -353,13 +483,102 @@ function formatDate(dateStr) {
     });
 }
 
+// Moderator Actions
+function timeoutUser(userId, messageId) {
+    const duration = prompt('Enter timeout duration in minutes:', '30');
+    if (duration === null) return; // User cancelled
+
+    fetch('../backend/timeout_user.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            user_id: userId,
+            message_id: messageId,
+            duration: parseInt(duration)
+        })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status) {
+                // Immediately update UI for all messages from this user
+                const userMessages = document.querySelectorAll('.message');
+                userMessages.forEach(messageEl => {
+                    const modActions = messageEl.querySelector('.moderator-actions');
+                    if (modActions) {
+                        // Get the onclick attribute of any timeout/ban button to extract user ID
+                        const timeoutBtn = modActions.querySelector('.btn-timeout');
+                        if (timeoutBtn && timeoutBtn.getAttribute('onclick').includes(`timeoutUser(${userId},`)) {
+                            modActions.innerHTML = `
+                                <span class="user-status timeout" style="display: inline-flex; align-items: center; padding: 6px 12px; background: #ffa500; color: white; border-radius: 4px; font-size: 14px;">
+                                    <i class="fa fa-clock-o" style="margin-right: 6px;"></i> Timed Out
+                                </span>`;
+                        }
+                    }
+                });
+                alert('User has been timed out');
+            } else {
+                alert(data.message || 'Failed to timeout user');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to timeout user. Please try again.');
+        });
+}
+
+function banUser(userId, messageId) {
+    if (!confirm('Are you sure you want to ban this user from the community?')) return;
+
+    fetch('../backend/ban_user.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            user_id: userId,
+            message_id: messageId
+        })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status) {
+                // Immediately update UI for all messages from this user
+                const userMessages = document.querySelectorAll('.message');
+                userMessages.forEach(messageEl => {
+                    const modActions = messageEl.querySelector('.moderator-actions');
+                    if (modActions) {
+                        // Get the onclick attribute of any timeout/ban button to extract user ID
+                        const banBtn = modActions.querySelector('.btn-ban');
+                        if (banBtn && banBtn.getAttribute('onclick').includes(`banUser(${userId},`)) {
+                            modActions.innerHTML = `
+                                <span class="user-status banned" style="display: inline-flex; align-items: center; padding: 6px 12px; background: #ff4444; color: white; border-radius: 4px; font-size: 14px;">
+                                    <i class="fa fa-ban" style="margin-right: 6px;"></i> Banned
+                                </span>`;
+                        }
+                    }
+                });
+                alert('User has been banned');
+            } else {
+                alert(data.message || 'Failed to ban user');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to ban user. Please try again.');
+        });
+}
+
 // Reply functionality
 function replyToMessage(messageId) {
     const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
     if (messageElement) {
-        const sender = messageElement.querySelector('.message-sender').textContent;
+        const senderElement = messageElement.querySelector('.message-sender');
+        // Get just the username text (first text node) before the moderator badge
+        const username = senderElement.childNodes[0].textContent.trim();
         const input = document.getElementById('messageInput');
-        input.value = `@${sender} `;
+        input.value = `@${username} `;
         input.focus();
     }
 }
