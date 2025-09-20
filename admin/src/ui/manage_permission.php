@@ -1,3 +1,21 @@
+<?php 
+    if (session_status() === PHP_SESSION_NONE) session_start();
+    $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : '';
+    // Direct URL access prevention
+    if ($user_id) {
+        include_once __DIR__ . '/../backend/get_sidebar_permissions.php';
+        $perm = getUserSidebarPermissions($user_id);
+        $role_name = $perm['role_name'];
+        if ($role_name !== 'Super Admin') {
+            header('Location: login.php');
+            exit();
+        }
+    } else {
+        header('Location: login.php');
+        exit();
+    }
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <?php include('../components/head.php') ?>
@@ -140,7 +158,7 @@
         Main wrapper end
     ***********************************-->
 
-    
+
     <!-- Export Columns Modal for Permissions -->
     <div class="modal fade" id="exportPermissionsColumnsModal" tabindex="-1" aria-labelledby="exportPermissionsColumnsModalLabel" aria-hidden="true">
         <div class="modal-dialog">

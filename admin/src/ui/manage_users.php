@@ -1,6 +1,21 @@
 <?php 
-    session_start();
+    if (session_status() === PHP_SESSION_NONE) session_start();
     $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : '';
+    // Direct URL access prevention
+    if ($user_id) {
+        include_once __DIR__ . '/../backend/get_sidebar_permissions.php';
+        $perm = getUserSidebarPermissions($user_id);
+        $allowed = $perm['allowed_pages'];
+        $role_name = $perm['role_name'];
+        $page_label = 'Manage Users';
+        if ($role_name !== 'Super Admin' && !in_array($page_label, $allowed)) {
+            header('Location: login.php');
+            exit();
+        }
+    } else {
+        header('Location: login.php');
+        exit();
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
