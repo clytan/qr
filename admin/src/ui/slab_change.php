@@ -61,7 +61,7 @@
             <div class="container-fluid">
               <input type="hidden" id="admin_user_id" value="<?php echo htmlspecialchars($user_id); ?>">
                             <h4 class="mb-4">Slab Change Request List</h4>
-                            <div id="slabChangeTableControls" style="display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 8px;"></div>
+                            <div id="slabChangeTableControls" style="display: flex; justify-content: flex-start; align-items: center; gap: 10px; margin-bottom: 8px;"></div>
                             <table id="userTable" class="table table-hover table-bordered table-striped align-middle">
                                 <thead class="table-primary">
                                     <tr>

@@ -57,7 +57,7 @@
         <div class="container-fluid">
             <input type="hidden" id="admin_user_id" value="<?php echo htmlspecialchars($user_id); ?>">
             <h4 class="mb-4">Invoice List</h4>
-            <div id="ordersTableControls" style="display: flex; justify-content: flex-end; align-items: center; gap: 10px; margin-bottom: 8px;"></div>
+            <div id="ordersTableControls" style="display: flex; justify-content: flex-start; align-items: center; gap: 10px; margin-bottom: 8px;"></div>
             <table id="ordersTable" class="table table-hover table-bordered table-striped align-middle">
                 <thead class="table-primary">
                     <tr>

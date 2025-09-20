@@ -63,6 +63,7 @@
 
                 <h4 class="mb-4">User List</h4>
 
+                <div id="userTableControls" style="display: flex; justify-content: flex-start; align-items: center; gap: 10px; margin-bottom: 8px;"></div>
                 <table id="userTable" class="table table-hover table-bordered table-striped align-middle">
                     <thead class="table-primary">
                         <tr>
