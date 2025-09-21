@@ -4,6 +4,7 @@
     include '../backend/dbconfig/connection.php';
     session_start();
 ?>
+
 <head>
     <title>ZQR</title>
     <link rel="icon" href="../assets/../assets/images/icon-red.png" type="image/gif" sizes="16x16">
@@ -96,11 +97,11 @@
 
 
         </div>
-        
+
         <!-- Profile begins -->
-        
+
         <!-- Profile ends-->
-         <?php include('./profile.php'); ?>
+        <?php include('./profile_new.php'); ?>
         <!-- content close -->
 
         <a href="#" id="back-to-top"></a>

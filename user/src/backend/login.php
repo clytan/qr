@@ -28,23 +28,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($resultLogin->num_rows > 0) {
         $user = $resultLogin->fetch_assoc();
-        // Do not print user or any debug output here
 
-        // Set session as 'individual' if user_type_id is 1, 'business' if user_type_id is 2, 'Contributor' if user_type_id is 3 , 'Gold Member' if user_type_id is 4, 'Silver Member' if user_type_id is 5
+        // Set session variables
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_user_type'] = $user['user_user_type'];
         $_SESSION['user_qr_id'] = $user['user_qr_id'];
-        $redirectUrl = 'index.php';
+
+        // Check if there's a return URL parameter from POST data
+        $redirectUrl = 'index.php'; // Default redirect
+
+        if (isset($_POST['return_url']) && !empty($_POST['return_url'])) {
+            // Decode the return URL and use it
+            $returnUrl = urldecode($_POST['return_url']);
+
+            // Basic security check - ensure it's a local URL
+            $parsedUrl = parse_url($returnUrl);
+            if (
+                !isset($parsedUrl['host']) ||
+                $parsedUrl['host'] === $_SERVER['HTTP_HOST'] ||
+                $parsedUrl['host'] === 'localhost'
+            ) {
+                $redirectUrl = $returnUrl;
+            }
+        }
 
         $data = ['redirect' => $redirectUrl];
         $stmt->close();
         echo json_encode(['status' => true, 'message' => '', 'data' => $data]);
         exit();
-        
+
     } else {
         $stmt->close();
         // Provide JSON response for AJAX
-        echo json_encode(['status' => false, 'message' => 'Invalid username or password' ,'data' => []]);
+        echo json_encode(['status' => false, 'message' => 'Invalid username or password', 'data' => []]);
         exit();
     }
 }

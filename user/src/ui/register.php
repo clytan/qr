@@ -13,6 +13,57 @@
     <?php include('../components/csslinks.php') ?>
     <!-- Registration Form CSS -->
     <link rel="stylesheet" href="../assets/css/register-form.css">
+
+    <style>
+    /* College name field styling */
+    .college-field {
+        display: none;
+        margin-top: 15px;
+        animation: slideDown 0.3s ease;
+    }
+
+    .college-field.show {
+        display: block;
+    }
+
+    .college-input {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: border-color 0.3s ease;
+        background: #f8f9fa;
+    }
+
+    .college-input:focus {
+        outline: none;
+        border-color: #74b9ff;
+        background: white;
+    }
+
+    .college-label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+        color: #2c3e50;
+        font-size: 14px;
+    }
+
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            max-height: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            max-height: 100px;
+            transform: translateY(0);
+        }
+    }
+    </style>
 </head>
 
 <body>
@@ -110,6 +161,14 @@
                                                     <option value="" style="background:#fff;color:#666;">🎯 Select your
                                                         plan...</option>
                                                 </select>
+
+                                                <!-- College Name Field (hidden by default) -->
+                                                <div id="college_field" class="college-field">
+                                                    <label class="college-label">🎓 Enter your college name:</label>
+                                                    <input type="text" name="college_name" id="college_name"
+                                                        placeholder="Enter your college/university name"
+                                                        class="college-input">
+                                                </div>
                                             </div>
 
                                             <!-- Register As Section with Better Responsive Design -->
@@ -270,15 +329,12 @@
 
     </div>
 
-
-
     <!-- Javascript Files
     ================================================== -->
     <?php include('../components/jslinks.php'); ?>
     <!-- Registration Form JavaScript -->
     <script src="../assets/js/register-form.js"></script>
     <script src="./custom_js/custom_register.js"></script>
-
 
 
 </body>
