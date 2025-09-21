@@ -28,16 +28,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($resultLogin->num_rows > 0) {
         $user = $resultLogin->fetch_assoc();
-        // Do not print user or any debug output here
-
-        // Set session as 'admin' if role_id is 1, else 'employee', and store user id separately
-        if ($user['role_id'] == 1) {
-            $_SESSION['user'] = 'admin';
-            $redirectUrl = 'index.php';
-        } else {
-            $_SESSION['user'] = 'employee';
-            $redirectUrl = 'login.php'; ## change the redirect URL here
-        }
+        $_SESSION['user'] = 'employee';
+        $redirectUrl = 'index.php';
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_role_id'] = $user['role_id'];
 

@@ -1,19 +1,4 @@
-<?php
-include '../backend/dbconfig/connection.php';
-session_start();
 
-if (isset($_SESSION['user'])) {
-    if($_SESSION['user']=="admin"){
-        header("Location: index.php");
-
-    }else{
-        header("Location: login.php"); ## change the redirect URL here
-    }
-    exit();
-}
-
-mysqli_close($conn);
-?>
 
 
 <!DOCTYPE html>
