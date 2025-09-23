@@ -13,15 +13,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$selected_slab = isset($_POST['user_slab']) ? $_POST['user_slab'] : '';
 	$reference_code = isset($_POST['reference_code']) ? trim($_POST['reference_code']) : '';
 	$referred_by_user_id = isset($_POST['referred_by_user_id']) ? $_POST['referred_by_user_id'] : null;
+	$college_name = isset($_POST['college_name']) ? trim($_POST['college_name']) : ''; // Add college name
 	$default_slab_id = 1;
 
 	// Convert empty user_tag to NULL for database
 	$user_tag = empty($user_tag) ? null : $user_tag;
 
+	// Convert empty college_name to NULL for database
+	$college_name = empty($college_name) ? null : $college_name;
+
 	// Basic input validation
 	if ($email === '' || $user_type === '' || $password === '' || $selected_slab === '') {
 		echo json_encode(['status' => false, 'message' => 'All required fields must be filled', 'data' => []]);
 		exit();
+	}
+
+	// Check if selected slab requires college name (assuming "Student Leader" slab name contains "student leader")
+	if (!empty($selected_slab)) {
+		$sqlSlabCheck = "SELECT name FROM user_slab WHERE id = ?";
+		$stmtSlabCheck = $conn->prepare($sqlSlabCheck);
+		$stmtSlabCheck->bind_param('i', $selected_slab);
+		$stmtSlabCheck->execute();
+		$resultSlabCheck = $stmtSlabCheck->get_result();
+
+		if ($resultSlabCheck->num_rows > 0) {
+			$slabData = $resultSlabCheck->fetch_assoc();
+			$slabName = strtolower($slabData['name']);
+
+			// If slab name contains "student leader", college name is required
+			if (strpos($slabName, 'student leader') !== false && empty($college_name)) {
+				$stmtSlabCheck->close();
+				echo json_encode(['status' => false, 'message' => 'College name is required for Student Leader plan', 'data' => []]);
+				exit();
+			}
+		}
+		$stmtSlabCheck->close();
 	}
 
 	// Validate reference code if provided
@@ -69,15 +95,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		$stmtCheckQr->close();
 	} while ($exists);
 
-	// Insert new user with user_qr_id and new fields
-	$sqlInsert = "INSERT INTO user_user(user_email, user_password, user_user_type, user_tag, user_slab_id, user_qr_id, referred_by_user_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
-	$stmtInsert = $conn->prepare($sqlInsert);
-	if (!$stmtInsert) {
-		echo json_encode(['status' => false, 'message' => 'Database error: ' . $conn->error, 'data' => []]);
-		exit();
+	// First check if college_name column exists in user_user table
+	$sqlCheckColumn = "SHOW COLUMNS FROM user_user LIKE 'college_name'";
+	$resultCheckColumn = $conn->query($sqlCheckColumn);
+	$columnExists = $resultCheckColumn && $resultCheckColumn->num_rows > 0;
+
+	if ($columnExists) {
+		// Insert new user with college_name if column exists
+		$sqlInsert = "INSERT INTO user_user(user_email, user_password, user_user_type, user_tag, user_slab_id, user_qr_id, referred_by_user_id, college_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+		$stmtInsert = $conn->prepare($sqlInsert);
+		if (!$stmtInsert) {
+			echo json_encode(['status' => false, 'message' => 'Database error: ' . $conn->error, 'data' => []]);
+			exit();
+		}
+		$stmtInsert->bind_param('ssisssis', $email, $password, $user_type, $user_tag, $default_slab_id, $user_qr_id, $referred_by_user_id, $college_name);
+	} else {
+		// Insert without college_name if column doesn't exist (fallback for existing systems)
+		$sqlInsert = "INSERT INTO user_user(user_email, user_password, user_user_type, user_tag, user_slab_id, user_qr_id, referred_by_user_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+		$stmtInsert = $conn->prepare($sqlInsert);
+		if (!$stmtInsert) {
+			echo json_encode(['status' => false, 'message' => 'Database error: ' . $conn->error, 'data' => []]);
+			exit();
+		}
+		$stmtInsert->bind_param('ssisssi', $email, $password, $user_type, $user_tag, $default_slab_id, $user_qr_id, $referred_by_user_id);
+
+		// Log the college name if provided but column doesn't exist
+		if (!empty($college_name)) {
+			error_log("College name '$college_name' provided for user '$email' but college_name column doesn't exist in user_user table");
+		}
 	}
-	// Always store default slab id
-	$stmtInsert->bind_param('ssisssi', $email, $password, $user_type, $user_tag, $default_slab_id, $user_qr_id, $referred_by_user_id);
+
 	$success = $stmtInsert->execute();
 	$stmtInsert->close();
 

@@ -1,0 +1,915 @@
+const profileFunction = {
+    init: function () {
+        const urlParams = new URLSearchParams(window.location.search);
+        const viewingQr = urlParams.get('qr');
+        const userQr = $('#user_qr').val();
+        const userId = $('#user_id').val();
+
+        if (viewingQr) {
+            // Viewing someone else's profile or own profile via QR link
+            window.PUBLIC_PROFILE = true;
+            this.getProfileData(viewingQr);
+            this.initQRCode(viewingQr);
+            this.checkLoginAndSetupView(viewingQr, userQr);
+            this.setAllFieldsReadOnly();
+            $('#qr-color-controls').addClass('hidden');
+            $('#update-profile-btn').addClass('hidden');
+        } else {
+            // Own profile edit mode
+            window.PUBLIC_PROFILE = false;
+            this.getProfileData();
+            this.initQRCode();
+            this.getFollowersCount(userQr, userId);
+            $('#qr-color-controls').removeClass('hidden');
+            $('#update-profile-btn').removeClass('hidden');
+            $('#follow-btn-container').addClass('hidden');
+        }
+
+        this.checkForProfileImage();
+        this.setupEventHandlers();
+    },
+
+    checkLoginAndSetupView: function (viewingQr, userQr) {
+        console.log('Checking login for QR:', viewingQr, 'vs user QR:', userQr);
+
+        // First, make sure follow button container is visible
+        $('#follow-btn-container').removeClass('hidden');
+
+        // Check if user is logged in
+        $.ajax({
+            url: '../backend/profile_new/check_login_status.php',
+            type: 'GET',
+            dataType: 'json',
+            success: function (loginRes) {
+                console.log('Login status:', loginRes);
+
+                if (loginRes.logged_in) {
+                    const userId = loginRes.user_id;
+
+                    if (viewingQr === userQr) {
+                        // User is viewing their own profile via QR link
+                        $('#follow-btn-container').addClass('hidden');
+                        profileFunction.getFollowersCount(viewingQr, userId);
+                    } else {
+                        // Logged in user viewing someone else's profile
+                        console.log('Setting up follow button for different user');
+                        profileFunction.getFollowButtonDetails(viewingQr, userId);
+                        profileFunction.getFollowersCount(viewingQr, userId);
+                    }
+                } else {
+                    // Not logged in - show login prompt button
+                    console.log('User not logged in, showing login button');
+                    $('#follow-btn-container').html(`
+                        <button class="btn btn-primary" id="login-to-follow-btn">
+                            <i class="fas fa-sign-in-alt"></i> Login to Follow
+                        </button>
+                    `).removeClass('hidden');
+
+                    // Get followers count without user context
+                    profileFunction.getFollowersCount(viewingQr, null);
+                }
+            },
+            error: function () {
+                console.log('Error checking login status, assuming not logged in');
+                // Assume not logged in on error
+                $('#follow-btn-container').html(`
+                    <button class="btn btn-primary" id="login-to-follow-btn">
+                        <i class="fas fa-sign-in-alt"></i> Login to Follow
+                    </button>
+                `).removeClass('hidden');
+                profileFunction.getFollowersCount(viewingQr, null);
+            }
+        });
+    },
+
+    setupEventHandlers: function () {
+        // Profile image upload (only in edit mode)
+        if (!window.PUBLIC_PROFILE) {
+            // Remove any existing handlers first
+            $('#click_profile_img').off('click');
+            $('#upload_profile_img').off('change');
+
+            $('#click_profile_img').on('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                $('#upload_profile_img').click();
+            });
+
+            $('#upload_profile_img').on('change', this.handleProfileImageUpload);
+        }
+
+        // QR Color changes (only in edit mode)
+        if (!window.PUBLIC_PROFILE) {
+            $('#qr-color-dark, #qr-color-light').on('input', this.handleQRColorChange);
+            $('#save-qr-color').on('click', this.handleSaveQRColor);
+        }
+
+        // Follow/Unfollow buttons
+        $(document).on('click', '#follow-btn', this.handleFollowClick);
+        $(document).on('click', '#unfollow-btn', this.handleUnfollowClick);
+        $(document).on('click', '#login-to-follow-btn', this.handleLoginRedirect);
+
+        // Followers/Following modal clicks
+        $(document).on('click', '#followers-count, .followers-link', this.showFollowersModal);
+        $(document).on('click', '#following-count, .following-link', this.showFollowingModal);
+
+        // Profile form submission (only in edit mode)
+        if (!window.PUBLIC_PROFILE) {
+            $('#form-create-item').on('submit', this.handleProfileSubmit);
+        }
+
+        // Set up visit links
+        this.setupSocialLinks();
+    },
+    showFollowersModal: function () {
+        const qrId = window.PUBLIC_PROFILE ?
+            new URLSearchParams(window.location.search).get('qr') :
+            $('#user_qr').val();
+
+        profileFunction.loadFollowersModal(qrId, 'followers');
+    },
+
+    showFollowingModal: function () {
+        const qrId = window.PUBLIC_PROFILE ?
+            new URLSearchParams(window.location.search).get('qr') :
+            $('#user_qr').val();
+
+        profileFunction.loadFollowersModal(qrId, 'following');
+    },
+
+    loadFollowersModal: function (qrId, type) {
+        $.ajax({
+            url: '../backend/profile_new/get_followers_list.php',
+            type: 'POST',
+            data: JSON.stringify({ qr_id: qrId, type: type }),
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function (res) {
+                if (res.status) {
+                    profileFunction.displayFollowersModal(res.data, type);
+                } else {
+                    showToast('Failed to load ' + type, 'error');
+                }
+            },
+            error: function () {
+                showToast('Error loading ' + type, 'error');
+            }
+        });
+    },
+
+    displayFollowersModal: function (data, type) {
+        const title = type === 'followers' ? 'Followers' : 'Following';
+        let content = `<div class="modal fade" id="followersModal" tabindex="-1" role="dialog" aria-labelledby="followersModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="followersModalLabel">${title}</h5>
+
+                </div>
+                <div class="modal-body">`;
+
+        if (data.length === 0) {
+            content += `<p>No ${type} found.</p>`;
+        } else {
+            data.forEach(user => {
+                const userImage = user.user_image_path || 'https://via.placeholder.com/40x40/667eea/ffffff?text=' + (user.user_full_name ? user.user_full_name.charAt(0) : 'A');
+                content += `
+                <div class="d-flex align-items-center mb-3 p-2 border-bottom">
+                    <img src="${userImage}" 
+                         class="rounded-circle me-3" width="40" height="40" 
+                         style="object-fit: cover; border: 2px solid #007bff;">
+                    <div>
+                        <div class="fw-bold" style="color: #fff;">${user.user_full_name || 'Anonymous'}</div>
+                        <small class="text-muted">@${user.user_qr_id}</small>
+                    </div>
+                </div>`;
+            });
+        }
+
+        content += `</div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>`;
+
+        // Remove existing modal and add new one
+        $('#followersModal').remove();
+        $('body').append(content);
+
+        // Initialize the modal manually and show it
+        $('#followersModal').modal({
+            backdrop: true,
+            keyboard: true,
+            focus: true
+        }).modal('show');
+
+        // Add explicit close handlers
+        $('#followersModal .close, #followersModal [data-dismiss="modal"]').on('click', function () {
+            $('#followersModal').modal('hide');
+        });
+    },
+    handleLoginRedirect: function () {
+        // Redirect to login page with return URL
+        const currentUrl = window.location.href;
+        window.location.href = '../ui/login.php?return=' + encodeURIComponent(currentUrl);
+    },
+
+    setupSocialLinks: function () {
+        const socialLinksConfig = {
+            website: { field: 'website', base: '' },
+            whatsapp_link: { field: 'whatsapp_link', base: 'https://wa.me/' },
+            telegram_link: { field: 'telegram_link', base: 'https://t.me/' },
+            twitter_username: { field: 'twitter_username', base: 'https://twitter.com/' },
+            instagram_username: { field: 'instagram_username', base: 'https://instagram.com/' },
+            youtube_username: { field: 'youtube_username', base: 'https://youtube.com/@' },
+            linkedin_username: { field: 'linkedin_username', base: 'https://linkedin.com/in/' },
+            snapchat_username: { field: 'snapchat_username', base: 'https://snapchat.com/add/' }
+        };
+
+        if (!window.PUBLIC_PROFILE) {
+            // Edit mode - add visit links as before
+            Object.entries(socialLinksConfig).forEach(([field, config]) => {
+                const inputGroup = $(`#${field}`).closest('.input-group');
+                if (!inputGroup.find('.visit-link').length) {
+                    inputGroup.append(`
+                    <div class="input-group-append">
+                        <button class="btn btn-outline visit-link" data-field="${field}" data-base="${config.base}">
+                            <i class="fas fa-external-link-alt"></i>
+                        </button>
+                    </div>
+                `);
+                }
+            });
+
+            $(document).on('click', '.visit-link', function (e) {
+                e.preventDefault();
+                const field = $(this).data('field');
+                const baseUrl = $(this).data('base');
+                const value = $(`#${field}`).val();
+                if (value) {
+                    const url = field === 'website' ? value : baseUrl + value;
+                    window.open(url.startsWith('http') ? url : 'https://' + url, '_blank');
+                }
+            });
+        } else {
+            // Public view - make individual fields clickable with visit button
+            Object.entries(socialLinksConfig).forEach(([field, config]) => {
+                const inputField = $(`#${field}`);
+                const value = inputField.val();
+
+                if (value && value.trim() !== '') {
+                    const url = field === 'website' ? value : config.base + value;
+                    const finalUrl = url.startsWith('http') ? url : 'https://' + url;
+
+                    // Add a visit button to the input group
+                    const inputGroup = inputField.closest('.input-group');
+                    if (!inputGroup.find('.public-visit-link').length) {
+                        inputGroup.append(`
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-primary public-visit-link" data-url="${finalUrl}">
+                                <i class="fas fa-external-link-alt"></i>
+                            </button>
+                        </div>
+                    `);
+                    }
+
+                    // Style the input field to look readonly but not clickable
+                    inputField.css({
+                        'background-color': 'rgba(255, 255, 255, 0.1)',
+                        'border': '1px solid #444',
+                        'color': '#007bff',
+                        'cursor': 'default'
+                    });
+                }
+            });
+
+            // Handle public visit link clicks
+            $(document).on('click', '.public-visit-link', function (e) {
+                e.preventDefault();
+                const url = $(this).data('url');
+                window.open(url, '_blank');
+            });
+        }
+    },
+
+
+    getFollowersCount: function (qrId, followerId) {
+        if (!qrId) return;
+
+        const data = { qr_id: qrId };
+        if (followerId) {
+            data.follower_id = followerId;
+        }
+
+        $.ajax({
+            url: '../backend/profile_new/get_followers_count.php',
+            type: 'POST',
+            data: JSON.stringify(data),
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function (resp) {
+                if (typeof resp.total_count !== 'undefined') {
+                    $('#followers-count').text(resp.total_count);
+                }
+                if (typeof resp.following_count !== 'undefined') {
+                    $('#following-count').text(resp.following_count);
+                }
+            }
+        });
+    },
+
+    getFollowButtonDetails: function (qrId, followerId) {
+        console.log('Getting follow button details for:', qrId, 'follower:', followerId);
+
+        if (!qrId || !followerId) {
+            console.log('Missing qrId or followerId');
+            return;
+        }
+
+        $.ajax({
+            url: '../backend/profile_new/get_user_type.php',
+            type: 'POST',
+            data: { qr_id: qrId },
+            dataType: 'json',
+            success: function (res) {
+                console.log('User type response:', res);
+
+                if (res && res.user_user_type != 1) {
+                    // Check if already following
+                    $.ajax({
+                        url: '../backend/profile_new/check_follow_status.php',
+                        type: 'POST',
+                        data: JSON.stringify({ qr_id: qrId, follower_id: followerId }),
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        success: function (followRes) {
+                            console.log('Follow status response:', followRes);
+
+                            let btnHtml;
+                            if (followRes.is_following) {
+                                btnHtml = `
+                                    <button class="btn btn-outline-danger" id="unfollow-btn">
+                                        <i class="fas fa-user-minus"></i> Unfollow
+                                    </button>
+                                `;
+                            } else {
+                                btnHtml = `
+                                    <button class="btn btn-primary" id="follow-btn">
+                                        <i class="fas fa-user-plus"></i> Follow
+                                    </button>
+                                `;
+                            }
+
+                            $('#follow-btn-container').html(btnHtml).removeClass('hidden').show();
+                            console.log('Follow button set and should be visible now');
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Error checking follow status:', error, xhr.responseText);
+                        }
+                    });
+                } else {
+                    console.log('User type is 1, hiding follow button');
+                    $('#follow-btn-container').addClass('hidden');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Error getting user type:', error, xhr.responseText);
+            }
+        });
+    },
+
+    setAllFieldsReadOnly: function () {
+        // Make all form inputs readonly
+        $('input, select, textarea').not('[type="hidden"]').prop('readonly', true);
+
+        // Hide all privacy toggles and controls - but keep the structure
+        $('.public-toggle, .public-toggle-input, .form-check').hide();
+
+        // Disable file uploads
+        $('#upload_profile_img').prop('disabled', true);
+
+        // Remove click handlers for profile image
+        $('#click_profile_img').off('click');
+        $('.profile-image-container').css('cursor', 'default');
+
+        // Hide edit-only elements
+        $('.edit-only').hide();
+
+        // Add public view styling
+        $('body').addClass('public-view-mode');
+
+        // Style basic info fields consistently
+        $('#full_name, #phone_number, #email_address, #address').css({
+            'background-color': 'rgba(255, 255, 255, 0.1)',
+            'border': '1px solid #444',
+            'color': '#fff',
+            'cursor': 'default'
+        });
+
+        // Remove any unwanted click events from the entire form
+        $('.form-control').off('click');
+    }
+    ,
+    handleProfileImageUpload: function (e) {
+        const file = this.files[0];
+        if (!file) return;
+
+        const ext = file.name.split('.').pop().toLowerCase();
+        if (!['jpg', 'jpeg', 'png'].includes(ext)) {
+            alert('Only JPG and PNG files are allowed.');
+            this.value = ''; // Clear the input
+            return;
+        }
+
+        // Check file size (max 5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('File size must be less than 5MB.');
+            this.value = '';
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('profile_img', file);
+        formData.append('user_id', $('#user_id').val());
+
+        // Show loading state
+        const $profileImg = $('#click_profile_img');
+        const originalSrc = $profileImg.attr('src');
+        $profileImg.css('opacity', '0.5');
+
+        $.ajax({
+            url: '../backend/profile_new/profile_upload.php',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: 'json',
+            success: function (res) {
+                if (res.status) {
+                    $profileImg.attr('src', res.src + '?t=' + Date.now()).css('opacity', '1');
+                    showToast('Profile image updated successfully!');
+                } else {
+                    $profileImg.css('opacity', '1');
+                    showToast(res.message || 'Upload failed.', 'error');
+                }
+            },
+            error: function (xhr) {
+                $profileImg.css('opacity', '1');
+                console.error('Upload error:', xhr.responseText);
+                showToast('Upload error.', 'error');
+            }
+        });
+
+        // Clear the input
+        this.value = '';
+    },
+
+    handleQRColorChange: function () {
+        const colorDark = $('#qr-color-dark').val();
+        const colorLight = $('#qr-color-light').val();
+        const userQr = $('#user_qr').val();
+
+        profileFunction.generateQRCode(userQr, colorDark, colorLight);
+    },
+
+    handleSaveQRColor: function () {
+        const userId = $('#user_id').val();
+        const colorDark = $('#qr-color-dark').val();
+        const colorLight = $('#qr-color-light').val();
+
+        $.ajax({
+            url: '../backend/profile_new/save_qr_color.php',
+            type: 'POST',
+            data: JSON.stringify({
+                user_id: userId,
+                colorDark: colorDark,
+                colorLight: colorLight
+            }),
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function (res) {
+                if (res.status) {
+                    showToast('QR colors saved successfully!');
+                } else {
+                    showToast(res.message || 'Failed to save QR colors.', 'error');
+                }
+            },
+            error: function () {
+                showToast('Error saving QR colors.', 'error');
+            }
+        });
+    },
+
+    handleFollowClick: function () {
+        const qrId = new URLSearchParams(window.location.search).get('qr');
+
+        // Check if user is logged in first
+        $.ajax({
+            url: '../backend/profile_new/check_login_status.php',
+            type: 'GET',
+            dataType: 'json',
+            success: function (loginRes) {
+                if (!loginRes.logged_in) {
+                    profileFunction.handleLoginRedirect();
+                    return;
+                }
+
+                const followerId = loginRes.user_id;
+
+                $.ajax({
+                    url: '../backend/profile_new/save_follow_user.php',
+                    type: 'POST',
+                    data: JSON.stringify({ qr_id: qrId, followers_id: followerId }),
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    success: function (res) {
+                        if (res.status) {
+                            showToast('Followed successfully!');
+                            $('#follow-btn').replaceWith(`
+                                <button class="btn btn-outline" id="unfollow-btn">
+                                    <i class="fas fa-user-minus"></i> Unfollow
+                                </button>
+                            `);
+                            profileFunction.getFollowersCount(qrId, followerId);
+                        } else {
+                            showToast(res.message || 'Could not follow.', 'error');
+                        }
+                    },
+                    error: function () {
+                        showToast('Error following user.', 'error');
+                    }
+                });
+            }
+        });
+    },
+
+    handleUnfollowClick: function () {
+        const qrId = new URLSearchParams(window.location.search).get('qr');
+
+        $.ajax({
+            url: '../backend/profile_new/check_login_status.php',
+            type: 'GET',
+            dataType: 'json',
+            success: function (loginRes) {
+                if (!loginRes.logged_in) {
+                    profileFunction.handleLoginRedirect();
+                    return;
+                }
+
+                const followerId = loginRes.user_id;
+
+                $.ajax({
+                    url: '../backend/profile_new/unfollow_user.php',
+                    type: 'POST',
+                    data: JSON.stringify({ qr_id: qrId, followers_id: followerId }),
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    success: function (res) {
+                        if (res.status) {
+                            showToast('Unfollowed successfully!');
+                            $('#unfollow-btn').replaceWith(`
+                                <button class="btn btn-primary" id="follow-btn">
+                                    <i class="fas fa-user-plus"></i> Follow
+                                </button>
+                            `);
+                            profileFunction.getFollowersCount(qrId, followerId);
+                        } else {
+                            showToast(res.message || 'Could not unfollow.', 'error');
+                        }
+                    },
+                    error: function () {
+                        showToast('Error unfollowing user.', 'error');
+                    }
+                });
+            }
+        });
+    },
+
+    handleProfileSubmit: function (e) {
+        e.preventDefault();
+        console.log('Profile submit triggered'); // Debug log
+
+        const formData = {
+            user_id: $('#user_id').val(),
+            user_full_name: $('#full_name').val(),
+            phone_number: $('#phone_number').val(),
+            user_email: $('#email_address').val(),
+            user_address: $('#address').val(),
+            links: {},
+            fields: []
+        };
+
+        // Collect social media links
+        const fields = [
+            'website',
+            'whatsapp_link',
+            'telegram_link',
+            'twitter_username',
+            'instagram_username',
+            'youtube_username',
+            'linkedin_username',
+            'snapchat_username'
+        ];
+
+        fields.forEach(field => {
+            formData.fields.push(field);
+            formData.links[field] = {
+                value: $(`#${field}`).val(),
+                is_public: $(`#public_${field}`).is(':checked') ? 1 : 0
+            };
+        });
+
+        console.log('Sending form data:', formData); // Debug log
+
+        $.ajax({
+            url: '../backend/profile_new/save_profile_data.php',
+            type: 'POST',
+            data: JSON.stringify(formData),
+            contentType: 'application/json',
+            dataType: 'json',
+            success: function (res) {
+                console.log('Profile update response:', res); // Debug log
+                if (res.status) {
+                    showToast('Profile updated successfully!', 'success');
+                } else {
+                    showToast(res.message || 'Profile update failed.', 'error');
+                }
+            },
+            error: function (xhr, status, error) {
+                console.error('Profile update error:', error, xhr.responseText); // Debug log
+                showToast('Error saving profile.', 'error');
+            }
+        });
+    },
+
+
+    getProfileData: function (qrId = "") {
+        const data = qrId ? { qr: qrId } : { user_id: $('#user_id').val() };
+
+        $.ajax({
+            url: '../backend/profile_new/get_profile_data.php',
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            success: function (res) {
+                console.log('Profile data received:', res);
+
+                if (res.user) {
+                    const user = res.user;
+                    const fullName = user.user_full_name || 'Anonymous';
+
+                    // Set initials
+                    const initials = fullName.split(' ')
+                        .map(word => word.charAt(0).toUpperCase())
+                        .slice(0, 2)
+                        .join('');
+                    $('#click_profile_img').attr('data-initials', initials);
+
+                    // Populate fields
+                    $('#full_name').val(user.user_full_name || '');
+                    $('#phone_number').val(user.user_phone || '');
+                    $('#email_address').val(user.user_email || '');
+                    $('#address').val(user.user_address || '');
+                    $('#user-name').text(fullName);
+
+                    // Hide empty fields in public view
+                    if (window.PUBLIC_PROFILE) {
+                        profileFunction.hideEmptyFields(user);
+                    }
+                }
+
+                if (res.links) {
+                    Object.entries(res.links).forEach(([fieldId, value]) => {
+                        if (value && typeof value === 'object') {
+                            const fieldValue = value.value || '';
+                            const isPublic = value.is_public == 1;
+
+                            $(`#${fieldId}`).val(fieldValue);
+                            if (!window.PUBLIC_PROFILE) {
+                                $(`#public_${fieldId}`).prop('checked', isPublic);
+                            }
+                        }
+                    });
+
+                    // Hide empty social media fields in public view
+                    if (window.PUBLIC_PROFILE) {
+                        profileFunction.hideEmptySocialFields(res.links);
+                    }
+                }
+
+                // Setup social links after data is loaded
+                profileFunction.setupSocialLinks();
+            },
+            error: function (xhr, status, error) {
+                console.error('Error fetching profile data:', error);
+            }
+        });
+    },
+
+    hideEmptyFields: function (user) {
+        // Hide basic info fields that are empty
+        const basicFields = {
+            'full_name': user.user_full_name,
+            'phone_number': user.user_phone,
+            'email_address': user.user_email,
+            'address': user.user_address
+        };
+
+        Object.entries(basicFields).forEach(([fieldId, value]) => {
+            if (!value || value.trim() === '') {
+                $(`#${fieldId}`).closest('.col-md-3, .form-group').hide();
+            }
+        });
+    },
+    hideEmptySocialFields: function (links) {
+        // Define all possible social media fields
+        const allSocialFields = [
+            'website',
+            'whatsapp_link',
+            'telegram_link',
+            'twitter_username',
+            'instagram_username',
+            'youtube_username',
+            'linkedin_username',
+            'snapchat_username'
+        ];
+
+        // Hide fields that don't have values or aren't in the links data
+        allSocialFields.forEach(fieldId => {
+            const hasValue = links[fieldId] && links[fieldId].value && links[fieldId].value.trim() !== '';
+            if (!hasValue) {
+                // Hide the entire column/form group containing this field
+                $(`#${fieldId}`).closest('.col-md-4, .col-lg-4, .form-group, .col').hide();
+            } else {
+                // Mark fields with values for different styling
+                $(`#${fieldId}`).attr('data-has-link', 'true');
+            }
+        });
+    },
+
+
+    initQRCode: function (qrId = '') {
+        const userId = $('#user_id').val();
+        const userQr = qrId || $('#user_qr').val();
+
+        // Always use profile.php for QR codes
+        const baseUrl = window.location.origin + '/qr/user/src/ui/profile.php';
+        const qrUrl = baseUrl + '?qr=' + encodeURIComponent(userQr || '');
+
+        const data = {};
+        if (userId) data.user_id = userId;
+        if (qrId) data.qr_id = qrId;
+
+        $.ajax({
+            url: '../backend/profile_new/get_qr_color.php',
+            type: 'POST',
+            data: data,
+            dataType: 'json',
+            success: function (res) {
+                const colorDark = res.colorDark || '#000000';
+                const colorLight = res.colorLight || '#ffffff';
+                $('#qr-color-dark').val(colorDark);
+                $('#qr-color-light').val(colorLight);
+                profileFunction.generateQRCode(qrUrl, colorDark, colorLight);
+            },
+            error: function () {
+                profileFunction.generateQRCode(qrUrl, '#000000', '#ffffff');
+            }
+        });
+    },
+
+    generateQRCode: function (data, colorDark = '#000000', colorLight = '#ffffff') {
+        const element = document.getElementById('click_banner_img');
+        const tempDiv = document.createElement('div');
+
+        new QRCode(tempDiv, {
+            text: data,
+            width: 192,
+            height: 192,
+            colorDark: colorDark,
+            colorLight: colorLight,
+            correctLevel: QRCode.CorrectLevel.H
+        });
+
+        setTimeout(() => {
+            const qrImg = tempDiv.querySelector('img');
+            if (qrImg && element) {
+                element.src = qrImg.src;
+            }
+        }, 100);
+    },
+
+    checkForProfileImage: function () {
+        // Check if we're viewing via QR parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const viewingQr = urlParams.get('qr');
+
+        let requestData = {};
+
+        if (viewingQr) {
+            // Viewing someone's profile via QR - fetch THEIR image
+            requestData = { qr: viewingQr };
+        } else {
+            // Viewing own profile - fetch logged-in user's image
+            const userId = $('#user_id').val();
+            if (!userId) return;
+            requestData = { user_id: userId };
+        }
+
+        $.ajax({
+            url: '../backend/profile_new/get_profile_image.php',
+            type: 'POST',
+            data: requestData,
+            dataType: 'json',
+            success: function (res) {
+                if (res.status && res.src) {
+                    // Fix the image path - ensure it points to the correct directory
+                    let imagePath = res.src;
+
+                    // Convert absolute path to relative if needed
+                    if (imagePath.startsWith('/qr/user/src/')) {
+                        imagePath = '..' + imagePath.substring('/qr/user/src'.length);
+                    } else if (!imagePath.includes('backend') && !imagePath.startsWith('http')) {
+                        imagePath = '../backend/ui/profile/' + imagePath.split('/').pop();
+                    }
+
+                    const img = new Image();
+                    img.onload = function () {
+                        // Image loaded successfully
+                        $('#click_profile_img').attr('src', imagePath);
+                    };
+                    img.onerror = function () {
+                        // Image failed to load, keep initials
+                        console.log('Profile image failed to load, showing initials');
+                        console.log('Attempted path:', imagePath);
+                    };
+                    img.src = imagePath;
+                } else {
+                    console.log('No profile image found, showing initials');
+                }
+            },
+            error: function () {
+                console.log('Error fetching profile image, showing initials');
+            }
+        });
+    }
+};
+
+function showToast(message, type = 'success') {
+    // Remove any existing toasts
+    document.querySelectorAll('.toast-notification').forEach(toast => toast.remove());
+
+    // Create new toast
+    const toast = document.createElement('div');
+    toast.className = `toast-notification ${type}`;
+    toast.textContent = message;
+
+    // Apply styles directly to ensure they work
+    Object.assign(toast.style, {
+        position: 'fixed',
+        top: '20px',
+        right: '20px',
+        padding: '15px 20px',
+        background: type === 'success'
+            ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+            : 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+        color: 'white',
+        borderRadius: '8px',
+        boxShadow: '0 8px 25px rgba(0, 0, 0, 0.4)',
+        zIndex: '2147483647', // Maximum z-index
+        maxWidth: '350px',
+        fontWeight: '500',
+        opacity: '0',
+        transform: 'translateX(400px)', // Start completely off-screen
+        transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+        border: '1px solid rgba(255, 255, 255, 0.2)',
+        pointerEvents: 'none',
+        display: 'block',
+        visibility: 'visible'
+    });
+
+    // Append to body
+    document.body.appendChild(toast);
+
+    // Force reflow and show
+    toast.offsetHeight; // Force reflow
+    toast.style.opacity = '1';
+    toast.style.transform = 'translateX(0)';
+
+    // Auto-hide after 4 seconds
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(400px)';
+        setTimeout(() => {
+            if (toast && toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }, 4000);
+}
+
+$(document).ready(function () {
+    profileFunction.init();
+});
