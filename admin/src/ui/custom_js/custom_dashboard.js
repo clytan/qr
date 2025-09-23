@@ -89,7 +89,7 @@ $(document).ready(function () {
     ],
     chart: {
         type: 'bar',
-        height: 365,
+        height: 250,
         stacked: true,
         toolbar: {
             show: true,
@@ -107,7 +107,7 @@ $(document).ready(function () {
     plotOptions: {
         bar: {
             horizontal: false,
-            columnWidth: '20%',  // adjusted for col-xl-6 layout
+            columnWidth: '15%', 
             endingShape: 'rounded'
         }
     },
