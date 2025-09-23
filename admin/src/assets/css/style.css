@@ -36493,7 +36493,7 @@ html[dir="rtl"] [direction="rtl"][data-sidebar-style="compact"]:not([data-layout
   overflow: hidden;
 }
 
-#userTableControls input[type="search"] {
+input[type="search"] {
   width: 150px !important; /* adjust width as needed */
   padding: 6px 8px;
   box-sizing: border-box;
