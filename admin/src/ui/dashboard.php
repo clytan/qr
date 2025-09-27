@@ -1,3 +1,22 @@
+<?php 
+    if (session_status() === PHP_SESSION_NONE) session_start();
+    $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : '';
+    // Direct URL access prevention
+    if ($user_id) {
+        include_once __DIR__ . '/../backend/get_sidebar_permissions.php';
+        $perm = getUserSidebarPermissions($user_id);
+        $allowed = $perm['allowed_pages'];
+        $role_name = $perm['role_name'];
+        $page_label = 'Manage Orders';
+        if ($role_name !== 'Super Admin' && !in_array($page_label, $allowed)) {
+            header('Location: login.php');
+            exit();
+        }
+    } else {
+        header('Location: login.php');
+        exit();
+    }
+?>
 <!DOCTYPE html>
 <html lang="en">
 <?php include('../components/head.php') ?>
@@ -57,6 +76,31 @@
 
                                 <!-- Chart Container -->
                                 <div id="revenueStackedBarChart" style="min-height: 365px; width:100%; margin-top: 20px;"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Users Added Card -->
+                    <div class="col-xl-6">
+                        <div class="card bg-success text-white" style="min-height: 300px;">
+                            <div class="card-header d-flex justify-content-between align-items-center py-2">
+                                <div>
+                                    <h4 class="card-title mb-2 bg-success text-white">Users Added</h4>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <input type="text" class="form-control form-control-sm bg-white"
+                                        id="usersDateRange"
+                                        style="min-width: 220px;"
+                                        readonly 
+                                        placeholder="Select date range">
+                                </div>
+                            </div>
+                            <div class="card-body py-2">
+                                <div class="mb-3">
+                                    <h6 class="mb-2">Total Users Added</h6>
+                                    <h6 class="mb-0" id="totalUsersLabel">0</h6>
+                                </div>
+                                <div id="usersAddedBarChart" style="min-height: 250px; width:100%; margin-top: 20px;"></div>
                             </div>
                         </div>
                     </div>

@@ -3,7 +3,7 @@
 if (session_status() === PHP_SESSION_NONE) session_start();
 $user_id = $_SESSION['user_id'] ?? null;
 $sidebar = [
-    ["href" => "./index.php", "label" => "Dashboard"],
+    ["href" => "./dashboard.php", "label" => "Dashboard"],
     ["href" => "./manage_users.php", "label" => "Manage Users"],
     ["href" => "./slab_change.php", "label" => "Slab Change Request"],
     ["href" => "./orders.php", "label" => "Manage Orders"],

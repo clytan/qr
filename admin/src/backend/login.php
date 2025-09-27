@@ -29,7 +29,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($resultLogin->num_rows > 0) {
         $user = $resultLogin->fetch_assoc();
         $_SESSION['user'] = 'employee';
-        $redirectUrl = 'index.php';
+        $redirectUrl = 'dashboard.php';
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_role_id'] = $user['role_id'];
 
