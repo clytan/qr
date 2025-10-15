@@ -754,9 +754,10 @@ const profileFunction = {
         const userId = $('#user_id').val();
         const userQr = qrId || $('#user_qr').val();
 
-        // Always use profile.php for QR codes
-        const baseUrl = window.location.origin + '/qr/user/src/ui/profile.php';
-        const qrUrl = baseUrl + '?qr=' + encodeURIComponent(userQr || '');
+        // Get the current path and replace profile_new.php with profile.php
+        const currentPath = window.location.pathname;
+        const basePath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
+        const qrUrl = window.location.origin + basePath + 'profile.php?qr=' + encodeURIComponent(userQr || '');
 
         const data = {};
         if (userId) data.user_id = userId;

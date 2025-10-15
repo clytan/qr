@@ -25,13 +25,16 @@
                                 <a href="index.php">HOME<span></span></a>
                             </li>
                             <li>
-                                <a href="index.php">CHAT<span></span></a>
+                                <a href="community.php">CHAT<span></span></a>
                             </li>
                             <li>
-                                <a href="index.php">REWARDS<span></span></a>
+                                <a href="login.php">LOGIN<span></span></a>
                             </li>
                             <li>
-                                <a href="index.php">BIZ<span></span></a>
+                                <a href="register.php">REGISTER<span></span></a>
+                            </li>
+                            <li>
+                                <a href="admin\src\ui\login.php">admin<span></span></a>
                             </li>
                         </ul>
                         <!-- mainmenu close -->

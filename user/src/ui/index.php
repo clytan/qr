@@ -101,7 +101,7 @@
         <!-- Profile begins -->
 
         <!-- Profile ends-->
-        <?php include('./profile_new.php'); ?>
+        <?php include('./profile.php'); ?>
         <!-- content close -->
 
         <a href="#" id="back-to-top"></a>
