@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 <?php
-    include '../backend/dbconfig/connection.php';
-    session_start();
-    $is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
-    $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
+include '../backend/dbconfig/connection.php';
+session_start();
+$is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
+$user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
 ?>
 
 <head>
@@ -12,13 +12,14 @@
     <link rel="icon" href="../assets/images/icon-red.png" type="image/gif" sizes="16x16">
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <meta content="ZQR - Create your QR profile, connect instantly, join communities and manage your digital wallet" name="description" />
+    <meta content="ZQR - Create your QR profile, connect instantly, join communities and manage your digital wallet"
+        name="description" />
     <meta content="QR code, digital profile, community, chat, wallet, instant connection" name="keywords" />
     <meta content="ZQR" name="author" />
     <!-- CSS Files -->
     <?php include('../components/csslinks.php') ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         :root {
             --primary: #667eea;
@@ -50,7 +51,7 @@
             width: 100%;
             height: calc(100% + 100px);
             background: linear-gradient(135deg, rgba(10, 14, 39, 0.95) 0%, rgba(26, 31, 58, 0.95) 100%),
-                        url('../assets/images/background/1.jpg') center/cover;
+                url('../assets/images/background/1.jpg') center/cover;
             transform: translateZ(-1px) scale(1.5);
             z-index: -1;
         }
@@ -160,30 +161,82 @@
             animation: float 20s infinite ease-in-out;
         }
 
-        .shape-1 { top: 10%; left: 10%; width: 100px; height: 100px; background: var(--gradient-1); border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%; }
-        .shape-2 { top: 60%; right: 15%; width: 150px; height: 150px; background: var(--gradient-2); border-radius: 63% 37% 54% 46% / 55% 48% 52% 45%; animation-delay: -5s; }
-        .shape-3 { bottom: 20%; left: 20%; width: 80px; height: 80px; background: var(--gradient-3); border-radius: 41% 59% 58% 42% / 45% 60% 40% 55%; animation-delay: -10s; }
+        .shape-1 {
+            top: 10%;
+            left: 10%;
+            width: 100px;
+            height: 100px;
+            background: var(--gradient-1);
+            border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+        }
+
+        .shape-2 {
+            top: 60%;
+            right: 15%;
+            width: 150px;
+            height: 150px;
+            background: var(--gradient-2);
+            border-radius: 63% 37% 54% 46% / 55% 48% 52% 45%;
+            animation-delay: -5s;
+        }
+
+        .shape-3 {
+            bottom: 20%;
+            left: 20%;
+            width: 80px;
+            height: 80px;
+            background: var(--gradient-3);
+            border-radius: 41% 59% 58% 42% / 45% 60% 40% 55%;
+            animation-delay: -10s;
+        }
 
         @keyframes float {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(30px, -30px) rotate(90deg); }
-            50% { transform: translate(-20px, 20px) rotate(180deg); }
-            75% { transform: translate(40px, 10px) rotate(270deg); }
+
+            0%,
+            100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+
+            25% {
+                transform: translate(30px, -30px) rotate(90deg);
+            }
+
+            50% {
+                transform: translate(-20px, 20px) rotate(180deg);
+            }
+
+            75% {
+                transform: translate(40px, 10px) rotate(270deg);
+            }
         }
 
         @keyframes fadeInDown {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         /* Enhanced Carousel Section */
         .carousel-section {
-            padding: 100px 0;
+            padding: 40px 0;
             background: var(--darker);
             position: relative;
             overflow: hidden;
@@ -191,7 +244,7 @@
 
         .section-header {
             text-align: center;
-            margin-bottom: 60px;
+            margin-bottom: 30px;
         }
 
         .section-title {
@@ -240,7 +293,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%);
+            background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, transparent 100%);
             padding: 30px;
             color: white;
             transform: translateY(20px);
@@ -281,7 +334,7 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 20px;
-            padding: 40px 30px;
+            padding: 25px 20px;
             transition: all 0.4s ease;
             position: relative;
             overflow: hidden;
@@ -324,8 +377,13 @@
             z-index: 1;
         }
 
-        .feature-card:nth-child(2) .feature-icon { background: var(--gradient-2); }
-        .feature-card:nth-child(3) .feature-icon { background: var(--gradient-3); }
+        .feature-card:nth-child(2) .feature-icon {
+            background: var(--gradient-2);
+        }
+
+        .feature-card:nth-child(3) .feature-icon {
+            background: var(--gradient-3);
+        }
 
         .feature-title {
             font-size: 1.5rem;
@@ -344,14 +402,14 @@
 
         /* Stats Counter */
         .stats-section {
-            padding: 80px 0;
+            padding: 40px 0;
             background: var(--gradient-1);
         }
 
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 40px;
+            gap: 20px;
             text-align: center;
         }
 
@@ -374,9 +432,9 @@
         /* CTA Section with Image */
         .cta-parallax {
             position: relative;
-            padding: 150px 0;
+            padding: 60px 0;
             background: linear-gradient(135deg, rgba(240, 147, 251, 0.95) 0%, rgba(245, 87, 108, 0.95) 100%),
-                        url('../assets/images/background/5.jpg') center/cover fixed;
+                url('../assets/images/background/5.jpg') center/cover fixed;
             text-align: center;
             color: white;
         }
@@ -384,6 +442,7 @@
         .cta-content {
             max-width: 800px;
             margin: 0 auto;
+            padding: 0 20px;
         }
 
         .cta-title {
@@ -400,18 +459,46 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            .hero-title { font-size: 2.5rem; }
-            .hero-subtitle { font-size: 1.1rem; }
-            .section-title { font-size: 2rem; }
-            .cta-title { font-size: 2rem; }
-            .stat-number { font-size: 2.5rem; }
-            .hero-buttons { flex-direction: column; align-items: center; }
-            .btn-hero { width: 100%; max-width: 300px; justify-content: center; }
-            .carousel-item-enhanced img { height: 300px; }
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .cta-title {
+                font-size: 2rem;
+            }
+
+            .stat-number {
+                font-size: 2.5rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .btn-hero {
+                width: 100%;
+                max-width: 300px;
+                justify-content: center;
+            }
+
+            .carousel-item-enhanced img {
+                height: 300px;
+            }
         }
 
         /* Smooth Scroll */
-        html { scroll-behavior: smooth; }
+        html {
+            scroll-behavior: smooth;
+        }
     </style>
 </head>
 
@@ -420,20 +507,20 @@
         <!-- header begin -->
         <?php include('../components/header.php') ?>
         <!-- header close -->
-        
+
         <!-- content begin -->
         <div class="no-bottom no-top" id="content">
-            
+
             <!-- Hero Section with Parallax -->
             <section class="hero-parallax" data-parallax="scroll">
                 <div class="parallax-bg"></div>
-                
+
                 <div class="floating-shapes">
                     <div class="shape shape-1"></div>
                     <div class="shape shape-2"></div>
                     <div class="shape shape-3"></div>
                 </div>
-                
+
                 <div class="hero-content-wrapper">
                     <?php if ($is_logged_in): ?>
                         <div class="hero-badge">
@@ -444,17 +531,17 @@
                             <i class="fas fa-star"></i> The Future of Digital Connection
                         </div>
                     <?php endif; ?>
-                    
+
                     <h1 class="hero-title">
                         Connect Through<br>
                         <span class="gradient-text">QR Codes</span>
                     </h1>
-                    
+
                     <p class="hero-subtitle">
                         Create your unique QR profile, share instantly with anyone, join vibrant communities,
                         and manage your digital wallet — all in one powerful platform.
                     </p>
-                    
+
                     <div class="hero-buttons">
                         <?php if (!$is_logged_in): ?>
                             <a href="register.php" class="btn-hero btn-primary">
@@ -484,7 +571,7 @@
                             Explore the powerful capabilities that make ZQR your ultimate digital connection platform
                         </p>
                     </div>
-                    
+
                     <div class="enhanced-carousel">
                         <div id="feature-carousel" class="owl-carousel owl-theme">
                             <div class="carousel-item-enhanced">
@@ -494,7 +581,7 @@
                                     <p>Create your personalized QR code profile in seconds and share with anyone</p>
                                 </div>
                             </div>
-                            
+
                             <div class="carousel-item-enhanced">
                                 <img src="../assets/images/carousel/crs-2.jpg" alt="Community Chat">
                                 <div class="carousel-overlay">
@@ -502,7 +589,7 @@
                                     <p>Join communities, engage in conversations, and build meaningful relationships</p>
                                 </div>
                             </div>
-                            
+
                             <div class="carousel-item-enhanced">
                                 <img src="../assets/images/carousel/crs-3.jpg" alt="Digital Wallet">
                                 <div class="carousel-overlay">
@@ -510,7 +597,7 @@
                                     <p>Manage your digital assets with our secure and easy-to-use wallet system</p>
                                 </div>
                             </div>
-                            
+
                             <div class="carousel-item-enhanced">
                                 <img src="../assets/images/carousel/crs-4.jpg" alt="Customization">
                                 <div class="carousel-overlay">
@@ -518,7 +605,7 @@
                                     <p>Personalize your QR code colors and profile theme to match your style</p>
                                 </div>
                             </div>
-                            
+
                             <div class="carousel-item-enhanced">
                                 <img src="../assets/images/carousel/crs-5.jpg" alt="Analytics">
                                 <div class="carousel-overlay">
@@ -526,7 +613,7 @@
                                     <p>Track your profile views, connections, and engagement with detailed insights</p>
                                 </div>
                             </div>
-                            
+
                             <div class="carousel-item-enhanced">
                                 <img src="../assets/images/carousel/crs-6.jpg" alt="Security">
                                 <div class="carousel-overlay">
@@ -548,7 +635,7 @@
                             Everything you need to manage your digital presence in one place
                         </p>
                     </div>
-                    
+
                     <div class="features-grid">
                         <div class="feature-card wow fadeInUp" data-wow-delay="0.1s">
                             <div class="feature-icon">
@@ -556,10 +643,11 @@
                             </div>
                             <h3 class="feature-title">Lightning Fast</h3>
                             <p class="feature-description">
-                                Create and share your QR profile in seconds. No complicated setup, just instant connections.
+                                Create and share your QR profile in seconds. No complicated setup, just instant
+                                connections.
                             </p>
                         </div>
-                        
+
                         <div class="feature-card wow fadeInUp" data-wow-delay="0.2s">
                             <div class="feature-icon">
                                 <i class="fas fa-mobile-alt"></i>
@@ -569,7 +657,7 @@
                                 Optimized for mobile devices. Access your profile anywhere, anytime from any device.
                             </p>
                         </div>
-                        
+
                         <div class="feature-card wow fadeInUp" data-wow-delay="0.3s">
                             <div class="feature-icon">
                                 <i class="fas fa-lock"></i>
@@ -579,7 +667,7 @@
                                 Your privacy matters. Control who sees your information and keep your data secure.
                             </p>
                         </div>
-                        
+
                         <div class="feature-card wow fadeInUp" data-wow-delay="0.4s">
                             <div class="feature-icon">
                                 <i class="fas fa-infinity"></i>
@@ -589,7 +677,7 @@
                                 Share your QR code unlimited times. No restrictions on how many people you connect with.
                             </p>
                         </div>
-                        
+
                         <div class="feature-card wow fadeInUp" data-wow-delay="0.5s">
                             <div class="feature-icon">
                                 <i class="fas fa-paint-brush"></i>
@@ -599,7 +687,7 @@
                                 Make it yours! Customize colors, themes, and design to reflect your unique personality.
                             </p>
                         </div>
-                        
+
                         <div class="feature-card wow fadeInUp" data-wow-delay="0.6s">
                             <div class="feature-icon">
                                 <i class="fas fa-headset"></i>
@@ -673,7 +761,7 @@
 
     <script>
         // Parallax Effect
-        window.addEventListener('scroll', function() {
+        window.addEventListener('scroll', function () {
             const scrolled = window.pageYOffset;
             const parallaxBg = document.querySelector('.parallax-bg');
             if (parallaxBg) {
@@ -716,7 +804,7 @@
         }
 
         // Initialize Enhanced Carousel
-        $(document).ready(function() {
+        $(document).ready(function () {
             $('#feature-carousel').owlCarousel({
                 loop: true,
                 margin: 20,
@@ -740,7 +828,7 @@
             });
 
             // Smooth scroll for anchor links
-            $('a[href^="#"]').on('click', function(e) {
+            $('a[href^="#"]').on('click', function (e) {
                 const target = $(this.getAttribute('href'));
                 if (target.length) {
                     e.preventDefault();
@@ -759,7 +847,7 @@
 
         // Back to top button
         const backToTop = document.getElementById('back-to-top');
-        window.addEventListener('scroll', function() {
+        window.addEventListener('scroll', function () {
             if (window.pageYOffset > 300) {
                 backToTop.style.opacity = '1';
                 backToTop.style.visibility = 'visible';
