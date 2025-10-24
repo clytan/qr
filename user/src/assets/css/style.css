@@ -1193,10 +1193,10 @@ section.no-bg,
     padding: 90px 0 90px 0;
 }
 
-.text-gradient{  
+.text-gradient {
     background: linear-gradient(45deg, var(--secondary-color-2), var(--secondary-color));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 .de-navbar-left .container-fluid .container {
@@ -1938,7 +1938,7 @@ header.header-light .logo-2 {
     margin-bottom: 20px;
 }
 
-.post-content img{    
+.post-content img {
     border-radius: 8px;
     -moz-border-radius: 8px;
     -webkit-border-radius: 8px;
@@ -3305,11 +3305,11 @@ a.btn-link {
 }
 
 .de_count.s1 h3,
-.de_count.s1 h3 span{
+.de_count.s1 h3 span {
     font-size: 26px;
 }
 
-.de_count.style-2{
+.de_count.style-2 {
     background: url(../images/background/16.jpg);
     padding: 60px 0 30px 0;
     border-radius: 10px;
@@ -3317,11 +3317,13 @@ a.btn-link {
     -webkit-border-radius: 10px;
     border: solid 1px #dddddd;
 }
-.dark-scheme .de_count.style-2{
+
+.dark-scheme .de_count.style-2 {
     background: url(../images/background/18.jpg);
 }
+
 .de_count.style-2 h3,
-.de_count.style-2 h3 span{
+.de_count.style-2 h3 span {
     font-size: 48px;
 }
 
@@ -3891,7 +3893,7 @@ h4.s3 {
     font-size: 20px;
 }
 
-h6.s1{
+h6.s1 {
     letter-spacing: 12px;
 }
 
@@ -4747,22 +4749,22 @@ i.font60 {
     margin: 0;
 }
 
-.de-card{
+.de-card {
     padding: 40px;
     border-radius: 20px;
     -moz-border-radius: 20px;
     -webkit-border-radius: 20px;
 }
 
-.de-card h3{
+.de-card h3 {
     margin-bottom: 20px;
 }
 
-.de-card p{
+.de-card p {
     margin-bottom: 0;
 }
 
-.de-card i{
+.de-card i {
     text-align: center;
     font-size: 28px;
     color: #ffffff;
@@ -4775,8 +4777,8 @@ i.font60 {
     margin-bottom: 20px;
 }
 
-.dark-scheme .de-card.has-border{
-    border:  solid 1px rgba(255, 255, 255, .1);
+.dark-scheme .de-card.has-border {
+    border: solid 1px rgba(255, 255, 255, .1);
 }
 
 .rtl .f-box.f-icon-left i {
@@ -10116,7 +10118,7 @@ i.bg-color-secondary {
     color: #ffffff;
 }
 
-.audio-control{
+.audio-control {
     width: 100%;
 }
 
@@ -10813,28 +10815,28 @@ i.big {
     color: #ffffff;
 }
 
-.owl-carousel.owl-center .owl-stage-outer{
+.owl-carousel.owl-center .owl-stage-outer {
     padding: 3% 0;
 }
 
 .owl-carousel.owl-center .owl-item.active.center {
-     position: relative;
-     z-index: 101;
-     -webkit-transform: scale(1.2);
-     transform: scale(1.2);
-     -webkit-box-shadow: 8px 8px 10px 0px rgba(0, 0, 0, 0.calc());
+    position: relative;
+    z-index: 101;
+    -webkit-transform: scale(1.2);
+    transform: scale(1.2);
+    -webkit-box-shadow: 8px 8px 10px 0px rgba(0, 0, 0, 0.calc());
     -moz-box-shadow: 8px 8px 10px 0px rgba(0, 0, 0, 0.calc());
     box-shadow: 8px 8px 10px 0px rgba(0, 0, 0, 0.calc());
 }
 
 .owl-carousel.owl-center .owl-item .nft_pic_title,
-.owl-carousel.owl-center .owl-item .nft_pic_by{
+.owl-carousel.owl-center .owl-item .nft_pic_by {
     opacity: 0;
 }
 
 .owl-carousel.owl-center .owl-item.active.center .nft_pic_title,
-.owl-carousel.owl-center .owl-item.active.center .nft_pic_by{
-     opacity: 1;
+.owl-carousel.owl-center .owl-item.active.center .nft_pic_by {
+    opacity: 1;
 }
 
 
@@ -11393,17 +11395,19 @@ section.no-padding {
     right: 8px;
 }
 
-.d-arrow-left.s2{
+.d-arrow-left.s2 {
     left: 0;
 }
-.d-arrow-right.s2{
+
+.d-arrow-right.s2 {
     right: 0;
 }
 
-.d-arrow-left.mod-a{
+.d-arrow-left.mod-a {
     left: 0;
 }
-.d-arrow-right.mod-a{
+
+.d-arrow-right.mod-a {
     right: 0;
 }
 
@@ -13115,7 +13119,7 @@ a.read_more i {
 }
 
 #demo-rtl,
-.rtl #demo-rtl{
+.rtl #demo-rtl {
     direction: ltr;
 }
 
@@ -13563,7 +13567,7 @@ a.read_more i {
     padding-left: 70px;
 }
 
-.p_list_info h5{
+.p_list_info h5 {
     font-size: 16px;
     margin-bottom: 0;
 }
@@ -14024,22 +14028,22 @@ a.read_more i {
     margin-left: 0;
 }
 
-.nft-item-price{
+.nft-item-price {
     margin-bottom: 30px;
 }
 
-.nft-item-price span{
+.nft-item-price span {
     color: #0d0c22;
     font-weight: bold;
     font-size: 28px;
     padding-right: 10px;
 }
 
-.dark-scheme .nft-item-price span{
+.dark-scheme .nft-item-price span {
     color: #ffffff;
 }
 
-.nft-item-price img{
+.nft-item-price img {
     width: 24px;
     height: 24px;
     margin-top: -12px;
@@ -14074,7 +14078,7 @@ a.read_more i {
     color: #ffffff;
 }
 
-.nft_alt_slider .nft_pic_info{
+.nft_alt_slider .nft_pic_info {
     background: none;
 }
 
@@ -14089,7 +14093,7 @@ a.read_more i {
     color: rgba(255, 255, 255, .6);
 }
 
-.nft_pic.nft_multi a{
+.nft_pic.nft_multi a {
     position: relative;
     border-radius: 8px;
     -moz-border-radius: 8px;
@@ -14099,49 +14103,51 @@ a.read_more i {
     overflow: hidden;
 }
 
-.nft_pic.nft_multi a:nth-child(1){
+.nft_pic.nft_multi a:nth-child(1) {
     margin: 0 10px 10px 0;
 }
 
-.nft_pic.nft_multi a:nth-child(2){
+.nft_pic.nft_multi a:nth-child(2) {
     margin: 0 0 10px 10px;
 }
 
-.nft_pic.nft_multi a:nth-child(3){
+.nft_pic.nft_multi a:nth-child(3) {
     margin: 10px 10px 0 0;
 }
 
-.nft_pic.nft_multi a:nth-child(4){
+.nft_pic.nft_multi a:nth-child(4) {
     margin: 10px 0 0 10px;
 }
 
-.nft_pic.nft_multi:hover img{
+.nft_pic.nft_multi:hover img {
     transform: scale(1.0);
 }
 
-.nft_pic.nft_multi a:hover  img{
+.nft_pic.nft_multi a:hover img {
     transform: scale(1.2);
 }
 
-.nft_pic.nft_multi .nft_pic_title{
+.nft_pic.nft_multi .nft_pic_title {
     position: absolute;
     margin: 20px;
     z-index: 1;
 }
 
-.nft_pic.nft_multi .nft_pic_title h4{
+.nft_pic.nft_multi .nft_pic_title h4 {
     font-size: 18px;
-    color:#ffffff;
+    color: #ffffff;
     margin: 0;
 }
-.nft_pic.nft_multi .nft_pic_title span{
+
+.nft_pic.nft_multi .nft_pic_title span {
     color: rgba(255, 255, 255, .5);
 }
 
-.nft_pic.nft_multi .nft_pic_title.text-dark h4{
-    color:#000000 !important;
+.nft_pic.nft_multi .nft_pic_title.text-dark h4 {
+    color: #000000 !important;
 }
-.nft_pic.nft_multi .nft_pic_title.text-dark span{
+
+.nft_pic.nft_multi .nft_pic_title.text-dark span {
     color: rgba(0, 0, 0, .5);
 }
 
@@ -14202,7 +14208,7 @@ a.read_more i {
     color: #0d0c22;
 }
 
-.de_countdown.bg-color-secondary{
+.de_countdown.bg-color-secondary {
     border: none;
 }
 
@@ -14410,7 +14416,7 @@ a.read_more i {
     display: none;
 }
 
-.nft_type_wrap{
+.nft_type_wrap {
     position: absolute;
     width: 100%;
     display: flex;
@@ -14421,7 +14427,7 @@ a.read_more i {
 .play-pause {
     position: relative;
     cursor: pointer;
-    height:60px;
+    height: 60px;
     width: 60px;
     padding: 17px 0;
     text-align: center;
@@ -14433,7 +14439,7 @@ a.read_more i {
 }
 
 
-.play-pause:before{
+.play-pause:before {
     font-family: FontAwesome;
     content: "\f04b";
     font-size: 24px;
@@ -14442,46 +14448,48 @@ a.read_more i {
 }
 
 
-.play-pause:active{
-   transform: scale(.9);
+.play-pause:active {
+    transform: scale(.9);
 }
 
-.play-pause.pause:before{
+.play-pause.pause:before {
     content: "\f04c";
     padding-left: 0;
 }
 
 .circle-ripple {
-  display: none;
-  position: absolute;
-  background-color: #35ffc3;
-  z-index:1;
-  width: 1em;
-  height: 1em;
-  border-radius: 50%;
-  -webkit-animation: ripple 0.7s linear infinite;
-          animation: ripple 0.7s linear infinite;
+    display: none;
+    position: absolute;
+    background-color: #35ffc3;
+    z-index: 1;
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    -webkit-animation: ripple 0.7s linear infinite;
+    animation: ripple 0.7s linear infinite;
 }
 
 @-webkit-keyframes ripple {
-  0% {
-    box-shadow: 0 0 0 0 rgba(255,255,255, 0.3), 0 0 0 1em rgba(255,255,255, 0.3), 0 0 0 3em rgba(255,255,255, 0.3), 0 0 0 5em rgba(255,255,255, 0.3);
-  }
-  100% {
-    box-shadow: 0 0 0 1em rgba(255,255,255, 0.3), 0 0 0 3em rgba(255,255,255, 0.3), 0 0 0 5em rgba(255,255,255, 0.3), 0 0 0 8em rgba(255,255,255, 0);
-  }
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.3), 0 0 0 1em rgba(255, 255, 255, 0.3), 0 0 0 3em rgba(255, 255, 255, 0.3), 0 0 0 5em rgba(255, 255, 255, 0.3);
+    }
+
+    100% {
+        box-shadow: 0 0 0 1em rgba(255, 255, 255, 0.3), 0 0 0 3em rgba(255, 255, 255, 0.3), 0 0 0 5em rgba(255, 255, 255, 0.3), 0 0 0 8em rgba(255, 255, 255, 0);
+    }
 }
 
 @keyframes ripple {
-  0% {
-    box-shadow: 0 0 0 0 rgba(255,255,255, 0.3), 0 0 0 1em rgba(255,255,255, 0.3), 0 0 0 3em rgba(255,255,255, 0.3), 0 0 0 5em rgba(255,255,255, 0.3);
-  }
-  100% {
-    box-shadow: 0 0 0 1em rgba(255,255,255, 0.3), 0 0 0 3em rgba(255,255,255, 0.3), 0 0 0 5em rgba(255,255,255, 0.3), 0 0 0 8em rgba(255,255,255, 0);
-  }
+    0% {
+        box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.3), 0 0 0 1em rgba(255, 255, 255, 0.3), 0 0 0 3em rgba(255, 255, 255, 0.3), 0 0 0 5em rgba(255, 255, 255, 0.3);
+    }
+
+    100% {
+        box-shadow: 0 0 0 1em rgba(255, 255, 255, 0.3), 0 0 0 3em rgba(255, 255, 255, 0.3), 0 0 0 5em rgba(255, 255, 255, 0.3), 0 0 0 8em rgba(255, 255, 255, 0);
+    }
 }
 
-.wallet-images-group-1 img{
+.wallet-images-group-1 img {
     margin: 0 5px 10px 5px;
     width: 60px;
     padding: 10px;
@@ -14489,6 +14497,7 @@ a.read_more i {
     -moz-border-radius: 10px;
     -webkit-border-radius: 10px;
 }
+
 /* ================================================== */
 
 
@@ -15202,7 +15211,7 @@ a.btn-slider:hover {
     margin: 0 6px;
     display: inline-block;
     zoom: 1;
-    *display: inline;
+    display: inline;
 }
 
 .testi-slider .flex-control-paging li a {
@@ -15525,11 +15534,19 @@ img {
     }
 }
 
+@media only screen and (max-width: 600px) {
+    #content {
+        margin-top: -80px;
+    }
+}
+
 /* -------------------------------------------------- 
     design for 768px
     /* ================================================== */
 
 @media (min-width: 768px) and (max-width: 979px) {
+
+
     .slider_text {
         padding-top: 0px;
     }
@@ -16464,6 +16481,7 @@ img {
         width: 49.9%;
     }
 
+
     .text-item {
         font-size: 48px;
         line-height: 48px;
@@ -16752,29 +16770,33 @@ img {
         top: -21px;
     }
 }
-    .input-group-append {
-        display: flex;
-        align-items: center;
-    }
-    .public-toggle[type="checkbox"] {
-        width: 18px;
-        height: 18px;
-        margin: 0 4px 0 0;
-        accent-color: #007bff;
-        vertical-align: middle;
-        background: #fff !important;
-        border: 1px solid #888 !important;
-        box-shadow: none !important;
-        appearance: auto;
-        -webkit-appearance: checkbox;
-    }
-    .public-label {
-        font-size: 14px;
-        margin-bottom: 0;
-        color: #222;
-        background: transparent;
-        cursor: pointer;
-    }
-    .input-group.mb-2 {
-        margin-bottom: 10px;
-    }
+
+.input-group-append {
+    display: flex;
+    align-items: center;
+}
+
+.public-toggle[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0 4px 0 0;
+    accent-color: #007bff;
+    vertical-align: middle;
+    background: #fff !important;
+    border: 1px solid #888 !important;
+    box-shadow: none !important;
+    appearance: auto;
+    -webkit-appearance: checkbox;
+}
+
+.public-label {
+    font-size: 14px;
+    margin-bottom: 0;
+    color: #222;
+    background: transparent;
+    cursor: pointer;
+}
+
+.input-group.mb-2 {
+    margin-bottom: 10px;
+}

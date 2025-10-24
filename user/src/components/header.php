@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
 <header class="transparent scroll-dark">
     <div class="container">
         <div class="row">
@@ -5,7 +7,7 @@
                 <div class="de-flex sm-pt10 justify-content-center">
                     <div class="de-flex-col text-center">
                         <!-- logo begin -->
-                        <div id="logo" style="margin: 20px;">
+                        <div id="logo" style="margin: 10px;">
                             <a href="index.php">
                                 <img alt="" class="centered-logo" src="../assets/images/logo-3.png" />
                             </a>

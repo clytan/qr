@@ -515,38 +515,38 @@ const profileFunction = {
     handleDownloadQR: function () {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-        
+
         // Instagram story size: 1080x1920 (9:16 ratio)
         canvas.width = 1080;
         canvas.height = 1920;
-        
+
         // Background gradient
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
         gradient.addColorStop(0, '#667eea');
         gradient.addColorStop(1, '#764ba2');
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
+
         // Square white background for QR (no rounded corners)
         const whiteBoxSize = 850;
         const whiteBoxX = (canvas.width - whiteBoxSize) / 2;
         const whiteBoxY = (canvas.height - whiteBoxSize) / 2;
-        
+
         ctx.fillStyle = 'white';
         ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
         ctx.shadowBlur = 40;
         ctx.shadowOffsetY = 20;
         ctx.fillRect(whiteBoxX, whiteBoxY, whiteBoxSize, whiteBoxSize);
         ctx.shadowColor = 'transparent';
-        
+
         // Get QR image and frame image
         const qrImg = document.getElementById('click_banner_img');
         const frameImg = new Image();
         frameImg.src = '../assets/images/frame.png';
-        
+
         // Wait for both images to load
         if (qrImg && qrImg.src && qrImg.complete) {
-            frameImg.onload = function() {
+            frameImg.onload = function () {
                 profileFunction.drawQROnCanvas(ctx, qrImg, frameImg, canvas);
             };
             // If frame already loaded
@@ -558,39 +558,39 @@ const profileFunction = {
         }
     },
 
-    drawQROnCanvas: function(ctx, qrImg, frameImg, canvas) {
+    drawQROnCanvas: function (ctx, qrImg, frameImg, canvas) {
         // Calculate square white box dimensions
         const whiteBoxSize = 850;
         const whiteBoxX = (canvas.width - whiteBoxSize) / 2;
         const whiteBoxY = (canvas.height - whiteBoxSize) / 2;
-        
+
         // Title
         ctx.fillStyle = '#2d3748';
         ctx.font = 'bold 60px Arial';
         ctx.textAlign = 'center';
         ctx.fillText('Scan My QR Code', canvas.width / 2, whiteBoxY + 100);
-        
+
         // QR Code size and position (centered in white box)
         const qrSize = 550;
         const qrX = (canvas.width - qrSize) / 2;
         const qrY = whiteBoxY + 160;
-        
+
         // Draw QR code first
         ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
-        
+
         // Draw frame overlay to match QR size
         const frameSize = 850;
         const frameX = (canvas.width - frameSize) / 2;
         const frameY = whiteBoxY + 10;
         ctx.drawImage(frameImg, frameX, frameY, frameSize, frameSize);
-        
+
         // Bottom text
         ctx.fillStyle = '#718096';
         ctx.font = '40px Arial';
         ctx.fillText('Connect with me instantly!', canvas.width / 2, whiteBoxY + whiteBoxSize - 60);
-        
+
         // Convert to blob and download
-        canvas.toBlob(function(blob) {
+        canvas.toBlob(function (blob) {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
@@ -852,10 +852,26 @@ const profileFunction = {
 
 
     initQRCode: function (qrId = '') {
+        console.log('Initializing QR code');
         const userId = $('#user_id').val();
         const userQr = qrId || $('#user_qr').val();
 
-        // Get the current path and replace profile_new.php with profile.php
+        // Ensure QR container and image exist
+        const container = document.getElementById('qr-frame-container');
+        if (!container) {
+            console.error('QR container not found');
+            return;
+        }
+
+        // Create or get QR image element
+        let qrImg = document.getElementById('click_banner_img');
+        if (!qrImg) {
+            qrImg = document.createElement('img');
+            qrImg.id = 'click_banner_img';
+            qrImg.alt = 'QR Code';
+            container.appendChild(qrImg);
+        }
+
         const currentPath = window.location.pathname;
         const basePath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
         const qrUrl = window.location.origin + basePath + 'profile.php?qr=' + encodeURIComponent(userQr || '');
@@ -874,38 +890,99 @@ const profileFunction = {
                 const colorLight = res.colorLight || '#ffffff';
                 $('#qr-color-dark').val(colorDark);
                 $('#qr-color-light').val(colorLight);
-                profileFunction.generateQRCode(qrUrl, colorDark, colorLight);
+
+                // Add delay for mobile
+                setTimeout(() => {
+                    profileFunction.generateQRCode(qrUrl, colorDark, colorLight);
+                }, 100);
             },
-            error: function () {
-                profileFunction.generateQRCode(qrUrl, '#000000', '#ffffff');
+            error: function (xhr, status, error) {
+                console.error('Error fetching QR colors:', error);
+                setTimeout(() => {
+                    profileFunction.generateQRCode(qrUrl, '#000000', '#ffffff');
+                }, 100);
             }
         });
     },
 
     generateQRCode: function (data, colorDark = '#000000', colorLight = '#ffffff') {
-        const element = document.getElementById('click_banner_img');
+        console.log('Generating QR code for:', data);
+
+        // Create a temporary container for QR generation
         const tempDiv = document.createElement('div');
+        tempDiv.style.position = 'absolute';
+        tempDiv.style.left = '-9999px';
+        document.body.appendChild(tempDiv);
 
-        new QRCode(tempDiv, {
-            text: data,
-            width: 192,
-            height: 192,
-            colorDark: colorDark,
-            colorLight: colorLight,
-            correctLevel: QRCode.CorrectLevel.H
-        });
+        try {
+            // Generate QR code
+            new QRCode(tempDiv, {
+                text: data,
+                width: 192,
+                height: 192,
+                colorDark: colorDark,
+                colorLight: colorLight,
+                correctLevel: QRCode.CorrectLevel.H
+            });
 
-        setTimeout(() => {
-            const qrImg = tempDiv.querySelector('img');
-            if (qrImg && element) {
-                // Preserve existing styles and attributes
-                element.src = qrImg.src;
-                element.style.width = '192px';
-                element.style.height = '192px';
-                element.style.borderRadius = '0.5rem';
-                element.alt = 'QR Code';
-            }
-        }, 100);
+            // Wait for QR code to be generated
+            setTimeout(() => {
+                const qrCanvas = tempDiv.querySelector('canvas');
+                const qrImg = tempDiv.querySelector('img');
+
+                if (qrCanvas) {
+                    // Use canvas if available (more reliable)
+                    const dataURL = qrCanvas.toDataURL('image/png');
+                    profileFunction.setQRImage(dataURL);
+                    console.log('QR generated from canvas');
+                } else if (qrImg && qrImg.complete) {
+                    // Use image if canvas not available
+                    profileFunction.setQRImage(qrImg.src);
+                    console.log('QR generated from img');
+                } else if (qrImg) {
+                    // Wait for image to load
+                    qrImg.onload = function () {
+                        profileFunction.setQRImage(qrImg.src);
+                        console.log('QR generated from img (delayed)');
+                    };
+                }
+
+                // Cleanup
+                setTimeout(() => {
+                    if (tempDiv && tempDiv.parentNode) {
+                        document.body.removeChild(tempDiv);
+                    }
+                }, 500);
+            }, 200); // Increased timeout for mobile
+
+        } catch (error) {
+            console.error('QR generation error:', error);
+            document.body.removeChild(tempDiv);
+        }
+    },
+    setQRImage: function (src) {
+        const element = document.getElementById('click_banner_img');
+
+        if (!element) {
+            console.error('QR image element not found');
+            return;
+        }
+
+        // Create new image to ensure proper loading
+        const img = new Image();
+        img.onload = function () {
+            element.src = src;
+            element.style.display = 'block';
+            element.style.width = '192px';
+            element.style.height = '192px';
+            element.style.position = 'relative';
+            element.style.zIndex = '5';
+            console.log('QR image set successfully');
+        };
+        img.onerror = function () {
+            console.error('Failed to load QR image');
+        };
+        img.src = src;
     },
 
     checkForProfileImage: function () {

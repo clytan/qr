@@ -72,6 +72,8 @@ $user_id = $_SESSION['user_id'];
                 </div>
             </section>
         </div>
+        <?php include('../components/footer.php'); ?>
+
     </div>
 
     <!-- Report Modal -->
