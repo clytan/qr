@@ -37,7 +37,7 @@ $typeMap = [
     'instagram_username' => 'Instagram',
     'youtube_username' => 'Youtube',
     'linkedin_username' => 'LinkedIn',
-    'snapchat_username' => 'SnapChat',
+    'snapchat_username' => 'Snapchat',
     'whatsapp_link' => 'WhatsApp',
     'telegram_link' => 'Telegram',
 ];

@@ -33,6 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['user_user_type'] = $user['user_user_type'];
         $_SESSION['user_qr_id'] = $user['user_qr_id'];
+        $_SESSION['user_name'] = $user['user_full_name'];
 
         // Check if there's a return URL parameter from POST data
         $redirectUrl = 'index.php'; // Default redirect

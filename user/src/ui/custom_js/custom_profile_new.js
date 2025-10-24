@@ -1,7 +1,8 @@
 const profileFunction = {
     init: function () {
         const urlParams = new URLSearchParams(window.location.search);
-        const viewingQr = urlParams.get('qr');
+        // Handle both lowercase 'qr' and uppercase 'QR' parameters
+        const viewingQr = urlParams.get('qr') || urlParams.get('QR');
         const userQr = $('#user_qr').val();
         const userId = $('#user_id').val();
 
@@ -103,6 +104,9 @@ const profileFunction = {
             $('#qr-color-dark, #qr-color-light').on('input', this.handleQRColorChange);
             $('#save-qr-color').on('click', this.handleSaveQRColor);
         }
+
+        // QR Download button
+        $('#download-qr-btn').on('click', this.handleDownloadQR);
 
         // Follow/Unfollow buttons
         $(document).on('click', '#follow-btn', this.handleFollowClick);
@@ -476,6 +480,7 @@ const profileFunction = {
 
     handleSaveQRColor: function () {
         const userId = $('#user_id').val();
+        const userQr = $('#user_qr').val();
         const colorDark = $('#qr-color-dark').val();
         const colorLight = $('#qr-color-light').val();
 
@@ -492,6 +497,11 @@ const profileFunction = {
             success: function (res) {
                 if (res.status) {
                     showToast('QR colors saved successfully!');
+                    // Regenerate QR code with saved colors and proper styling
+                    const currentPath = window.location.pathname;
+                    const basePath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1);
+                    const qrUrl = window.location.origin + basePath + 'profile.php?qr=' + encodeURIComponent(userQr || '');
+                    profileFunction.generateQRCode(qrUrl, colorDark, colorLight);
                 } else {
                     showToast(res.message || 'Failed to save QR colors.', 'error');
                 }
@@ -500,6 +510,97 @@ const profileFunction = {
                 showToast('Error saving QR colors.', 'error');
             }
         });
+    },
+
+    handleDownloadQR: function () {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        // Instagram story size: 1080x1920 (9:16 ratio)
+        canvas.width = 1080;
+        canvas.height = 1920;
+        
+        // Background gradient
+        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        gradient.addColorStop(0, '#667eea');
+        gradient.addColorStop(1, '#764ba2');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Square white background for QR (no rounded corners)
+        const whiteBoxSize = 850;
+        const whiteBoxX = (canvas.width - whiteBoxSize) / 2;
+        const whiteBoxY = (canvas.height - whiteBoxSize) / 2;
+        
+        ctx.fillStyle = 'white';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+        ctx.shadowBlur = 40;
+        ctx.shadowOffsetY = 20;
+        ctx.fillRect(whiteBoxX, whiteBoxY, whiteBoxSize, whiteBoxSize);
+        ctx.shadowColor = 'transparent';
+        
+        // Get QR image and frame image
+        const qrImg = document.getElementById('click_banner_img');
+        const frameImg = new Image();
+        frameImg.src = '../assets/images/frame.png';
+        
+        // Wait for both images to load
+        if (qrImg && qrImg.src && qrImg.complete) {
+            frameImg.onload = function() {
+                profileFunction.drawQROnCanvas(ctx, qrImg, frameImg, canvas);
+            };
+            // If frame already loaded
+            if (frameImg.complete) {
+                profileFunction.drawQROnCanvas(ctx, qrImg, frameImg, canvas);
+            }
+        } else {
+            showToast('QR code not loaded yet. Please try again.', 'error');
+        }
+    },
+
+    drawQROnCanvas: function(ctx, qrImg, frameImg, canvas) {
+        // Calculate square white box dimensions
+        const whiteBoxSize = 850;
+        const whiteBoxX = (canvas.width - whiteBoxSize) / 2;
+        const whiteBoxY = (canvas.height - whiteBoxSize) / 2;
+        
+        // Title
+        ctx.fillStyle = '#2d3748';
+        ctx.font = 'bold 60px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Scan My QR Code', canvas.width / 2, whiteBoxY + 100);
+        
+        // QR Code size and position (centered in white box)
+        const qrSize = 550;
+        const qrX = (canvas.width - qrSize) / 2;
+        const qrY = whiteBoxY + 160;
+        
+        // Draw QR code first
+        ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+        
+        // Draw frame overlay to match QR size
+        const frameSize = 850;
+        const frameX = (canvas.width - frameSize) / 2;
+        const frameY = whiteBoxY + 10;
+        ctx.drawImage(frameImg, frameX, frameY, frameSize, frameSize);
+        
+        // Bottom text
+        ctx.fillStyle = '#718096';
+        ctx.font = '40px Arial';
+        ctx.fillText('Connect with me instantly!', canvas.width / 2, whiteBoxY + whiteBoxSize - 60);
+        
+        // Convert to blob and download
+        canvas.toBlob(function(blob) {
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'QR-Code-Story.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showToast('QR code downloaded! Perfect for Instagram stories!', 'success');
+        }, 'image/png');
     },
 
     handleFollowClick: function () {
@@ -797,15 +898,20 @@ const profileFunction = {
         setTimeout(() => {
             const qrImg = tempDiv.querySelector('img');
             if (qrImg && element) {
+                // Preserve existing styles and attributes
                 element.src = qrImg.src;
+                element.style.width = '192px';
+                element.style.height = '192px';
+                element.style.borderRadius = '0.5rem';
+                element.alt = 'QR Code';
             }
         }, 100);
     },
 
     checkForProfileImage: function () {
-        // Check if we're viewing via QR parameter
+        // Check if we're viewing via QR parameter (handle both 'qr' and 'QR')
         const urlParams = new URLSearchParams(window.location.search);
-        const viewingQr = urlParams.get('qr');
+        const viewingQr = urlParams.get('qr') || urlParams.get('QR');
 
         let requestData = {};
 

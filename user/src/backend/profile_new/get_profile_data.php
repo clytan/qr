@@ -61,6 +61,7 @@ $typeMap = [
     'Youtube' => 'youtube_username',
     'LinkedIn' => 'linkedin_username',
     'SnapChat' => 'snapchat_username',
+    'Snapchat' => 'snapchat_username',
     'WhatsApp' => 'whatsapp_link',
     'Telegram' => 'telegram_link'
 ];
