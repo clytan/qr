@@ -18,9 +18,9 @@ $user_id = $_SESSION['user_id'];
     <meta content="ZQR Community" name="description" />
     <?php include('../components/csslinks.php') ?>
 
-    <link href="community_additional_styles.css" rel="stylesheet" type="text/css" />
-    <link href="community_mod_styles.css" rel="stylesheet" type="text/css" />
-    <link href="timeout_styles.css" rel="stylesheet" type="text/css" />
+    <link href="discord_chat_layout.css?v=<?php echo time(); ?>" rel="stylesheet" type="text/css" />
+    <link href="community_mod_styles.css?v=<?php echo time(); ?>" rel="stylesheet" type="text/css" />
+    <link href="timeout_styles.css?v=<?php echo time(); ?>" rel="stylesheet" type="text/css" />
 </head>
 
 <body class="dark-scheme de-grey">
@@ -38,34 +38,89 @@ $user_id = $_SESSION['user_id'];
                             </div>
                         </div>
                     </div>
-                    <div class="row g-4">
-                        <div class="col-lg-8">
-                            <div class="chat-container">
-                                <div class="chat-messages" id="chatMessages">
-                                    <!-- Messages will be loaded here -->
-                                </div>
-                                <div class="chat-input" style="display: none;">
-                                    <label for="attachment" class="btn-attachment">
-                                        <i class="fa fa-paperclip"></i>
-                                    </label>
-                                    <input type="file" id="attachment" style="display: none;">
-                                    <input type="text" id="messageInput" placeholder="Type your message...">
-                                    <button class="btn-main" onclick="sendMessage()">Send</button>
-                                </div>
+                    <!-- Discord-Style Chat Layout -->
+                    <div class="discord-chat-layout">
+                        <!-- Chat Section -->
+                        <div class="discord-chat-section">
+                            <div class="chat-messages" id="chatMessages">
+                                <!-- Messages will be loaded here -->
+                            </div>
+                            <div class="chat-input-wrapper">
+                                <!-- Attachment Preview -->
                                 <div id="attachmentPreview" class="attachment-preview" style="display: none;">
                                     <div class="preview-content">
                                         <span id="attachmentName"></span>
                                         <button class="btn-remove" onclick="removeAttachment()">×</button>
                                     </div>
                                 </div>
+                                
+                                <div class="chat-input">
+                                    <!-- Expandable Actions Button -->
+                                    <button class="input-toggle-btn" id="toggleActionsBtn" onclick="toggleInputActions()" title="Actions">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                    
+                                    <!-- Hidden Actions (expand on click) -->
+                                    <div class="input-actions-group" id="inputActionsGroup" style="display: none;">
+                                        <button class="input-action-btn" onclick="toggleEmojiPicker()" title="Emoji">
+                                            <i class="fa fa-smile-o"></i>
+                                        </button>
+                                        
+                                        <button class="input-action-btn" onclick="toggleGifPicker()" title="GIF">
+                                            <i class="fa fa-gift"></i>
+                                        </button>
+                                        
+                                        <label for="attachment" class="input-action-btn" title="Attach file">
+                                            <i class="fa fa-paperclip"></i>
+                                        </label>
+                                        <input type="file" id="attachment" accept="image/*,.pdf,.doc,.docx,.txt" style="display: none;">
+                                    </div>
+                                    
+                                    <input type="text" id="messageInput" placeholder="Message in Community Chat">
+                                    
+                                    <button class="btn-send" onclick="sendMessage()" title="Send">
+                                        <i class="fa fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Emoji Picker -->
+                            <div id="emojiPicker" class="emoji-picker" style="display: none;">
+                                <div class="picker-header">
+                                    <span class="picker-title">Emojis</span>
+                                    <button class="picker-close" onclick="closeEmojiPicker()">×</button>
+                                </div>
+                                <div class="emoji-tabs">
+                                    <button class="emoji-tab active" onclick="showEmojiCategory('smileys')">😊</button>
+                                    <button class="emoji-tab" onclick="showEmojiCategory('gestures')">👋</button>
+                                    <button class="emoji-tab" onclick="showEmojiCategory('hearts')">❤️</button>
+                                    <button class="emoji-tab" onclick="showEmojiCategory('objects')">🎉</button>
+                                </div>
+                                <div class="emoji-grid" id="emojiGrid">
+                                    <!-- Emojis will be populated here -->
+                                </div>
+                            </div>
+                            
+                            <!-- GIF Picker -->
+                            <div id="gifPicker" class="gif-picker" style="display: none;">
+                                <div class="picker-header">
+                                    <span class="picker-title">GIFs</span>
+                                    <button class="picker-close" onclick="closeGifPicker()">×</button>
+                                </div>
+                                <div class="gif-search">
+                                    <input type="text" id="gifSearchInput" placeholder="Search GIFs..." onkeyup="searchGifs(this.value)">
+                                </div>
+                                <div class="gif-grid" id="gifGrid">
+                                    <div class="gif-loading">Loading GIFs...</div>
+                                </div>
                             </div>
                         </div>
-                        <div class="col-lg-4">
-                            <div class="members-list">
-                                <h4>Community Members</h4>
-                                <div id="membersList">
-                                    <!-- Members will be loaded here -->
-                                </div>
+                        
+                        <!-- Members Sidebar -->
+                        <div class="discord-members-section">
+                            <div class="members-header">Community Members</div>
+                            <div class="members-list" id="membersList">
+                                <!-- Members will be loaded here -->
                             </div>
                         </div>
                     </div>
@@ -76,8 +131,8 @@ $user_id = $_SESSION['user_id'];
 
     </div>
 
-    <!-- Report Modal -->
-    <div id="reportModal" class="report-modal">
+<!-- Report Modal (outside wrapper for proper positioning) -->
+<div id="reportModal" class="report-modal">
         <div class="report-modal-content">
             <div class="report-modal-header">
                 <div class="report-modal-title">Report Message</div>
@@ -90,6 +145,15 @@ $user_id = $_SESSION['user_id'];
                 <button type="submit">Submit Report</button>
             </form>
         </div>
+    </div>
+
+    <!-- Image Lightbox Modal -->
+    <div id="imageLightbox" class="image-lightbox" onclick="closeLightbox()">
+        <div class="lightbox-content" onclick="event.stopPropagation()">
+            <button class="lightbox-close" onclick="closeLightbox()">×</button>
+            <img id="lightboxImage" src="" alt="Expanded image" class="lightbox-image">
+        </div>
+        <div class="lightbox-hint">Click anywhere to close</div>
     </div>
 
     <?php include('../components/jslinks.php'); ?>

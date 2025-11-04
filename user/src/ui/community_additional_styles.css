@@ -834,3 +834,356 @@
                 font-size: 0.8em;
             }
         }
+
+        /* Discord-Style Chat Input */
+        .chat-input {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: #2B2D31;
+            border-radius: 8px;
+            margin: 16px;
+        }
+
+        .input-action-btn {
+            background: transparent;
+            border: none;
+            color: #B5BAC1;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .input-action-btn:hover {
+            color: #DBDEE1;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .chat-input input[type="text"] {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #DBDEE1;
+            font-size: 15px;
+            padding: 8px 12px;
+            outline: none;
+        }
+
+        .chat-input input[type="text"]::placeholder {
+            color: #6D6F78;
+        }
+
+        .btn-send {
+            background: #5865F2;
+            border: none;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 10px 14px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-send:hover {
+            background: #4752C4;
+        }
+
+        /* Discord-Style Messages */
+        .message {
+            padding: 4px 16px 4px 72px;
+            margin: 0;
+            position: relative;
+            transition: background 0.1s ease;
+            border: none;
+            border-radius: 0;
+        }
+
+        .message:hover {
+            background: rgba(4, 4, 5, 0.07);
+        }
+
+        .message-avatar {
+            position: absolute;
+            left: 16px;
+            top: 4px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .message-content {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .message-header {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .message-username {
+            font-weight: 500;
+            color: #F2F3F5;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .message-username:hover {
+            text-decoration: underline;
+        }
+
+        .message-timestamp {
+            font-size: 12px;
+            color: #949BA4;
+            font-weight: 400;
+        }
+
+        .message-text {
+            color: #DBDEE1;
+            font-size: 15px;
+            line-height: 1.375;
+            word-wrap: break-word;
+        }
+
+        /* Emoji & GIF Picker Styles */
+        .emoji-picker,
+        .gif-picker {
+            position: absolute;
+            bottom: 80px;
+            left: 16px;
+            width: 360px;
+            height: 420px;
+            background: #313338;
+            border-radius: 8px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.24);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .picker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            border-bottom: 1px solid #1E1F22;
+            background: #2B2D31;
+        }
+
+        .picker-title {
+            color: #F2F3F5;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .picker-close {
+            background: transparent;
+            border: none;
+            color: #B5BAC1;
+            font-size: 28px;
+            cursor: pointer;
+            padding: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+
+        .picker-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #DBDEE1;
+        }
+
+        .emoji-tabs {
+            display: flex;
+            gap: 4px;
+            padding: 8px 12px;
+            background: #2B2D31;
+            border-bottom: 1px solid #1E1F22;
+        }
+
+        .emoji-tab {
+            background: transparent;
+            border: none;
+            font-size: 22px;
+            padding: 8px 12px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background 0.2s ease;
+            opacity: 0.6;
+        }
+
+        .emoji-tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+            opacity: 1;
+        }
+
+        .emoji-tab.active {
+            background: #5865F2;
+            opacity: 1;
+        }
+
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 2px;
+            padding: 8px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .emoji-item {
+            font-size: 28px;
+            padding: 8px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.1s ease;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .emoji-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.2);
+        }
+
+        /* GIF Picker Styles */
+        .gif-search {
+            padding: 12px;
+            background: #2B2D31;
+            border-bottom: 1px solid #1E1F22;
+        }
+
+        .gif-search input {
+            width: 100%;
+            background: #1E1F22;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 12px;
+            color: #DBDEE1;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .gif-search input::placeholder {
+            color: #6D6F78;
+        }
+
+        .gif-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            padding: 8px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .gif-item {
+            cursor: pointer;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 1;
+            transition: transform 0.2s ease;
+        }
+
+        .gif-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .gif-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        .gif-loading {
+            text-align: center;
+            color: #B5BAC1;
+            padding: 40px;
+            font-size: 14px;
+        }
+
+        /* Community Members Discord Style */
+        .member-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            margin: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+
+        .member-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .member-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .member-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .member-qr-id {
+            color: #F2F3F5;
+            font-weight: 500;
+            font-size: 15px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        @media (max-width: 768px) {
+            .emoji-picker,
+            .gif-picker {
+                left: 8px;
+                right: 8px;
+                width: auto;
+                height: 380px;
+            }
+
+            .emoji-grid {
+                grid-template-columns: repeat(7, 1fr);
+            }
+
+            .gif-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .message {
+                padding-left: 60px;
+            }
+
+            .message-avatar {
+                left: 12px;
+                width: 36px;
+                height: 36px;
+            }
+        }

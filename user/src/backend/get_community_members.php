@@ -18,7 +18,7 @@ if (!isset($_GET['community_id'])) {
 $community_id = intval($_GET['community_id']);
 
 // Get members
-$sql = "SELECT cm.*, uu.user_full_name, uu.user_image_path 
+$sql = "SELECT cm.*, uu.user_full_name, uu.user_qr_id, uu.user_image_path 
         FROM community_members cm
         JOIN user_user uu ON cm.user_id = uu.id
         WHERE cm.community_id = ? AND cm.is_deleted = 0
@@ -35,6 +35,7 @@ while ($row = $result->fetch_assoc()) {
         'id' => $row['id'],
         'user_id' => $row['user_id'],
         'user_full_name' => $row['user_full_name'],
+        'user_qr_id' => $row['user_qr_id'],
         'user_image_path' => $row['user_image_path'],
         'created_on' => $row['created_on']
     ];

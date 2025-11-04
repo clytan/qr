@@ -65,15 +65,18 @@ function assignUserToCommunity($conn, $user_id) {
         }
         $stmtCheck->close();
         
-        // Update user with community_id
-        $sqlUpdateUser = "UPDATE user_user SET community_id = ? WHERE id = ?";
+        // Update user with community_id and joined date
+        $now_datetime = date('Y-m-d H:i:s');
+        $sqlUpdateUser = "UPDATE user_user SET community_id = ?, community_joined_date = ? WHERE id = ?";
         $stmtUpdateUser = $conn->prepare($sqlUpdateUser);
-        $stmtUpdateUser->bind_param('ii', $community_id, $user_id);
+        $stmtUpdateUser->bind_param('isi', $community_id, $now_datetime, $user_id);
         
         if (!$stmtUpdateUser->execute()) {
             throw new Exception("Failed to update user community: " . $stmtUpdateUser->error);
         }
         $stmtUpdateUser->close();
+        
+        error_log("Updated user $user_id: community_id = $community_id, joined_date = $now_datetime");
         
         // Add to community_members table
         $now = date('Y-m-d H:i:s.000');

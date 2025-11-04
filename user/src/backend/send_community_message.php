@@ -9,6 +9,10 @@ if (!isset($_SESSION['user_id'])) {
 
 include_once('./dbconfig/connection.php');
 require_once('check_user_penalties.php');
+
+// Set charset to utf8mb4 for emoji support
+$conn->set_charset("utf8mb4");
+
 $user_id = $_SESSION['user_id'];
 
 // Get POST data and file

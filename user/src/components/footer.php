@@ -1,3 +1,36 @@
+<style>
+/* Global Dark Theme for All Pages */
+body {
+    background: #1A1A1B !important;
+    overflow-x: hidden;
+}
+
+#content {
+    background: #1A1A1B !important;
+}
+
+section {
+    background: transparent !important;
+}
+
+.container {
+    background: transparent !important;
+}
+
+.no-bottom.no-top {
+    background: #1A1A1B !important;
+}
+
+#wrapper {
+    background: #1A1A1B !important;
+}
+
+/* Remove white backgrounds from all elements */
+div, section, article, aside, header, nav {
+    background-color: transparent;
+}
+</style>
+
 <br>
 <!-- Mobile Footer - Jeeto Daily Inspired -->
 <footer class="mobile-footer d-md-none">
