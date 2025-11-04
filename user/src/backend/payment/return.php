@@ -39,7 +39,7 @@ function processRegistration($data, $payment_id, $bank_reference, $order_id)
         }
         $stmtCheck->close();
 
-        // Generate user_qr_id (ZOKLI_XXXXXX format)
+        // Generate user_qr_id (ZOK_XXXXXXX format)
         do {
             $random_digits = str_pad(strval(mt_rand(0, 999999)), 7, '0', STR_PAD_LEFT);
             $user_qr_id = 'ZOK' . $random_digits;
@@ -77,7 +77,7 @@ function processRegistration($data, $payment_id, $bank_reference, $order_id)
         }
 
         $stmtInsert->bind_param(
-            'ssssssisssiss', 
+            'ssssssissssss', 
             $email, 
             $password, 
             $full_name, 
@@ -88,7 +88,7 @@ function processRegistration($data, $payment_id, $bank_reference, $order_id)
             $user_type, 
             $user_tag, 
             $selected_slab, 
-            $user_qr_id, 
+            $user_qr_id,        // Changed from 'i' to 's' - QR ID is STRING not INT!
             $referred_by_user_id, 
             $college_name
         );
