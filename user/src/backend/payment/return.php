@@ -15,6 +15,11 @@ function processRegistration($data, $payment_id, $bank_reference, $order_id)
 
         $email = $data['email'];
         $password = $data['password'];
+        $full_name = $data['full_name'] ?? null;
+        $phone = $data['phone'] ?? null;
+        $address = $data['address'] ?? null;
+        $pincode = $data['pincode'] ?? null;
+        $landmark = $data['landmark'] ?? null;
         $user_type = $data['user_type'];
         $user_tag = $data['user_tag'] ?? null;
         $selected_slab = $data['user_slab'];
@@ -36,8 +41,8 @@ function processRegistration($data, $payment_id, $bank_reference, $order_id)
 
         // Generate user_qr_id (ZOKLI_XXXXXX format)
         do {
-            $random_digits = str_pad(strval(mt_rand(0, 999999)), 6, '0', STR_PAD_LEFT);
-            $user_qr_id = 'ZOKLI_' . $random_digits;
+            $random_digits = str_pad(strval(mt_rand(0, 999999)), 7, '0', STR_PAD_LEFT);
+            $user_qr_id = 'ZOK' . $random_digits;
             $sqlCheckQr = "SELECT 1 FROM user_user WHERE user_qr_id = ?";
             $stmtCheckQr = $conn->prepare($sqlCheckQr);
             $stmtCheckQr->bind_param('s', $user_qr_id);
@@ -49,14 +54,44 @@ function processRegistration($data, $payment_id, $bank_reference, $order_id)
 
         error_log("Generated QR ID: " . $user_qr_id);
 
-        // Insert user
-        $sqlInsert = "INSERT INTO user_user(user_email, user_password, user_user_type, user_tag, user_slab_id, user_qr_id, referred_by_user_id, college_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        // Insert user with ALL registration data
+        $sqlInsert = "INSERT INTO user_user(
+            user_email, 
+            user_password, 
+            user_full_name, 
+            user_phone, 
+            user_address, 
+            user_pincode, 
+            user_landmark, 
+            user_user_type, 
+            user_tag, 
+            user_slab_id, 
+            user_qr_id, 
+            referred_by_user_id, 
+            college_name
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        
         $stmtInsert = $conn->prepare($sqlInsert);
         if (!$stmtInsert) {
             throw new Exception("Failed to prepare user insert statement: " . $conn->error);
         }
 
-        $stmtInsert->bind_param('ssisssis', $email, $password, $user_type, $user_tag, $selected_slab, $user_qr_id, $referred_by_user_id, $college_name);
+        $stmtInsert->bind_param(
+            'ssssssisssiss', 
+            $email, 
+            $password, 
+            $full_name, 
+            $phone, 
+            $address, 
+            $pincode, 
+            $landmark, 
+            $user_type, 
+            $user_tag, 
+            $selected_slab, 
+            $user_qr_id, 
+            $referred_by_user_id, 
+            $college_name
+        );
 
         if (!$stmtInsert->execute()) {
             throw new Exception("Failed to create user: " . $stmtInsert->error);

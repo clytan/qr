@@ -97,9 +97,10 @@ function processRegistration($data, $payment_id, $bank_reference, $order_id)
         $college_name = $data['college_name'] ?? null;
         $amount = $data['amount'];
 
-        // Generate user_qr_id
+        // Generate user_qr_id (ZOK format - 10 digits total)
         do {
-            $user_qr_id = strval(mt_rand(1000000000, 9999999999));
+            $random_digits = str_pad(strval(mt_rand(0, 9999999)), 7, '0', STR_PAD_LEFT);
+            $user_qr_id = 'ZOK' . $random_digits;
             $sqlCheckQr = "SELECT 1 FROM user_user WHERE user_qr_id = ?";
             $stmtCheckQr = $conn->prepare($sqlCheckQr);
             $stmtCheckQr->bind_param('s', $user_qr_id);
