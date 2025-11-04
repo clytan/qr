@@ -32,8 +32,8 @@ $penaltyCheck = checkUserPenalties($user_id, $community_id, $conn);
 $isTimedOut = !$penaltyCheck['status'];
 $timeoutMessage = $isTimedOut ? $penaltyCheck['message'] : null;
 
-// Get messages with reaction info and moderator status
-$sql = "SELECT cc.*, uu.user_full_name,
+// Get messages with reaction info, moderator status, and QR ID
+$sql = "SELECT cc.*, uu.user_full_name, uu.user_qr_id,
         (SELECT reaction_type FROM community_reactions 
          WHERE message_id = cc.id AND user_id = ? AND is_deleted = 0) as user_reaction,
         (SELECT COUNT(*) FROM community_reactions 
@@ -103,6 +103,7 @@ while ($row = $result->fetch_assoc()) {
         'id' => $row['id'],
         'message' => $row['message'],
         'user_name' => $row['user_full_name'],
+        'user_qr_id' => $row['user_qr_id'],
         'created_on' => $row['created_on'],
         'is_own' => $row['user_id'] == $user_id,
         'user_reaction' => $row['user_reaction'],

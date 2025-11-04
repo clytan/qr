@@ -63,6 +63,245 @@
             transform: translateY(0);
         }
     }
+
+    /* Membership tier card price styling */
+    .card-price {
+        display: block;
+        margin-top: 8px;
+        font-size: 18px;
+        font-weight: 700;
+        color: #27ae60;
+    }
+
+    .card-features {
+        display: block;
+        margin-top: 6px;
+        font-size: 12px;
+        color: #7f8c8d;
+        font-weight: 500;
+    }
+
+    /* Common selection card styling */
+    .selection-card {
+        cursor: pointer;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 15px;
+        border: 2px solid #ddd;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .selection-card input[type="radio"] {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        width: 20px;
+        height: 20px;
+        margin: 0;
+        cursor: pointer;
+    }
+
+    .selection-card:hover {
+        border-color: #3498db;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+
+    /* User type card styling */
+    .type-card input:checked ~ .card-icon span {
+        color: #3498db;
+        transform: scale(1.2);
+    }
+
+    .type-card input:checked ~ .card-text {
+        color: #3498db;
+        font-weight: 700;
+    }
+
+    /* Tier card styling with specific colors */
+    .tier-card[data-tier="normal"]:has(input:checked) {
+        border-color: #3498db !important;
+        background: #f0f8ff;
+    }
+
+    .tier-card[data-tier="silver"]:has(input:checked) {
+        border-color: #c0c0c0 !important;
+        background: #f8f8f8;
+    }
+
+    .tier-card[data-tier="gold"]:has(input:checked) {
+        border-color: #ffd700 !important;
+        background: #fffef0;
+    }
+
+    .tier-card input:checked ~ .card-price {
+        color: #27ae60;
+        font-weight: 800;
+    }
+
+    /* ==================== MOBILE RESPONSIVE STYLES ==================== */
+    @media (max-width: 768px) {
+        /* Adjust padding for mobile */
+        .box-rounded {
+            padding: 25px 15px !important;
+        }
+
+        /* Full width form on mobile */
+        .col-lg-4 {
+            padding: 0 15px;
+        }
+
+        /* Pincode and Landmark - Stack vertically on mobile */
+        .field-set-grid {
+            display: block !important;
+        }
+
+        .field-set-grid .field-set {
+            margin-bottom: 15px !important;
+        }
+
+        /* User type cards - Stack vertically on mobile */
+        .basic-user-types {
+            grid-template-columns: 1fr !important;
+            gap: 10px !important;
+        }
+
+        /* Tier cards - Stack vertically on mobile */
+        .tier-cards-grid {
+            grid-template-columns: 1fr !important;
+            gap: 10px !important;
+        }
+
+        /* Adjust card padding on mobile */
+        .selection-card {
+            padding: 12px !important;
+            flex-direction: row !important;
+            justify-content: flex-start !important;
+            gap: 12px;
+        }
+
+        .selection-card .card-icon {
+            margin: 0 !important;
+        }
+
+        .selection-card .card-text {
+            flex: 1;
+            text-align: left !important;
+        }
+
+        /* Adjust tier card layout on mobile */
+        .tier-card {
+            flex-direction: row !important;
+            align-items: center !important;
+            text-align: left !important;
+        }
+
+        .tier-card .card-icon {
+            order: 1;
+            margin-right: 10px !important;
+        }
+
+        .tier-card .card-text {
+            order: 2;
+            flex: 1;
+            text-align: left !important;
+            font-size: 16px !important;
+        }
+
+        .tier-card .card-price {
+            order: 3;
+            margin: 0 10px 0 0 !important;
+            font-size: 16px !important;
+        }
+
+        .tier-card .card-features {
+            order: 4;
+            font-size: 11px !important;
+            margin: 0 !important;
+        }
+
+        /* Adjust reference section checkbox on mobile */
+        .reference-section label {
+            font-size: 15px !important;
+        }
+
+        .reference-section label span {
+            font-size: 15px !important;
+        }
+
+        /* Input field adjustments */
+        .form-input,
+        .college-input,
+        .reference-input {
+            font-size: 14px !important;
+            padding: 10px 12px !important;
+        }
+
+        /* Hide left column on mobile */
+        .col-lg-5.text-light {
+            display: none !important;
+        }
+
+        /* Center the form on mobile */
+        .col-lg-4.offset-lg-2 {
+            margin: 0 !important;
+            max-width: 100% !important;
+            flex: 0 0 100% !important;
+        }
+
+        /* Adjust section margins */
+        .field-set {
+            margin-bottom: 15px !important;
+        }
+
+        /* Heading adjustments */
+        h3 {
+            font-size: 22px !important;
+        }
+
+        /* Button full width on mobile */
+        .btn-fullwidth {
+            width: 100% !important;
+            padding: 12px !important;
+            font-size: 15px !important;
+        }
+
+        /* Policy checkboxes - more compact on mobile */
+        .field-set > div[style*="background: rgba(255, 255, 255, 0.05)"] {
+            padding: 15px !important;
+        }
+
+        .field-set label {
+            font-size: 13px !important;
+        }
+    }
+
+    /* Small phone screens */
+    @media (max-width: 480px) {
+        .box-rounded {
+            padding: 20px 12px !important;
+        }
+
+        .selection-card {
+            padding: 10px !important;
+        }
+
+        .card-price {
+            font-size: 14px !important;
+        }
+
+        .card-features {
+            font-size: 10px !important;
+        }
+
+        h3 {
+            font-size: 20px !important;
+        }
+    }
     </style>
 </head>
 
@@ -125,10 +364,18 @@
                                         <form name="registerForm" id='register_form' class="form-border" method="post"
                                             action=''>
 
+                                            <!-- Full Name Field -->
+                                            <div class="field-set">
+                                                <input type='text' name='full_name' id='full_name'
+                                                    placeholder="👤 Full Name (e.g., John D Smith)" class="form-input" required>
+                                                <span id="name-validation-status"
+                                                    style="margin-top:5px; display:block; font-size:12px; font-weight:600;"></span>
+                                            </div>
+
                                             <!-- Email Field with Cool Design -->
                                             <div class="field-set" style="position:relative; margin-bottom:20px;">
                                                 <input type='text' name='email' id='email'
-                                                    placeholder="✉️ Email Address" class="form-input">
+                                                    placeholder="✉️ Email Address" class="form-input" required>
                                                 <div id="verify-email-section" style="display:none; margin-top:8px;">
                                                     <a href="#" id="verify-email-link" class="verify-email-btn">
                                                         🔐 Verify Email
@@ -138,36 +385,45 @@
                                                 </div>
                                             </div>
 
+                                            <!-- Phone Number Field -->
+                                            <div class="field-set">
+                                                <input type='tel' name='phone' id='phone'
+                                                    placeholder="📱 Phone Number (10 digits)" class="form-input" 
+                                                    maxlength="10" pattern="[0-9]{10}" required>
+                                                <span id="phone-validation-status"
+                                                    style="margin-top:5px; display:block; font-size:12px; font-weight:600;"></span>
+                                            </div>
+
                                             <!-- Password Field -->
                                             <div class="field-set">
                                                 <input type='password' name='password' id='password'
-                                                    placeholder="🔒 Password" class="form-input">
+                                                    placeholder="🔒 Password" class="form-input" required>
                                             </div>
 
                                             <!-- Confirm Password Field -->
                                             <div class="field-set">
                                                 <input type='password' name='confirmpassword' id='confirmpassword'
-                                                    placeholder="🔐 Confirm Password" class="form-input">
+                                                    placeholder="🔐 Confirm Password" class="form-input" required>
                                                 <span id="password-match-status"
                                                     style="margin-bottom:20px; display:block; font-weight:600;"></span>
                                             </div>
 
-                                            <!-- User Slab Selection with Cool Design -->
-                                            <div class="field-set" style="margin-top: -5%;">
-                                                <label
-                                                    style="margin-bottom:12px;display:block;font-weight:600;color:#2c3e50;font-size:14px;">💎
-                                                    Select Your Plan</label>
-                                                <select name="user_slab" id="user_slab" required class="form-select">
-                                                    <option value="" style="background:#fff;color:#666;">🎯 Select your
-                                                        plan...</option>
-                                                </select>
+                                            <!-- Address Field -->
+                                            <div class="field-set">
+                                                <input type='text' name='address' id='address'
+                                                    placeholder="📍 Address" class="form-input" required>
+                                            </div>
 
-                                                <!-- College Name Field (hidden by default) -->
-                                                <div id="college_field" class="college-field">
-                                                    <label class="college-label">🎓 Enter your college name:</label>
-                                                    <input type="text" name="college_name" id="college_name"
-                                                        placeholder="Enter your college/university name"
-                                                        class="college-input">
+                                            <!-- Pincode and Landmark in Grid -->
+                                            <div class="field-set-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
+                                                <div class="field-set" style="margin-bottom:0;">
+                                                    <input type='text' name='pincode' id='pincode'
+                                                        placeholder="📮 Pincode" class="form-input" 
+                                                        maxlength="6" pattern="[0-9]{6}" required>
+                                                </div>
+                                                <div class="field-set" style="margin-bottom:0;">
+                                                    <input type='text' name='landmark' id='landmark'
+                                                        placeholder="🏛️ Landmark" class="form-input" required>
                                                 </div>
                                             </div>
 
@@ -182,9 +438,8 @@
                                                     class="basic-user-types">
 
                                                     <!-- Individual Card -->
-                                                    <label class="user-type-card" data-type="individual">
-                                                        <input type="radio" name="user_type" value="1" required
-                                                            style="display:none;">
+                                                    <label class="selection-card type-card" data-type="individual">
+                                                        <input type="radio" name="user_type" value="1" id="type_individual" required>
                                                         <div class="card-icon">
                                                             <span style="font-size:18px;">👤</span>
                                                         </div>
@@ -192,9 +447,8 @@
                                                     </label>
 
                                                     <!-- Creator Card -->
-                                                    <label class="user-type-card" data-type="creator">
-                                                        <input type="radio" name="user_type" value="2"
-                                                            style="display:none;">
+                                                    <label class="selection-card type-card" data-type="creator">
+                                                        <input type="radio" name="user_type" value="2" id="type_creator">
                                                         <div class="card-icon">
                                                             <span style="font-size:18px;">🎨</span>
                                                         </div>
@@ -202,39 +456,68 @@
                                                     </label>
 
                                                     <!-- Business Card -->
-                                                    <label class="user-type-card" data-type="business">
-                                                        <input type="radio" name="user_type" value="3"
-                                                            style="display:none;">
+                                                    <label class="selection-card type-card" data-type="business">
+                                                        <input type="radio" name="user_type" value="3" id="type_business">
                                                         <div class="card-icon">
                                                             <span style="font-size:18px;">🏢</span>
                                                         </div>
                                                         <span class="card-text">Business</span>
                                                     </label>
                                                 </div>
+                                            </div>
 
-                                                <!-- Premium Membership Cards -->
-                                                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;"
-                                                    class="premium-types">
+                                            <!-- Membership Tier Selection (User Tag: Gold/Silver/Normal) -->
+                                            <div class="field-set" style="margin-top: -5%;">
+                                                <label
+                                                    style="margin-bottom:15px;display:block;font-weight:600;color:#2c3e50;font-size:16px;">💎
+                                                    Select Your Membership Tier</label>
+                                                
+                                                <!-- Membership Tier Cards -->
+                                                <div class="tier-cards-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:15px;">
 
-                                                    <!-- Gold Member Card -->
-                                                    <label class="user-type-card" data-type="gold">
-                                                        <input type="radio" name="user_type" value="1" data-tag="gold"
-                                                            style="display:none;">
+                                                    <!-- Gold Tier (Investor QR) -->
+                                                    <label class="selection-card tier-card" data-tier="gold">
+                                                        <input type="radio" name="user_tag" value="gold" id="tier_gold">
                                                         <div class="card-icon">
-                                                            <span style="font-size:16px;">✨</span>
+                                                            <span style="font-size:24px;">✨</span>
                                                         </div>
                                                         <span class="card-text">Gold</span>
+                                                        <span class="card-price">₹9,999</span>
+                                                        <span class="card-features">Investor + Supercharge</span>
                                                     </label>
 
-                                                    <!-- Silver Member Card -->
-                                                    <label class="user-type-card" data-type="silver">
-                                                        <input type="radio" name="user_type" value="1" data-tag="silver"
-                                                            style="display:none;">
+                                                    <!-- Silver Tier (Influencer Pack) -->
+                                                    <label class="selection-card tier-card" data-tier="silver">
+                                                        <input type="radio" name="user_tag" value="silver" id="tier_silver">
                                                         <div class="card-icon">
-                                                            <span style="font-size:16px;">🥈</span>
+                                                            <span style="font-size:24px;">🥈</span>
                                                         </div>
                                                         <span class="card-text">Silver</span>
+                                                        <span class="card-price">₹5,555</span>
+                                                        <span class="card-features">Influencer + Supercharge</span>
                                                     </label>
+
+                                                    <!-- Normal Tier (Regular) - DEFAULT SELECTED -->
+                                                    <label class="selection-card tier-card" data-tier="normal">
+                                                        <input type="radio" name="user_tag" value="" id="tier_normal" checked required>
+                                                        <div class="card-icon">
+                                                            <span style="font-size:24px;">⚡</span>
+                                                        </div>
+                                                        <span class="card-text">Normal</span>
+                                                        <span class="card-price">₹999</span>
+                                                        <span class="card-features">Regular User</span>
+                                                    </label>
+                                                </div>
+
+                                                <!-- Hidden field for slab ID (set dynamically by JS) -->
+                                                <input type="hidden" name="user_slab" id="user_slab">
+
+                                                <!-- College Name Field (hidden by default) -->
+                                                <div id="college_field" class="college-field">
+                                                    <label class="college-label">🎓 Enter your college name:</label>
+                                                    <input type="text" name="college_name" id="college_name"
+                                                        placeholder="Enter your college/university name"
+                                                        class="college-input">
                                                 </div>
                                             </div>
 
@@ -265,6 +548,16 @@
                                                         <span id="reference-status"
                                                             style="margin-left:0px; margin-top:10px; display:block; font-size:14px; font-weight:600;"></span>
                                                     </div>
+                                                </div>
+                                            </div>
+
+                                            <!-- Terms and Policies Agreement -->
+                                            <div class="field-set" style="margin-top:20px;">
+                                                <div style="background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 8px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                                    <label style="display: flex; align-items: center; cursor: pointer; font-size: 13px; color: #b0b0b0; line-height: 1.6;">
+                                                        <input type="checkbox" id="terms-checkbox" required style="margin-right: 10px; min-width: 20px; width: 20px; height: 20px; cursor: pointer; flex-shrink: 0; accent-color: #8364e2; -webkit-appearance: auto; appearance: auto;">
+                                                        <span>I agree to the <a href="terms.php" target="_blank" style="color: #8364e2; text-decoration: underline;" onclick="event.stopPropagation();">Terms & Conditions</a>, <a href="privacy.php" target="_blank" style="color: #8364e2; text-decoration: underline;" onclick="event.stopPropagation();">Privacy Policy</a> and <a href="refund.php" target="_blank" style="color: #8364e2; text-decoration: underline;" onclick="event.stopPropagation();">Refund Policy</a></span>
+                                                    </label>
                                                 </div>
                                             </div>
 

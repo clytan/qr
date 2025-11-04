@@ -15,6 +15,18 @@
     <!-- FontAwesome 5+ for wallet icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
         crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* Mobile footer fix */
+        @media (max-width: 768px) {
+            section[aria-label="section"] {
+                padding-bottom: 120px !important;
+            }
+            
+            .container {
+                padding-bottom: 20px;
+            }
+        }
+    </style>
 </head>
 
 <body class="dark-scheme de-grey">

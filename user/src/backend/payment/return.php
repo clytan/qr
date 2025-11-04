@@ -1,6 +1,7 @@
 <?php
 require_once('../dbconfig/connection.php');
 require_once('./session_config.php');
+require_once('../auto_community_helper.php');
 
 error_log("Return URL accessed - Query string: " . $_SERVER['QUERY_STRING']);
 
@@ -101,6 +102,15 @@ function processRegistration($data, $payment_id, $bank_reference, $order_id)
 
         $conn->commit();
         error_log("Registration completed successfully for user ID: " . $user_id);
+        
+        // AUTO-ASSIGN USER TO COMMUNITY (100 users per community)
+        $communityResult = assignUserToCommunity($conn, $user_id);
+        if ($communityResult['status']) {
+            error_log("User $user_id auto-assigned to {$communityResult['community_name']} (Members: {$communityResult['member_count']}/100)");
+        } else {
+            error_log("Failed to auto-assign community for user $user_id: " . $communityResult['error']);
+        }
+        
         return ['status' => true, 'message' => 'Registration successful'];
 
     } catch (Exception $e) {
@@ -185,67 +195,85 @@ if (isset($_GET['orderId'])) {
     $order_id = $_GET['orderId'];
     error_log("Order ID from return URL: " . $order_id);
 
-    // Verify payment status with Cashfree
-    $clientId = "TEST10846745c5a8303d342dc718d3fd54764801";
-    $clientSecret = "cfsk_ma_test_0f8d48d6e963a3ff6c8005964e961bab_f925b695";
-    $cashfreeBaseUrl = "https://sandbox.cashfree.com/pg/";
+    // First, get registration data from database (more reliable than session)
+    $sqlGetReg = "SELECT registration_data, status FROM user_pending_registration WHERE order_id = ? AND status = 'pending'";
+    $stmtGetReg = $conn->prepare($sqlGetReg);
+    $stmtGetReg->bind_param('s', $order_id);
+    $stmtGetReg->execute();
+    $resultGetReg = $stmtGetReg->get_result();
+    
+    if ($resultGetReg->num_rows === 0) {
+        error_log("No pending registration found for order: " . $order_id);
+        $message = "Registration data not found or already processed. Please contact support if you made a payment.";
+        $redirect = "/user/src/ui/register.php";
+    } else {
+        $rowReg = $resultGetReg->fetch_assoc();
+        $regData = json_decode($rowReg['registration_data'], true);
+        error_log("Registration data retrieved from database: " . print_r($regData, true));
+        
+        // Verify payment status with Cashfree
+        $clientId = "TEST10846745c5a8303d342dc718d3fd54764801";
+        $clientSecret = "cfsk_ma_test_0f8d48d6e963a3ff6c8005964e961bab_f925b695";
+        $cashfreeBaseUrl = "https://sandbox.cashfree.com/pg/";
 
-    $headers = array(
-        "accept: application/json",
-        "x-api-version: 2022-09-01",
-        "x-client-id: " . $clientId,
-        "x-client-secret: " . $clientSecret
-    );
+        $headers = array(
+            "accept: application/json",
+            "x-api-version: 2022-09-01",
+            "x-client-id: " . $clientId,
+            "x-client-secret: " . $clientSecret
+        );
 
-    $ch = curl_init($cashfreeBaseUrl . "orders/" . $order_id);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    curl_close($ch);
+        $ch = curl_init($cashfreeBaseUrl . "orders/" . $order_id);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
 
-    error_log("Cashfree order status response: " . $response);
+        error_log("Cashfree order status response: " . $response);
 
-    $orderData = json_decode($response, true);
+        $orderData = json_decode($response, true);
 
-    if ($httpCode == 200 && isset($orderData['order_status'])) {
-        error_log("Order status: " . $orderData['order_status']);
+        if ($httpCode == 200 && isset($orderData['order_status'])) {
+            error_log("Order status: " . $orderData['order_status']);
 
-        if ($orderData['order_status'] === 'PAID') {
-            error_log("Payment successful, processing registration");
-            error_log("Session data available: " . print_r($_SESSION, true));
+            if ($orderData['order_status'] === 'PAID') {
+                error_log("Payment successful, processing registration");
 
-            if (isset($_SESSION['registration_data'])) {
-                $regData = $_SESSION['registration_data'];
                 $result = processRegistration($regData, $orderData['payments']['payment_id'] ?? null, $order_id, $order_id);
 
                 if ($result['status']) {
-                    error_log("Registration successful");
+                    error_log("Registration successful, updating pending registration status");
+                    
+                    // Update status to completed
+                    $sqlUpdate = "UPDATE user_pending_registration SET status = 'completed' WHERE order_id = ?";
+                    $stmtUpdate = $conn->prepare($sqlUpdate);
+                    $stmtUpdate->bind_param('s', $order_id);
+                    $stmtUpdate->execute();
+                    $stmtUpdate->close();
+                    
                     $message = "Registration successful! Redirecting to login...";
-                    $redirect = "/qr/user/src/ui/login.php";
+                    $redirect = "/user/src/ui/login.php";
                 } else {
                     error_log("Registration failed: " . $result['message']);
                     $message = "Registration failed: " . $result['message'];
-                    $redirect = "/qr/user/src/ui/register.php";
+                    $redirect = "/user/src/ui/register.php";
                 }
             } else {
-                error_log("No registration data found in session");
-                $message = "Registration data not found. Please try again.";
-                $redirect = "/qr/user/src/ui/register.php";
+                $message = "Payment not completed. Status: " . $orderData['order_status'];
+                $redirect = "/user/src/ui/register.php";
             }
         } else {
-            $message = "Payment not completed. Please try again.";
-            $redirect = "/qr/user/src/ui/register.php";
+            error_log("Could not verify payment status. HTTP Code: " . $httpCode);
+            $message = "Could not verify payment status. Please contact support with order ID: " . $order_id;
+            $redirect = "/user/src/ui/register.php";
         }
-    } else {
-        $message = "Could not verify payment status. Please contact support.";
-        $redirect = "/qr/user/src/ui/register.php";
     }
+    $stmtGetReg->close();
 } else {
     $message = "Invalid request. Please try again.";
-    $redirect = "/qr/user/src/ui/register.php";
-}
-?>
+    $redirect = "/user/src/ui/register.php";
+}?>
 <!DOCTYPE html>
 <html lang="en">
 

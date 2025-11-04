@@ -405,7 +405,7 @@ const profileFunction = {
         $('body').addClass('public-view-mode');
 
         // Style basic info fields consistently
-        $('#full_name, #phone_number, #email_address, #address').css({
+        $('#full_name, #phone_number, #email_address, #address, #landmark, #pincode').css({
             'background-color': 'rgba(255, 255, 255, 0.1)',
             'border': '1px solid #444',
             'color': '#fff',
@@ -698,6 +698,8 @@ const profileFunction = {
             phone_number: $('#phone_number').val(),
             user_email: $('#email_address').val(),
             user_address: $('#address').val(),
+            user_pincode: $('#pincode').val(),
+            user_landmark: $('#landmark').val(),
             links: {},
             fields: []
         };
@@ -773,6 +775,8 @@ const profileFunction = {
                     $('#phone_number').val(user.user_phone || '');
                     $('#email_address').val(user.user_email || '');
                     $('#address').val(user.user_address || '');
+                    $('#landmark').val(user.user_landmark || '');
+                    $('#pincode').val(user.user_pincode || '');
                     $('#user-name').text(fullName);
 
                     // Hide empty fields in public view
@@ -815,7 +819,9 @@ const profileFunction = {
             'full_name': user.user_full_name,
             'phone_number': user.user_phone,
             'email_address': user.user_email,
-            'address': user.user_address
+            'address': user.user_address,
+            'landmark': user.user_landmark,
+            'pincode': user.user_pincode
         };
 
         Object.entries(basicFields).forEach(([fieldId, value]) => {
@@ -1013,8 +1019,8 @@ const profileFunction = {
                     let imagePath = res.src;
 
                     // Convert absolute path to relative if needed
-                    if (imagePath.startsWith('/qr/user/src/')) {
-                        imagePath = '..' + imagePath.substring('/qr/user/src'.length);
+                    if (imagePath.startsWith('/user/src/')) {
+                        imagePath = '..' + imagePath.substring('/user/src'.length);
                     } else if (!imagePath.includes('backend') && !imagePath.startsWith('http')) {
                         imagePath = '../backend/ui/profile/' + imagePath.split('/').pop();
                     }

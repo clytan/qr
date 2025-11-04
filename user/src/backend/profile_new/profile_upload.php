@@ -27,7 +27,7 @@ if (isset($_FILES['profile_img']) && isset($_POST['user_id'])) {
 
         if (move_uploaded_file($file['tmp_name'], $targetFile)) {
             // CORRECTED: Path now matches where file is actually saved
-            $src = '/qr/user/src/backend/ui/profile/' . $newName;
+            $src = '/user/src/backend/ui/profile/' . $newName;
 
             // Update user_user table with new image path
             $sql = "UPDATE user_user SET user_image_path = ?, updated_on = NOW(), updated_by = ? WHERE id = ? AND is_deleted = 0";

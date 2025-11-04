@@ -93,7 +93,7 @@ $user_id = $_SESSION['user_id'];
     </div>
 
     <?php include('../components/jslinks.php'); ?>
-    <script src="custom_js/community.js"></script>
+    <script src="custom_js/community.js?v=<?php echo time(); ?>"></script>
     <script src="custom_js/report.js"></script>
 </body>
 

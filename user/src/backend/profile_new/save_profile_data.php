@@ -13,18 +13,20 @@ $user_full_name = $data['user_full_name'] ?? '';
 $phone_number = $data['phone_number'] ?? '';
 $user_email = $data['user_email'] ?? '';
 $user_address = $data['user_address'] ?? '';
+$user_pincode = $data['user_pincode'] ?? '';
+$user_landmark = $data['user_landmark'] ?? '';
 $fields = $data['fields'] ?? [];
 $links = $data['links'] ?? [];
 
 // Update user_user table
 global $conn;
-$user_sql = "UPDATE user_user SET user_full_name=?, user_phone=?, user_email=?, user_address=? WHERE id=?";
+$user_sql = "UPDATE user_user SET user_full_name=?, user_phone=?, user_email=?, user_address=?, user_pincode=?, user_landmark=? WHERE id=?";
 $user_stmt = $conn->prepare($user_sql);
 if (!$user_stmt) {
     echo json_encode(['status' => 0, 'message' => 'DB error: ' . $conn->error]);
     exit;
 }
-$user_stmt->bind_param('ssssi', $user_full_name, $phone_number, $user_email, $user_address, $user_id);
+$user_stmt->bind_param('ssssssi', $user_full_name, $phone_number, $user_email, $user_address, $user_pincode, $user_landmark, $user_id);
 $user_stmt->execute();
 $user_stmt->close();
 

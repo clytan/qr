@@ -82,23 +82,30 @@ function renderMessage(msg) {
 
     return `
         <div class="message ${msg.is_own ? 'sent' : 'received'}" data-message-id="${msg.id}">
-            <div class="message-header">
-                <div class="message-sender" style="margin-right: 10px;">
-                    ${msg.user_name}
-                    ${msg.is_moderator ? `
-                        <span class="moderator-badge">
-                            <i class="fa fa-shield"></i> Mod
-                        </span>
-                    ` : ''}
+            <div style="display: flex; gap: 12px; align-items: flex-start;">
+                <div style="flex-shrink: 0; width: 40px; height: 40px;">
+                    <img src="assets/images/user.jpg" alt="${msg.user_name}" 
+                         style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover; border: 2px solid rgba(131, 100, 226, 0.3);"
+                         onerror="this.src='assets/images/user.jpg'">
                 </div>
-                <div class="timestamp">${formatDate(msg.created_on)}</div>
-            </div>
-            <div class="message-content" style="word-break: break-word; overflow-wrap: break-word; white-space: pre-wrap; max-width: 100%;">${msg.message}</div>
-            ${renderAttachment()}
-            <div class="message-footer">
+                <div style="flex: 1; min-width: 0;">
+                    <div class="message-header">
+                        <div class="message-sender" style="margin-right: 10px;">
+                            <span style="color: rgba(131, 100, 226, 0.8); font-size: 0.9em;">@${msg.user_qr_id}</span>
+                            ${msg.is_moderator ? `
+                                <span class="moderator-badge">
+                                    <i class="fa fa-shield"></i> Mod
+                                </span>
+                            ` : ''}
+                        </div>
+                        <div class="timestamp">${formatDate(msg.created_on)}</div>
+                    </div>
+                    <div class="message-content" style="word-break: break-word; overflow-wrap: break-word; white-space: pre-wrap; max-width: 100%;">${msg.message}</div>
+                    ${renderAttachment()}
+                    <div class="message-footer">
                 <div class="d-flex align-items-center">
                     ${isMember ? `
-                        <button class="btn-reply" onclick="replyToMessage(${msg.id})">
+                        <button class="btn-reply" onclick="replyToMessage(${msg.id}, '${msg.user_qr_id}')">
                             <i class="fa fa-reply"></i>Reply
                         </button>
                     ` : ``}
@@ -154,6 +161,8 @@ function renderMessage(msg) {
                             `}
                         </div>
                     ` : ''}
+                </div>
+            </div>
                 </div>
             </div>
         </div>
@@ -571,14 +580,8 @@ function banUser(userId, messageId) {
 }
 
 // Reply functionality
-function replyToMessage(messageId) {
-    const messageElement = document.querySelector(`[data-message-id="${messageId}"]`);
-    if (messageElement) {
-        const senderElement = messageElement.querySelector('.message-sender');
-        // Get just the username text (first text node) before the moderator badge
-        const username = senderElement.childNodes[0].textContent.trim();
-        const input = document.getElementById('messageInput');
-        input.value = `@${username} `;
-        input.focus();
-    }
+function replyToMessage(messageId, userQrId) {
+    const input = document.getElementById('messageInput');
+    input.value = `@${userQrId} `;
+    input.focus();
 }

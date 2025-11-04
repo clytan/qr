@@ -1,6 +1,7 @@
 <?php
 require_once('../dbconfig/connection.php');
 require_once('./session_config.php');
+require_once('../auto_community_helper.php');
 error_log("Payment callback received - Method: " . $_SERVER['REQUEST_METHOD']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -8,18 +9,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     error_log("Callback raw data: " . $postData);
     $data = json_decode($postData, true);
 
-    error_log("Session data: " . print_r($_SESSION, true));
-
-    if ($data && isset($data['payment']['payment_status']) && isset($_SESSION['registration_data'])) {
+    if ($data && isset($data['payment']['payment_status'])) {
         error_log("Payment status: " . $data['payment']['payment_status']);
+        
+        // Get order_id from callback data
+        $order_id = $data['order']['order_id'] ?? null;
+        
+        if (!$order_id) {
+            error_log("Order ID not found in callback data");
+            echo json_encode(['status' => false, 'message' => 'Order ID missing']);
+            exit;
+        }
+        
+        error_log("Order ID from callback: " . $order_id);
+
+        // Get registration data from database (more reliable than session)
+        $sqlGetReg = "SELECT registration_data, status FROM user_pending_registration WHERE order_id = ? AND status = 'pending'";
+        $stmtGetReg = $conn->prepare($sqlGetReg);
+        $stmtGetReg->bind_param('s', $order_id);
+        $stmtGetReg->execute();
+        $resultGetReg = $stmtGetReg->get_result();
+        
+        if ($resultGetReg->num_rows === 0) {
+            error_log("No pending registration found for order: " . $order_id);
+            echo json_encode(['status' => false, 'message' => 'Registration data not found']);
+            exit;
+        }
+        
+        $rowReg = $resultGetReg->fetch_assoc();
+        $regData = json_decode($rowReg['registration_data'], true);
+        $stmtGetReg->close();
+        
+        error_log("Registration data retrieved from database: " . print_r($regData, true));
 
         if ($data['payment']['payment_status'] == "SUCCESS") {
             $payment_id = $data['payment']['cf_payment_id'];
             $bank_reference = $data['payment']['bank_reference'];
-
-            // Get registration data from session
-            $regData = $_SESSION['registration_data'];
-            $order_id = $_SESSION['order_id'];
 
             error_log("Processing registration with data: " . print_r($regData, true));
 
@@ -29,19 +54,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             error_log("Registration result: " . print_r($result, true));
 
             if ($result['status']) {
+                // Update status to completed
+                $sqlUpdate = "UPDATE user_pending_registration SET status = 'completed' WHERE order_id = ?";
+                $stmtUpdate = $conn->prepare($sqlUpdate);
+                $stmtUpdate->bind_param('s', $order_id);
+                $stmtUpdate->execute();
+                $stmtUpdate->close();
+                
                 echo json_encode(['status' => true, 'message' => 'Registration successful']);
             } else {
                 echo json_encode(['status' => false, 'message' => $result['message']]);
             }
-
-            // Clear session data
-            unset($_SESSION['registration_data']);
-            unset($_SESSION['order_id']);
         } else {
             echo json_encode(['status' => false, 'message' => 'Payment failed or pending']);
         }
     } else {
-        echo json_encode(['status' => false, 'message' => 'Invalid data or session expired']);
+        echo json_encode(['status' => false, 'message' => 'Invalid payment data']);
     }
 } else {
     echo json_encode(['status' => false, 'message' => 'Invalid request method']);
@@ -54,8 +82,13 @@ function processRegistration($data, $payment_id, $bank_reference, $order_id)
     try {
         $conn->begin_transaction();
 
+        $full_name = $data['full_name'] ?? null;
         $email = $data['email'];
+        $phone = $data['phone'] ?? null;
         $password = $data['password'];
+        $address = $data['address'] ?? null;
+        $pincode = $data['pincode'] ?? null;
+        $landmark = $data['landmark'] ?? null;
         $user_type = $data['user_type'];
         $user_tag = $data['user_tag'] ?? null;
         $selected_slab = $data['user_slab'];
@@ -76,10 +109,60 @@ function processRegistration($data, $payment_id, $bank_reference, $order_id)
             $stmtCheckQr->close();
         } while ($exists);
 
-        // Insert user
-        $sqlInsert = "INSERT INTO user_user(user_email, user_password, user_user_type, user_tag, user_slab_id, user_qr_id, referred_by_user_id, college_name) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        // Build INSERT query using actual column names from database
+        $columns = ['user_email', 'user_password', 'user_user_type', 'user_tag', 'user_slab_id', 'user_qr_id', 'referred_by_user_id'];
+        $values = [$email, $password, $user_type, $user_tag, $selected_slab, $user_qr_id, $referred_by_user_id];
+        $types = 'ssisssi';
+
+        // Add user_full_name (column exists in database)
+        if ($full_name !== null) {
+            $columns[] = 'user_full_name';
+            $values[] = $full_name;
+            $types .= 's';
+        }
+
+        // Add user_phone (column exists in database)
+        if ($phone !== null) {
+            $columns[] = 'user_phone';
+            $values[] = $phone;
+            $types .= 's';
+        }
+
+        // Add user_address (column exists in database)
+        if ($address !== null) {
+            $columns[] = 'user_address';
+            $values[] = $address;
+            $types .= 's';
+        }
+
+        // Add user_pincode (column exists in database)
+        if ($pincode !== null) {
+            $columns[] = 'user_pincode';
+            $values[] = $pincode;
+            $types .= 's';
+        }
+
+        // Add user_landmark (column exists in database)
+        if ($landmark !== null) {
+            $columns[] = 'user_landmark';
+            $values[] = $landmark;
+            $types .= 's';
+        }
+
+        // Add college_name (column exists in database)
+        if ($college_name !== null) {
+            $columns[] = 'college_name';
+            $values[] = $college_name;
+            $types .= 's';
+        }
+
+        // Build SQL query
+        $columnsList = implode(', ', $columns);
+        $placeholders = implode(', ', array_fill(0, count($columns), '?'));
+        $sqlInsert = "INSERT INTO user_user($columnsList) VALUES ($placeholders)";
+        
         $stmtInsert = $conn->prepare($sqlInsert);
-        $stmtInsert->bind_param('ssisssis', $email, $password, $user_type, $user_tag, $selected_slab, $user_qr_id, $referred_by_user_id, $college_name);
+        $stmtInsert->bind_param($types, ...$values);
 
         if (!$stmtInsert->execute()) {
             throw new Exception("Failed to create user: " . $conn->error);
@@ -119,6 +202,15 @@ function processRegistration($data, $payment_id, $bank_reference, $order_id)
         }
 
         $conn->commit();
+        
+        // AUTO-ASSIGN USER TO COMMUNITY (100 users per community)
+        $communityResult = assignUserToCommunity($conn, $user_id);
+        if ($communityResult['status']) {
+            error_log("User $user_id auto-assigned to {$communityResult['community_name']} (Members: {$communityResult['member_count']}/100)");
+        } else {
+            error_log("Failed to auto-assign community for user $user_id: " . $communityResult['error']);
+        }
+        
         return ['status' => true, 'message' => 'Registration successful'];
 
     } catch (Exception $e) {

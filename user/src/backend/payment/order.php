@@ -6,11 +6,36 @@ ini_set('display_errors', 0);
 date_default_timezone_set("Asia/Kolkata");
 
 require_once('./session_config.php');
+require_once('../dbconfig/connection.php');
 
-// Change these URLs to match your setup
+// ============================================
+// CONFIGURATION: Choose your testing method
+// ============================================
+
+// Option A: Using ngrok (RECOMMENDED - works with Cashfree sandbox)
+// 1. Download ngrok from https://ngrok.com/download
+// 2. Run: ngrok http 8000
+// 3. Copy the HTTPS URL (e.g., https://abc123.ngrok.io)
+// 4. Uncomment line below and paste your ngrok URL
+// $NGROK_URL = "https://YOUR_NGROK_URL.ngrok.io"; // PASTE YOUR NGROK URL HERE
+
+// Option B: Using localhost (may cause 403 on Cashfree payment page)
+// Keep $NGROK_URL commented to use localhost
+// ============================================
+
 $cashfreeBaseUrl = "https://sandbox.cashfree.com/pg/";
-$notifyURL = "http://" . $_SERVER['HTTP_HOST'] . "/qr/user/src/backend/payment/callback.php";
-$returnURL = "http://" . $_SERVER['HTTP_HOST'] . "/qr/user/src/backend/payment/return.php";
+
+// Automatically use ngrok URL if set, otherwise use localhost
+if (isset($NGROK_URL) && !empty($NGROK_URL)) {
+    $baseURL = $NGROK_URL;
+    error_log("Using ngrok URL: " . $baseURL);
+} else {
+    $baseURL = "http://" . $_SERVER['HTTP_HOST'];
+    error_log("Using localhost URL: " . $baseURL . " (may cause 403 on Cashfree payment page)");
+}
+
+$notifyURL = $baseURL . "/user/src/backend/payment/callback.php";
+$returnURL = $baseURL . "/user/src/backend/payment/return.php";
 
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
@@ -22,7 +47,7 @@ try {
         throw new Exception('Invalid JSON data');
     }
 
-    $required_params = ['email', 'password', 'user_type', 'user_slab', 'amount'];
+    $required_params = ['full_name', 'email', 'phone', 'password', 'address', 'pincode', 'landmark', 'user_type', 'user_slab', 'amount'];
     foreach ($required_params as $param) {
         if (!isset($data[$param]) || empty($data[$param])) {
             throw new Exception("Missing or empty parameter: $param");
@@ -36,27 +61,39 @@ try {
     $order_id = 'REG_' . time() . '_' . rand(1000, 9999);
     $customer_id = 'CUST_' . time() . '_' . rand(1000, 9999);
 
-    // Store registration data in session for later use
-    session_start();
-
-    // Store the data in session
+    // Store registration data in DATABASE (more reliable than session after redirect)
+    $registrationJson = json_encode($data);
+    $sqlStore = "INSERT INTO user_pending_registration (order_id, registration_data, status) VALUES (?, ?, 'pending')";
+    $stmtStore = $conn->prepare($sqlStore);
+    
+    if (!$stmtStore) {
+        error_log("Failed to prepare statement: " . $conn->error);
+        throw new Exception('Database error: Unable to store registration data');
+    }
+    
+    $stmtStore->bind_param('ss', $order_id, $registrationJson);
+    
+    if (!$stmtStore->execute()) {
+        error_log("Failed to store registration data: " . $stmtStore->error);
+        throw new Exception('Database error: Unable to save registration data');
+    }
+    
+    $stmtStore->close();
+    
+    error_log("Registration data stored in database for order: " . $order_id);
+    
+    // Also store in session as backup (but don't rely on it)
     $_SESSION['registration_data'] = $data;
     $_SESSION['order_id'] = $order_id;
-
-    error_log("Storing registration data in session: " . print_r($data, true));
-    error_log("Session ID: " . session_id());
-
-    // Ensure session data is written immediately
-    session_write_close();
 
     $data = createOrder(
         $clientId,
         $clientSecret,
         $order_id,
         $customer_id,
-        $data['email'], // Using email as name since we don't have name field
+        $data['full_name'],
         $data['email'],
-        $data['phone'] ?? '0000000000', // Phone is optional in our form
+        $data['phone'],
         $data['amount']
     );
 
@@ -79,28 +116,58 @@ function requestWithHeader($url, $headers, $data)
             throw new Exception('Failed to initialize CURL');
         }
 
+        // Properly encode JSON
+        $jsonData = json_encode($data);
+        
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false); // For testing only
-        curl_setopt($curl, CURLOPT_POSTFIELDS, json_encode($data, true));
+        curl_setopt($curl, CURLOPT_POSTFIELDS, $jsonData);
+        
+        // SSL and timeout settings
+        // For local development, disable SSL verification
+        // TODO: Enable SSL verification in production!
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, false);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 30);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 10);
+        
+        // Follow redirects
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($curl, CURLOPT_MAXREDIRS, 3);
+        
+        // Add user agent to avoid CloudFront blocks
+        curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36');
+
+        error_log('Cashfree API Request - URL: ' . $url);
+        error_log('Cashfree API Request - Headers: ' . json_encode($headers));
+        error_log('Cashfree API Request - Data: ' . $jsonData);
 
         $resp = curl_exec($curl);
+        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($curl);
+        $curlErrno = curl_errno($curl);
+
+        error_log('Cashfree API Response - HTTP Code: ' . $httpCode);
+        error_log('Cashfree API Response - Body: ' . $resp);
 
         if ($resp === false) {
-            throw new Exception('CURL Error: ' . curl_error($curl));
+            curl_close($curl);
+            throw new Exception('CURL Error (' . $curlErrno . '): ' . $curlError);
         }
 
-        $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        if ($httpCode == 403) {
+            curl_close($curl);
+            throw new Exception('Access denied by payment gateway (403). Please verify API credentials and ensure your IP/domain is whitelisted in Cashfree dashboard.');
+        }
+
         if ($httpCode >= 400) {
-            throw new Exception('HTTP Error: ' . $httpCode . ' - ' . $resp);
+            curl_close($curl);
+            $errorDetails = json_decode($resp, true);
+            $errorMsg = isset($errorDetails['message']) ? $errorDetails['message'] : $resp;
+            throw new Exception('Payment gateway error (' . $httpCode . '): ' . $errorMsg);
         }
-
-        error_log('Request URL: ' . $url);
-        error_log('Request Headers: ' . json_encode($headers));
-        error_log('Request Data: ' . json_encode($data));
-        error_log('Response: ' . $resp);
 
         curl_close($curl);
         return $resp;
@@ -113,38 +180,73 @@ function requestWithHeader($url, $headers, $data)
 function createOrder($clientId, $clientSecret, $orderId, $customerId, $name, $email, $number, $amount)
 {
     global $cashfreeBaseUrl, $notifyURL, $returnURL;
+    
+    // Ensure phone number has country code (Cashfree requirement)
+    if (strlen($number) == 10 && is_numeric($number)) {
+        $number = '+91' . $number; // Add India country code
+    } elseif (strlen($number) == 10) {
+        $number = '91' . $number;
+    }
+    
+    // Ensure amount is numeric and formatted correctly
+    $amount = floatval($amount);
+    
+    error_log("Creating Cashfree order - ID: $orderId, Amount: $amount, Phone: $number");
+    
     $headers = array(
         "accept: application/json",
         "content-type: application/json",
-        "x-api-version: 2022-09-01",
+        "x-api-version: 2023-08-01",
         "x-client-id: $clientId",
         "x-client-secret: $clientSecret"
     );
 
-    $postData = array();
-    $postData['customer_details']['customer_id'] = $customerId;
-    $postData['customer_details']['customer_name'] = $name;
-    $postData['customer_details']['customer_email'] = $email;
-    $postData['customer_details']['customer_phone'] = $number;
-    $postData['order_meta']['return_url'] = $returnURL . '?orderId={order_id}';
-    $postData['order_meta']['notify_url'] = $notifyURL;
-    $postData['order_meta']['payment_methods'] = "upi";
-    $postData['order_amount'] = $amount;
-    $postData['order_id'] = $orderId;
-    $postData['order_currency'] = "INR";
-    $postData['order_expiry_time'] = createExpiryTime();
-    $response = requestWithHeader($cashfreeBaseUrl . 'orders', $headers, $postData);
-    $response = json_decode($response, true);
+    // Build proper nested array structure for Cashfree API
+    $postData = array(
+        'order_id' => $orderId,
+        'order_amount' => $amount,
+        'order_currency' => 'INR',
+        'customer_details' => array(
+            'customer_id' => $customerId,
+            'customer_name' => $name,
+            'customer_email' => $email,
+            'customer_phone' => $number
+        ),
+        'order_meta' => array(
+            'return_url' => $returnURL . '?orderId={order_id}',
+            'notify_url' => $notifyURL,
+            'payment_methods' => 'upi,cc,dc,nb,app'
+        ),
+        'order_expiry_time' => createExpiryTime()
+    );
+    
+    error_log("Cashfree request data: " . json_encode($postData));
+    
+    try {
+        $response = requestWithHeader($cashfreeBaseUrl . 'orders', $headers, $postData);
+        $response = json_decode($response, true);
+        
+        error_log("Cashfree response: " . json_encode($response));
 
-    $arr = array();
-    if (isset($response['payment_session_id'])) {
-        $arr['status'] = true;
-        $arr['session'] = $response['payment_session_id'];
-    } else {
-        $arr['status'] = false;
-        $arr['error'] = isset($response['message']) ? $response['message'] : 'Unknown error';
-        error_log('Cashfree Error: ' . json_encode($response));
+        $arr = array();
+        if (isset($response['payment_session_id'])) {
+            $arr['status'] = true;
+            $arr['session'] = $response['payment_session_id'];
+            $arr['order_id'] = $orderId;
+            error_log("Cashfree order created successfully: " . $response['payment_session_id']);
+        } else {
+            $arr['status'] = false;
+            $arr['error'] = isset($response['message']) ? $response['message'] : 'Unknown error from payment gateway';
+            $arr['cashfree_response'] = $response;
+            error_log('Cashfree Error Response: ' . json_encode($response));
+        }
+        return $arr;
+    } catch (Exception $e) {
+        error_log('Exception in createOrder: ' . $e->getMessage());
+        return array(
+            'status' => false,
+            'error' => 'Payment gateway error: ' . $e->getMessage()
+        );
     }
-    return $arr;
 }
 ?>

@@ -10,6 +10,71 @@ var eventHandler = {
         eventHandler.referenceEvents();
         eventHandler.loadUserSlabs();
         eventHandler.slabSelectionEvents();
+        eventHandler.membershipTierEvents();
+    },
+
+    // Handle membership tier selection
+    membershipTierEvents: () => {
+        // Load slabs and store mapping
+        $.ajax({
+            url: '../backend/get_user_slabs.php',
+            type: 'GET',
+            dataType: 'json',
+            success: function (response) {
+                console.log('Get user slabs response:', response);
+                if (response.status && response.data) {
+                    // Store slab mapping
+                    window.slabMapping = {};
+                    response.data.forEach(function (slab) {
+                        const slabName = slab.name.toLowerCase();
+                        console.log('Processing slab:', slabName, 'id:', slab.id);
+                        if (slabName.includes('normal') || slabName.includes('bronze') || slabName.includes('individual') || slabName.includes('default')) {
+                            window.slabMapping['normal'] = slab.id;
+                        } else if (slabName.includes('silver')) {
+                            window.slabMapping['silver'] = slab.id;
+                        } else if (slabName.includes('gold')) {
+                            window.slabMapping['gold'] = slab.id;
+                        }
+                    });
+                    console.log('Slab mapping:', window.slabMapping);
+                    
+                    // Set default "Normal" tier slab ID on page load
+                    if (window.slabMapping['normal']) {
+                        $('#user_slab').val(window.slabMapping['normal']);
+                        console.log('Default Normal tier slab ID set:', window.slabMapping['normal']);
+                        
+                        // Trigger the change event for the pre-checked Normal tier
+                        const checkedTier = $('input[name="user_tag"]:checked');
+                        if (checkedTier.length > 0) {
+                            checkedTier.trigger('change');
+                        } else {
+                            registerFunction.updateSubmitState();
+                        }
+                    } else {
+                        console.error('ERROR: No normal tier found in slabs!');
+                    }
+                } else {
+                    console.error('ERROR: Failed to load slabs:', response.message || 'Unknown error');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX ERROR loading slabs:', status, error, xhr.responseText);
+            }
+        });
+
+        // Handle tier selection (user_tag)
+        $('input[name="user_tag"]').on('change', function() {
+            const tier = $(this).val() || 'normal'; // Empty value = normal
+            const slabId = window.slabMapping[tier];
+            
+            if (slabId) {
+                $('#user_slab').val(slabId);
+                console.log('Selected tier:', tier, 'Slab ID:', slabId);
+            }
+            
+            registerFunction.updateSubmitText();
+            registerFunction.updateSubmitState();
+        });
     },
 
     slabSelectionEvents: () => {
@@ -171,9 +236,29 @@ var eventHandler = {
         $('#user_slab').on('change', function () {
             registerFunction.updateSubmitState();
         });
+
+        // Policy checkbox event listener
+        $('#terms-checkbox').on('change', function () {
+            registerFunction.updateSubmitState();
+        });
     },
 
     onInput: () => {
+        $('#full_name').on('input', function () {
+            registerFunction.validateFullName();
+            registerFunction.updateSubmitState();
+        });
+
+        $('#phone').on('input', function () {
+            registerFunction.validatePhone();
+            registerFunction.updateSubmitState();
+        });
+
+        $('#pincode').on('input', function () {
+            registerFunction.validatePincode();
+            registerFunction.updateSubmitState();
+        });
+
         $('#email').on('input', function () {
             registerFunction.updateSubmitState();
         });
@@ -185,6 +270,14 @@ var eventHandler = {
 
         $('#password').on('input', function () {
             registerFunction.checkPasswordMatch();
+            registerFunction.updateSubmitState();
+        });
+
+        $('#address').on('input', function () {
+            registerFunction.updateSubmitState();
+        });
+
+        $('#landmark').on('input', function () {
             registerFunction.updateSubmitState();
         });
 
@@ -210,50 +303,76 @@ var eventHandler = {
 
             var selectedUserType = registerFunction.getSelectedUserType();
             var userTypeValue = selectedUserType[0];
-            var userTagValue = selectedUserType[1];
+            
+            // Get the selected membership tier
+            var userTagValue = $('input[name="user_tag"]:checked').val() || 'normal';
 
             var finalUserType = userTypeValue;
             var finalUserTag = userTagValue;
 
             if (userTypeValue === '4' || userTypeValue === '5') {
                 finalUserType = '1';
-            } else {
-                finalUserTag = '';
             }
 
             var formData = {
+                full_name: $('#full_name').val().trim(),
                 email: $('#email').val().trim(),
+                phone: $('#phone').val().trim(),
                 password: $('#password').val().trim(),
+                address: $('#address').val().trim(),
+                pincode: $('#pincode').val().trim(),
+                landmark: $('#landmark').val().trim(),
                 user_type: finalUserType,
                 user_tag: finalUserTag,
                 user_slab: $('#user_slab').val(),
-                college_name: $('#college_name').val().trim(), // Add college name to form data
+                college_name: $('#college_name').val().trim(),
                 reference_code: $('#has_reference').is(':checked') ? $('#reference_code').val()
                     .trim() : '',
                 referred_by_user_id: registerFunction.referredByUserId || null
             };
 
-            // Calculate amount based on user type
+            // Calculate amount based on user type and membership tier
             const amount = registerFunction.calculateAmount(finalUserType, finalUserTag);
             formData.amount = amount;
+            
+            console.log('Form submission - User Type:', finalUserType, 'Membership Tier:', finalUserTag, 'Amount:', amount);
 
-            // First create payment order
+            // First check if user already exists
             $.ajax({
-                url: '../backend/payment/order.php',
+                url: '../backend/check_user_exists.php',
                 type: 'POST',
-                data: JSON.stringify(formData),
+                data: JSON.stringify({ email: formData.email }),
                 contentType: 'application/json',
                 dataType: 'json',
-                success: function (response) {
-                    if (response.status && response.session) {
-                        // Redirect to payment intent page
-                        window.location.href = '../backend/payment/intent.php?session=' + response.session;
-                    } else {
-                        alert(response.error || 'Failed to initiate payment.');
+                success: function (checkResponse) {
+                    if (checkResponse.exists) {
+                        alert('This email is already registered. Please login instead.');
+                        window.location.href = 'login.php';
+                        return;
                     }
+                    
+                    // If user doesn't exist, proceed to create payment order
+                    $.ajax({
+                        url: '../backend/payment/order.php',
+                        type: 'POST',
+                        data: JSON.stringify(formData),
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        success: function (response) {
+                            if (response.status && response.session) {
+                                // Redirect to payment intent page
+                                window.location.href = '../backend/payment/intent.php?session=' + response.session;
+                            } else {
+                                alert(response.error || 'Failed to initiate payment.');
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            alert('An error occurred while initiating payment: ' + error);
+                        }
+                    });
                 },
                 error: function (xhr, status, error) {
-                    alert('An error occurred while initiating payment: ' + error);
+                    alert('An error occurred while checking user: ' + error);
                 }
             });
         });
@@ -267,14 +386,16 @@ var registerFunction = {
     referenceTimeout: null,
 
     calculateAmount: function (userType, userTag) {
-        // Default registration amount
-        let amount = 2000;
+        // Registration amount based on membership tier
+        let amount = 999; // Default Normal tier
 
-        // Adjust amount based on user type and tag
+        // Adjust amount based on membership tier
         if (userTag === 'gold') {
-            amount = 5000;
+            amount = 9999;
         } else if (userTag === 'silver') {
-            amount = 3000;
+            amount = 5555;
+        } else {
+            amount = 999; // Normal tier
         }
 
         return amount;
@@ -329,6 +450,53 @@ var registerFunction = {
 
     validateEmail: function (email) {
         return /^\S+@\S+\.\S+$/.test(email);
+    },
+
+    validateFullName: function () {
+        const name = $('#full_name').val().trim();
+        const namePattern = /^[A-Z][a-z]+(\s[A-Z][a-z]*)+$/;
+        
+        if (name === '') {
+            $('#name-validation-status').text('').css('color', '');
+            return false;
+        }
+        
+        if (!namePattern.test(name)) {
+            $('#name-validation-status').text('Name must start with capital letter, followed by space and another capital letter (e.g., John D Smith)').css('color', 'red');
+            return false;
+        }
+        
+        $('#name-validation-status').text('✓ Valid name format').css('color', 'green');
+        return true;
+    },
+
+    validatePhone: function () {
+        const phone = $('#phone').val().trim();
+        const phonePattern = /^[0-9]{10}$/;
+        
+        if (phone === '') {
+            $('#phone-validation-status').text('').css('color', '');
+            return false;
+        }
+        
+        if (!phonePattern.test(phone)) {
+            $('#phone-validation-status').text('Phone must be exactly 10 digits').css('color', 'red');
+            return false;
+        }
+        
+        $('#phone-validation-status').text('✓ Valid phone number').css('color', 'green');
+        return true;
+    },
+
+    validatePincode: function () {
+        const pincode = $('#pincode').val().trim();
+        const pincodePattern = /^[0-9]{6}$/;
+        
+        if (pincode === '' || pincodePattern.test(pincode)) {
+            return true;
+        }
+        
+        return false;
     },
 
     sendOtp: function (email, resend = false) {
@@ -454,7 +622,10 @@ var registerFunction = {
     updateSubmitText: (init = false) => {
         const selectedUserType = $('input[name="user_type"]:checked');
         const userType = selectedUserType.val();
-        const userTag = selectedUserType.attr('data-tag');
+        
+        // Get membership tier from the tier radio buttons
+        const userTag = $('input[name="user_tag"]:checked').val() || 'normal';
+        
         const amount = registerFunction.calculateAmount(userType, userTag);
 
         if (init) {
@@ -465,36 +636,67 @@ var registerFunction = {
     },
 
     isFormComplete: () => {
+        var fullName = $.trim($('#full_name').val());
         var email = $.trim($('#email').val());
+        var phone = $.trim($('#phone').val());
         var password = $.trim($('#password').val());
         var confirmPassword = $.trim($('#confirmpassword').val());
+        var address = $.trim($('#address').val());
+        var pincode = $.trim($('#pincode').val());
+        var landmark = $.trim($('#landmark').val());
         var userType = registerFunction.getSelectedUserType()[0];
         var userSlab = $('#user_slab').val();
-        var hasReference = $('#has_reference').is(':checked');
-        var referenceCode = $.trim($('#reference_code').val());
+        
+        console.log('Form validation check - userSlab value:', userSlab, 'emailVerified:', registerFunction.emailVerified);
 
         // Check if college field is required and filled
         var collegeRequired = $('#college_name').prop('required');
         var collegeName = $.trim($('#college_name').val());
         var collegeValid = !collegeRequired || (collegeRequired && collegeName !== '');
 
+        // Validate name pattern
+        var namePattern = /^[A-Z][a-z]+(\s[A-Z][a-z]*)+$/;
+        var nameValid = namePattern.test(fullName);
+
+        // Validate phone pattern
+        var phonePattern = /^[0-9]{10}$/;
+        var phoneValid = phonePattern.test(phone);
+
+        // Validate pincode pattern
+        var pincodePattern = /^[0-9]{6}$/;
+        var pincodeValid = pincodePattern.test(pincode);
+
+        // Check if policy checkbox is checked
+        var termsChecked = $('#terms-checkbox').is(':checked');
+
         var isValid = (
+            fullName !== '' &&
+            nameValid &&
             email !== '' &&
+            phone !== '' &&
+            phoneValid &&
             password !== '' &&
             confirmPassword !== '' &&
             password === confirmPassword &&
+            address !== '' &&
+            pincode !== '' &&
+            pincodeValid &&
+            landmark !== '' &&
             registerFunction.emailVerified &&
             userType !== null &&
             userSlab !== '' &&
-            collegeValid // Add college validation
+            collegeValid &&
+            termsChecked
         );
 
         return isValid;
     },
 
     updateSubmitState: () => {
-        var $submit = $('#register_user_form');
-        $submit.prop('disabled', !registerFunction.isFormComplete());
+        const $submit = $('#register_user_form');
+        const isComplete = registerFunction.isFormComplete();
+        console.log('Update submit state - Form complete:', isComplete);
+        $submit.prop('disabled', !isComplete);
     },
 
     checkPasswordMatch: function () {
