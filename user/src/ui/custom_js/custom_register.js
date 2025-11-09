@@ -1,4 +1,3 @@
-
 // Enhanced JavaScript with college name functionality
 var eventHandler = {
     init: () => {
@@ -8,9 +7,30 @@ var eventHandler = {
         eventHandler.emailInputEvents();
         eventHandler.emailVerifyEvents();
         eventHandler.referenceEvents();
-        eventHandler.loadUserSlabs();
-        eventHandler.slabSelectionEvents();
         eventHandler.membershipTierEvents();
+        eventHandler.studentLeaderEvents();
+    },
+
+    studentLeaderEvents: () => {
+        $('#student_leader').on('change', function () {
+            if ($(this).val() === 'yes') {
+                $('#college_field').addClass('show');
+                $('#college_name').prop('required', true);
+                $('#membership_tier_section').hide();
+                $('#pay-amount').text(999);
+            } else {
+                $('#college_field').removeClass('show');
+                $('#college_name').prop('required', false);
+                $('#college_name').val('');
+                $('#membership_tier_section').show();
+                let checkedTier = $('input[name="user_tag"]:checked').val();
+                let amount = 999;
+                if (checkedTier === 'gold') amount = 9999;
+                else if (checkedTier === 'silver') amount = 5555;
+                $('#pay-amount').text(amount);
+            }
+            registerFunction.updateSubmitState();
+        });
     },
 
     // Handle membership tier selection
@@ -37,12 +57,12 @@ var eventHandler = {
                         }
                     });
                     console.log('Slab mapping:', window.slabMapping);
-                    
+
                     // Set default "Normal" tier slab ID on page load
                     if (window.slabMapping['normal']) {
                         $('#user_slab').val(window.slabMapping['normal']);
                         console.log('Default Normal tier slab ID set:', window.slabMapping['normal']);
-                        
+
                         // Trigger the change event for the pre-checked Normal tier
                         const checkedTier = $('input[name="user_tag"]:checked');
                         if (checkedTier.length > 0) {
@@ -57,22 +77,31 @@ var eventHandler = {
                     console.error('ERROR: Failed to load slabs:', response.message || 'Unknown error');
                 }
             },
-            error: function(xhr, status, error) {
+            error: function (xhr, status, error) {
                 console.error('AJAX ERROR loading slabs:', status, error, xhr.responseText);
             }
         });
 
-        // Handle tier selection (user_tag)
-        $('input[name="user_tag"]').on('change', function() {
-            const tier = $(this).val() || 'normal'; // Empty value = normal
-            const slabId = window.slabMapping[tier];
-            
-            if (slabId) {
-                $('#user_slab').val(slabId);
-                console.log('Selected tier:', tier, 'Slab ID:', slabId);
+        // Make Gold/Silver toggleable
+        $('input[name="user_tag"]').on('click', function () {
+            if ($(this).prop('checked')) {
+                // If already checked, uncheck
+                if ($(this).data('waschecked')) {
+                    $(this).prop('checked', false);
+                    $(this).data('waschecked', false);
+                } else {
+                    $(this).data('waschecked', true);
+                }
+            } else {
+                $(this).data('waschecked', false);
             }
-            
-            registerFunction.updateSubmitText();
+            // Update price
+            let checked = $('input[name="user_tag"]:checked').val();
+            let amount = 999;
+            if (checked === 'gold') amount = 9999;
+            else if (checked === 'silver') amount = 5555;
+            if ($('#student_leader').val() === 'yes') amount = 999;
+            $('#pay-amount').text(amount);
             registerFunction.updateSubmitState();
         });
     },
@@ -120,19 +149,7 @@ var eventHandler = {
     },
 
     referenceEvents: () => {
-        $('#has_reference').on('change', function () {
-            if ($(this).is(':checked')) {
-                $('#reference_section').show();
-                $('#reference_code').focus();
-            } else {
-                $('#reference_section').hide();
-                $('#reference_code').val('');
-                $('#reference-status').text('');
-                registerFunction.setReferenceValid(true);
-            }
-            registerFunction.updateSubmitState();
-        });
-
+        // Reference code is always visible, validate for 10 digits if filled
         $('#reference_code').on('input', function () {
             var code = $(this).val().trim();
             if (code === '') {
@@ -141,7 +158,13 @@ var eventHandler = {
                 registerFunction.updateSubmitState();
                 return;
             }
-
+            if (!/^[0-9]{10}$/.test(code)) {
+                $('#reference-status').text('Reference code must be 10 digits').css('color', 'red');
+                registerFunction.setReferenceValid(false);
+                registerFunction.referredByUserId = null;
+                registerFunction.updateSubmitState();
+                return;
+            }
             clearTimeout(registerFunction.referenceTimeout);
             registerFunction.referenceTimeout = setTimeout(function () {
                 registerFunction.validateReference(code);
@@ -241,6 +264,18 @@ var eventHandler = {
         $('#terms-checkbox').on('change', function () {
             registerFunction.updateSubmitState();
         });
+
+        // Always update price on load and on membership/student leader change
+        function updatePayAmount() {
+            let checkedTier = $('input[name="user_tag"]:checked').val();
+            let amount = 999;
+            if (checkedTier === 'gold') amount = 9999;
+            else if (checkedTier === 'silver') amount = 5555;
+            if ($('#student_leader').val() === 'yes') amount = 999;
+            $('#pay-amount').text(amount);
+        }
+        updatePayAmount();
+        $('input[name="user_tag"], #student_leader').on('change click', updatePayAmount);
     },
 
     onInput: () => {
@@ -248,40 +283,21 @@ var eventHandler = {
             registerFunction.validateFullName();
             registerFunction.updateSubmitState();
         });
-
         $('#phone').on('input', function () {
             registerFunction.validatePhone();
             registerFunction.updateSubmitState();
         });
-
-        $('#pincode').on('input', function () {
-            registerFunction.validatePincode();
-            registerFunction.updateSubmitState();
-        });
-
         $('#email').on('input', function () {
             registerFunction.updateSubmitState();
         });
-
         $('#confirmpassword').on('input', function () {
             registerFunction.checkPasswordMatch();
             registerFunction.updateSubmitState();
         });
-
         $('#password').on('input', function () {
             registerFunction.checkPasswordMatch();
             registerFunction.updateSubmitState();
         });
-
-        $('#address').on('input', function () {
-            registerFunction.updateSubmitState();
-        });
-
-        $('#landmark').on('input', function () {
-            registerFunction.updateSubmitState();
-        });
-
-        // Add college name input validation
         $('#college_name').on('input', function () {
             registerFunction.updateSubmitState();
         });
@@ -290,53 +306,37 @@ var eventHandler = {
     submitEvent: () => {
         $('#register_form').on('submit', function (e) {
             e.preventDefault();
-
             if (!registerFunction.isFormComplete()) {
                 alert('Please complete all required fields and verify your email.');
                 return;
             }
-
             if ($('#password').val().trim() !== $('#confirmpassword').val().trim()) {
                 alert('Passwords do not match.');
                 return;
             }
-
             var selectedUserType = registerFunction.getSelectedUserType();
             var userTypeValue = selectedUserType[0];
-            
-            // Get the selected membership tier
             var userTagValue = $('input[name="user_tag"]:checked').val() || 'normal';
-
             var finalUserType = userTypeValue;
             var finalUserTag = userTagValue;
-
             if (userTypeValue === '4' || userTypeValue === '5') {
                 finalUserType = '1';
             }
-
             var formData = {
                 full_name: $('#full_name').val().trim(),
                 email: $('#email').val().trim(),
                 phone: $('#phone').val().trim(),
                 password: $('#password').val().trim(),
-                address: $('#address').val().trim(),
-                pincode: $('#pincode').val().trim(),
-                landmark: $('#landmark').val().trim(),
                 user_type: finalUserType,
-                user_tag: finalUserTag,
                 user_slab: $('#user_slab').val(),
                 college_name: $('#college_name').val().trim(),
-                reference_code: $('#has_reference').is(':checked') ? $('#reference_code').val()
-                    .trim() : '',
+                reference_code: $('#reference_code').val().trim(),
                 referred_by_user_id: registerFunction.referredByUserId || null
             };
-
             // Calculate amount based on user type and membership tier
             const amount = registerFunction.calculateAmount(finalUserType, finalUserTag);
             formData.amount = amount;
-            
             console.log('Form submission - User Type:', finalUserType, 'Membership Tier:', finalUserTag, 'Amount:', amount);
-
             // First check if user already exists
             $.ajax({
                 url: '../backend/check_user_exists.php',
@@ -350,7 +350,6 @@ var eventHandler = {
                         window.location.href = 'login.php';
                         return;
                     }
-                    
                     // If user doesn't exist, proceed to create payment order
                     $.ajax({
                         url: '../backend/payment/order.php',
@@ -455,17 +454,17 @@ var registerFunction = {
     validateFullName: function () {
         const name = $('#full_name').val().trim();
         const namePattern = /^[A-Z][a-z]+(\s[A-Z][a-z]*)+$/;
-        
+
         if (name === '') {
             $('#name-validation-status').text('').css('color', '');
             return false;
         }
-        
+
         if (!namePattern.test(name)) {
             $('#name-validation-status').text('Name must start with capital letter, followed by space and another capital letter (e.g., John D Smith)').css('color', 'red');
             return false;
         }
-        
+
         $('#name-validation-status').text('✓ Valid name format').css('color', 'green');
         return true;
     },
@@ -473,17 +472,17 @@ var registerFunction = {
     validatePhone: function () {
         const phone = $('#phone').val().trim();
         const phonePattern = /^[0-9]{10}$/;
-        
+
         if (phone === '') {
             $('#phone-validation-status').text('').css('color', '');
             return false;
         }
-        
+
         if (!phonePattern.test(phone)) {
             $('#phone-validation-status').text('Phone must be exactly 10 digits').css('color', 'red');
             return false;
         }
-        
+
         $('#phone-validation-status').text('✓ Valid phone number').css('color', 'green');
         return true;
     },
@@ -491,11 +490,11 @@ var registerFunction = {
     validatePincode: function () {
         const pincode = $('#pincode').val().trim();
         const pincodePattern = /^[0-9]{6}$/;
-        
+
         if (pincode === '' || pincodePattern.test(pincode)) {
             return true;
         }
-        
+
         return false;
     },
 
@@ -622,10 +621,10 @@ var registerFunction = {
     updateSubmitText: (init = false) => {
         const selectedUserType = $('input[name="user_type"]:checked');
         const userType = selectedUserType.val();
-        
+
         // Get membership tier from the tier radio buttons
         const userTag = $('input[name="user_tag"]:checked').val() || 'normal';
-        
+
         const amount = registerFunction.calculateAmount(userType, userTag);
 
         if (init) {
@@ -641,34 +640,23 @@ var registerFunction = {
         var phone = $.trim($('#phone').val());
         var password = $.trim($('#password').val());
         var confirmPassword = $.trim($('#confirmpassword').val());
-        var address = $.trim($('#address').val());
-        var pincode = $.trim($('#pincode').val());
-        var landmark = $.trim($('#landmark').val());
         var userType = registerFunction.getSelectedUserType()[0];
         var userSlab = $('#user_slab').val();
-        
-        console.log('Form validation check - userSlab value:', userSlab, 'emailVerified:', registerFunction.emailVerified);
-
-        // Check if college field is required and filled
+        // College field logic
         var collegeRequired = $('#college_name').prop('required');
         var collegeName = $.trim($('#college_name').val());
         var collegeValid = !collegeRequired || (collegeRequired && collegeName !== '');
-
         // Validate name pattern
         var namePattern = /^[A-Z][a-z]+(\s[A-Z][a-z]*)+$/;
         var nameValid = namePattern.test(fullName);
-
         // Validate phone pattern
         var phonePattern = /^[0-9]{10}$/;
         var phoneValid = phonePattern.test(phone);
-
-        // Validate pincode pattern
-        var pincodePattern = /^[0-9]{6}$/;
-        var pincodeValid = pincodePattern.test(pincode);
-
-        // Check if policy checkbox is checked
+        // Reference code validation
+        var referenceCode = $.trim($('#reference_code').val());
+        var referenceValid = referenceCode === '' || (/^[0-9]{10}$/.test(referenceCode) && registerFunction.referenceValid);
+        // Policy checkbox
         var termsChecked = $('#terms-checkbox').is(':checked');
-
         var isValid = (
             fullName !== '' &&
             nameValid &&
@@ -678,25 +666,22 @@ var registerFunction = {
             password !== '' &&
             confirmPassword !== '' &&
             password === confirmPassword &&
-            address !== '' &&
-            pincode !== '' &&
-            pincodeValid &&
-            landmark !== '' &&
             registerFunction.emailVerified &&
             userType !== null &&
             userSlab !== '' &&
             collegeValid &&
+            referenceValid &&
             termsChecked
         );
-
         return isValid;
     },
 
     updateSubmitState: () => {
-        const $submit = $('#register_user_form');
-        const isComplete = registerFunction.isFormComplete();
-        console.log('Update submit state - Form complete:', isComplete);
-        $submit.prop('disabled', !isComplete);
+    const $submit = $('#register_user_form');
+    const isComplete = registerFunction.isFormComplete();
+    // Also require terms checkbox to be checked
+    const termsChecked = $('#terms-checkbox').is(':checked');
+    $submit.prop('disabled', !(isComplete && termsChecked));
     },
 
     checkPasswordMatch: function () {

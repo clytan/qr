@@ -408,23 +408,22 @@
                                                     style="margin-bottom:20px; display:block; font-weight:600;"></span>
                                             </div>
 
-                                            <!-- Address Field -->
-                                            <div class="field-set">
-                                                <input type='text' name='address' id='address'
-                                                    placeholder="📍 Address" class="form-input" required>
-                                            </div>
 
-                                            <!-- Pincode and Landmark in Grid -->
-                                            <div class="field-set-grid" style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px;">
-                                                <div class="field-set" style="margin-bottom:0;">
-                                                    <input type='text' name='pincode' id='pincode'
-                                                        placeholder="📮 Pincode" class="form-input" 
-                                                        maxlength="6" pattern="[0-9]{6}" required>
-                                                </div>
-                                                <div class="field-set" style="margin-bottom:0;">
-                                                    <input type='text' name='landmark' id='landmark'
-                                                        placeholder="🏛️ Landmark" class="form-input" required>
-                                                </div>
+
+
+                                            <!-- Student Leader Dropdown and College Name (above Register As) -->
+                                            <div class="field-set" style="margin-bottom:15px;">
+                                                <label for="student_leader" style="font-weight:600;color:#2c3e50;font-size:15px;">🏅 Are you a Student Leader?</label>
+                                                <select name="student_leader" id="student_leader" class="form-input">
+                                                    <option value="no" selected>No</option>
+                                                    <option value="yes">Yes</option>
+                                                </select>
+                                            </div>
+                                            <div id="college_field" class="college-field" style="margin-bottom:15px;">
+                                                <label class="college-label">🎓 Enter your college name:</label>
+                                                <input type="text" name="college_name" id="college_name"
+                                                    placeholder="Enter your college/university name"
+                                                    class="college-input">
                                             </div>
 
                                             <!-- Register As Section with Better Responsive Design -->
@@ -467,88 +466,42 @@
                                             </div>
 
                                             <!-- Membership Tier Selection (User Tag: Gold/Silver/Normal) -->
-                                            <div class="field-set" style="margin-top: -5%;">
+                                            <div class="field-set" id="membership_tier_section" style="margin-top: -5%;">
                                                 <label
                                                     style="margin-bottom:15px;display:block;font-weight:600;color:#2c3e50;font-size:16px;">💎
                                                     Select Your Membership Tier</label>
                                                 
-                                                <!-- Membership Tier Cards -->
-                                                <div class="tier-cards-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:15px;">
 
-                                                    <!-- Gold Tier (Investor QR) -->
+                                                <!-- Membership Tier Cards (No price/description) -->
+                                                <div class="tier-cards-grid" style="display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-bottom:15px;">
                                                     <label class="selection-card tier-card" data-tier="gold">
                                                         <input type="radio" name="user_tag" value="gold" id="tier_gold">
                                                         <div class="card-icon">
                                                             <span style="font-size:24px;">✨</span>
                                                         </div>
                                                         <span class="card-text">Gold</span>
-                                                        <span class="card-price">₹9,999</span>
-                                                        <span class="card-features">Investor + Supercharge</span>
                                                     </label>
-
-                                                    <!-- Silver Tier (Influencer Pack) -->
                                                     <label class="selection-card tier-card" data-tier="silver">
                                                         <input type="radio" name="user_tag" value="silver" id="tier_silver">
                                                         <div class="card-icon">
                                                             <span style="font-size:24px;">🥈</span>
                                                         </div>
                                                         <span class="card-text">Silver</span>
-                                                        <span class="card-price">₹5,555</span>
-                                                        <span class="card-features">Influencer + Supercharge</span>
                                                     </label>
-
-                                                    <!-- Normal Tier (Regular) - DEFAULT SELECTED -->
-                                                    <label class="selection-card tier-card" data-tier="normal">
-                                                        <input type="radio" name="user_tag" value="" id="tier_normal" checked required>
-                                                        <div class="card-icon">
-                                                            <span style="font-size:24px;">⚡</span>
-                                                        </div>
-                                                        <span class="card-text">Normal</span>
-                                                        <span class="card-price">₹999</span>
-                                                        <span class="card-features">Regular User</span>
-                                                    </label>
+                                                    <!-- Normal tier removed: only Gold and Silver shown -->
                                                 </div>
+
+                                                <!-- ...existing code... -->
 
                                                 <!-- Hidden field for slab ID (set dynamically by JS) -->
                                                 <input type="hidden" name="user_slab" id="user_slab">
-
-                                                <!-- College Name Field (hidden by default) -->
-                                                <div id="college_field" class="college-field">
-                                                    <label class="college-label">🎓 Enter your college name:</label>
-                                                    <input type="text" name="college_name" id="college_name"
-                                                        placeholder="Enter your college/university name"
-                                                        class="college-input">
-                                                </div>
                                             </div>
 
-                                            <!-- Reference Code Section with Modern Toggle -->
+                                            <!-- Reference Code Section (Always Visible, 10 digits) -->
                                             <div class="field-set" style="margin-bottom:20px;">
-                                                <div class="reference-section">
-                                                    <label
-                                                        style="display:flex;align-items:center;font-weight:600;cursor:pointer;color:#333;margin-bottom:0;gap:15px;">
-                                                        <div style="position:relative;">
-                                                            <input type="checkbox" id="has_reference"
-                                                                name="has_reference"
-                                                                style="width:24px;height:24px;cursor:pointer;opacity:0;position:absolute;">
-                                                            <div class="reference-checkbox" id="checkbox_visual">
-                                                                <span
-                                                                    style="color:#74b9ff;font-size:16px;font-weight:bold;opacity:0;transition:opacity 0.3s ease;"
-                                                                    id="check_mark">✓</span>
-                                                            </div>
-                                                        </div>
-                                                        <span style="font-size:17px;font-weight:600;color:#333;">🎯 Do
-                                                            you have a reference code?</span>
-                                                    </label>
-
-                                                    <div id="reference_section"
-                                                        style="display:none;margin-top:20px;animation:slideDown 0.3s ease;">
-                                                        <input type="text" name="reference_code" id="reference_code"
-                                                            class="reference-input"
-                                                            placeholder="🔗 Enter your reference code">
-                                                        <span id="reference-status"
-                                                            style="margin-left:0px; margin-top:10px; display:block; font-size:14px; font-weight:600;"></span>
-                                                    </div>
-                                                </div>
+                                                <label for="reference_code" style="font-weight:600;color:#2c3e50;font-size:15px;">🎯 Reference Code (if any)</label>
+                                                <input type="text" name="reference_code" id="reference_code" class="reference-input" maxlength="10" pattern="[0-9]{10}" placeholder="🔗 Enter 10-digit reference code">
+                                                <span id="reference-status" style="margin-left:0px; margin-top:10px; display:block; font-size:14px; font-weight:600;"></span>
                                             </div>
 
                                             <!-- Terms and Policies Agreement -->
@@ -565,7 +518,7 @@
                                             <div class="field-set" style="margin-top:25px;">
                                                 <button type='submit' id='register_user_form' disabled
                                                     class="btn btn-main btn-fullwidth color-2">
-                                                    🚀 Create Account
+                                                    🚀 Create Account (₹ <span id="pay-amount">999</span> )
                                                 </button>
                                             </div>
 

@@ -47,7 +47,7 @@ try {
         throw new Exception('Invalid JSON data');
     }
 
-    $required_params = ['full_name', 'email', 'phone', 'password', 'address', 'pincode', 'landmark', 'user_type', 'user_slab', 'amount'];
+    $required_params = ['full_name', 'email', 'phone', 'password', 'user_type', 'user_slab', 'amount'];
     foreach ($required_params as $param) {
         if (!isset($data[$param]) || empty($data[$param])) {
             throw new Exception("Missing or empty parameter: $param");

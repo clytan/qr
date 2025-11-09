@@ -15,10 +15,26 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
     <meta content="Zokli Privacy Policy" name="description" />
     <?php include('../components/csslinks.php') ?>
     <style>
-        /* keep minimal additional styles so page matches site */
+          /* keep minimal additional styles so page matches site */
         .policy-container{padding:80px 0;}
-        .policy-card{background:rgba(255,255,255,0.03);padding:30px;border-radius:12px;border:1px solid rgba(255,255,255,0.06)}
-        .policy-title{font-size:2.2rem;margin-bottom:10px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        #logo {
+            margin-bottom: 30px;
+        }
+        .policy-card{
+            background:rgba(255,255,255,0.03);
+            padding:30px;
+            border-radius:12px;
+            border:1px solid rgba(255,255,255,0.06);
+            margin-top: 70px;
+        }
+        .policy-title{
+            font-size:2.2rem;
+            margin-bottom:10px;
+            background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);
+            -webkit-background-clip:text;
+            -webkit-text-fill-color:transparent;
+            color: #a5b4fc;
+        }
         .policy-sub{color:#94a3b8;margin-bottom:20px}
     </style>
 </head>
@@ -34,7 +50,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                         <h1 class="policy-title">Privacy Policy</h1>
                         <p class="policy-sub">Last updated: October 2025</p>
 
-                        <p>Welcome to Zokli. Your privacy matters to us. This Privacy Policy explains how Zokli ("we", "our", or "us") collects, uses, discloses, and protects information when you visit or use our website and services.</p>
+                        <p>Welcome to Zokli <strong>(Blr Leaf Technologies Pvt Ltd.)</strong>. Your privacy matters to us. This Privacy Policy explains how Zokli ("we", "our", or "us") collects, uses, discloses, and protects information when you visit or use our website and services.</p>
 
                         <h3>1. Information We Collect</h3>
                         <p>We may collect information you provide directly (for example, when you register, update your profile, or contact support) such as name, email address, username, profile data, and any other information you choose to provide. We also collect data automatically when you use our services, including device information, IP address, browser type, pages visited, and usage statistics.</p>
@@ -71,7 +87,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                         <p>We may update this Policy from time to time. We will post the updated policy with a revised "Last updated" date.</p>
 
                         <h3>9. Contact Us</h3>
-                        <p>If you have questions about this Privacy Policy, please contact us at: support@zokli.example</p>
+                        <p>If you have questions about this Privacy Policy, please contact us at: Zokli.india@gmail.com</p>
                     </div>
                 </div>
             </section>
