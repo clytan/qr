@@ -324,9 +324,51 @@ div, section, article, aside, header, nav {
 }
 
 /* Hide back-to-top button on mobile */
+/* Mobile-specific size overrides to make footer icons/text smaller */
 @media (max-width: 767px) {
+    /* Slightly smaller nav text and tighter padding */
+    .mobile-nav .nav-item {
+        font-size: 0.6rem; /* reduced from 0.7rem */
+        padding: 6px 6px;
+        max-width: 70px;
+    }
+
+    /* Smaller icon wrapper */
+    .nav-icon-wrapper {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        margin-bottom: 2px;
+    }
+
+    .nav-icon-wrapper i {
+        font-size: 1.05rem; /* reduced from 1.4rem */
+    }
+
+    /* Center featured icon smaller and less offset */
+    .nav-item-center {
+        transform: translateY(-6px);
+    }
+
+    .nav-icon-center {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: 2px solid rgba(10, 14, 39, 0.8);
+    }
+
+    .nav-icon-center i {
+        font-size: 1.4rem; /* reduced from 1.8rem */
+    }
+
+    /* Keep the back-to-top hidden on mobile */
     #back-to-top {
         display: none !important;
+    }
+
+    /* reduce bottom margin so content isn't pushed too far on small screens */
+    #content {
+        margin-bottom: 64px;
     }
 }
 </style>
