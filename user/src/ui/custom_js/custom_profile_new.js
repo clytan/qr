@@ -84,6 +84,18 @@ const profileFunction = {
     },
 
     setupEventHandlers: function () {
+        // Name formatting handler
+        $('#full_name').on('input', function () {
+            const name = $(this).val();
+            if (name) {
+                const properName = name.toLowerCase().split(' ')
+                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                    .join(' ');
+                $(this).val(properName);
+                $('#user-name').text(properName);
+            }
+        });
+
         // Profile image upload (only in edit mode)
         if (!window.PUBLIC_PROFILE) {
             // Remove any existing handlers first
@@ -761,7 +773,17 @@ const profileFunction = {
 
                 if (res.user) {
                     const user = res.user;
-                    const fullName = user.user_full_name || 'Anonymous';
+                    let fullName = user.user_full_name || 'Anonymous';
+
+                    // Proper case formatting function
+                    const toProperCase = (str) => {
+                        return str.toLowerCase().split(' ')
+                            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                            .join(' ');
+                    };
+
+                    // Format the full name in proper case
+                    fullName = toProperCase(fullName);
 
                     // Set initials
                     const initials = fullName.split(' ')
@@ -770,8 +792,8 @@ const profileFunction = {
                         .join('');
                     $('#click_profile_img').attr('data-initials', initials);
 
-                    // Populate fields
-                    $('#full_name').val(user.user_full_name || '');
+                    // Populate fields with properly formatted name
+                    $('#full_name').val(fullName);
                     $('#phone_number').val(user.user_phone || '');
                     $('#email_address').val(user.user_email || '');
                     $('#address').val(user.user_address || '');
