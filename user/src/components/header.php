@@ -7,19 +7,21 @@
                 <div class="de-flex sm-pt10 justify-content-center">
                     <div class="de-flex-col text-center">
                         <!-- logo begin -->
-                        <div id="logo" style="margin: 10px;">
+                        <div id="logo" style="margin: 8px 0 20px;">
                             <a href="index.php">
-                                <img alt="" class="centered-logo" src="../assets/images/logo-3.png" />
+                                <img alt="Logo" class="centered-logo" src="../assets/logo.png" style="width:240px; min-width:180px; height:auto;" />
                             </a>
                         </div>
                         <!-- logo close -->
                     </div>
                     <style>
                         .centered-logo {
-                            width: 150px;
-                            height: 50px;
-                            display: block;
-                            margin: 0 auto;
+                            width: 240px !important; /* desktop size - increased */
+                            height: auto !important;
+                            min-width: 180px !important; /* prevent excessive shrinking */
+                            display: block !important;
+                            margin: 0 auto !important;
+                            max-width: none !important; /* use fixed size unless viewport smaller */
                         }
 
                         .justify-content-center {
@@ -37,8 +39,8 @@
 
                         @media (max-width: 768px) {
                             .centered-logo {
-                                width: 120px;
-                                height: 40px;
+                                width: 180px; /* mobile size - increased */
+                                height: auto;
                             }
                         }
                     </style>

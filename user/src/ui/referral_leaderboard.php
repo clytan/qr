@@ -16,7 +16,7 @@ if (!$is_logged_in) {
 
 <head>
     <title>Zokli - Referral & Leaderboard</title>
-    <link rel="icon" href="../assets/images/icon-red.png" type="image/gif" sizes="16x16">
+    <link rel="icon" href="../assets/logo2.png" type="image/gif" sizes="16x16">
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <meta content="Zokli Referral Program & Leaderboard - Earn rewards by referring friends" name="description" />

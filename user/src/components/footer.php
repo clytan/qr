@@ -51,7 +51,7 @@ div, section, article, aside, header, nav {
             <div class="nav-icon-wrapper nav-icon-center">
                 <i class="fas fa-trophy"></i>
             </div>
-            <span>Rewards</span>
+            <span>Leaderboard</span>
         </a>
         <a href="/user/src/ui/community.php" class="nav-item" data-page="community">
             <div class="nav-icon-wrapper">

@@ -3,7 +3,7 @@
 
 <head>
     <title>ZQR</title>
-    <link rel="icon" href="../assets/images/company_logo.jpg" type="image/gif" sizes="16x16">
+    <link rel="icon" href="../assets/logo2.png" type="image/gif" sizes="16x16">
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <meta content="" name="keywords" />
@@ -13,6 +13,12 @@
     <?php include('../components/csslinks.php') ?>
     <!-- Registration Form CSS -->
     <link rel="stylesheet" href="../assets/css/register-form.css">
+
+    <style>
+        .centered-logo { width: 240px !important; height: auto !important; min-width: 180px !important; display:block !important; margin:0 auto !important; }
+        @media (max-width: 768px) { .centered-logo { width:180px !important; } }
+        .logo-container-hero { text-align:center; margin: 10px 0 20px; }
+    </style>
 
     <style>
     /* College name field styling */
@@ -319,8 +325,7 @@
                                     <!-- logo begin -->
                                     <div id="logo">
                                         <a href="index.php">
-                                            <img alt="" class="logo" src="../assets/images/logo-3.png" />
-                                            <img alt="" class="logo-2" src="../assets/images/logo-3.png" />
+                                            <img alt="Logo" class="centered-logo" src="../assets/logo2.png" />
                                         </a>
                                     </div>
                                     <!-- logo close -->
@@ -354,7 +359,11 @@
                             <div class="row align-items-center">
                                 <div class="col-lg-5 text-light wow fadeInRight" data-wow-delay=".5s">
                                     <div class="spacer-10"></div>
-                                    <h1>Create, sell or collect digital items.</h1>
+                                    <div class="logo-container-hero">
+                                        <a href="index.php">
+                                            <img src="../assets/logo2.png" alt="Logo" class="centered-logo" style="width:240px; min-width:180px; height:auto;" />
+                                        </a>
+                                    </div>
                                 </div>
 
                                 <div class="col-lg-4 offset-lg-2 wow fadeIn" data-wow-delay=".5s">
