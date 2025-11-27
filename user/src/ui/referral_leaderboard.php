@@ -70,6 +70,12 @@ if (!$is_logged_in) {
                                     <a href="#" class="share-btn twitter" id="share-twitter" title="Share on Twitter">
                                         <i class="fab fa-twitter"></i>
                                     </a>
+                                    <a href="#" class="share-btn messenger" id="share-messenger" title="Share on Messenger">
+                                        <i class="fab fa-facebook-messenger"></i>
+                                    </a>
+                                    <a href="#" class="share-btn instagram" id="share-instagram" title="Share on Instagram">
+                                        <i class="fab fa-instagram"></i>
+                                    </a>
                                 </div>
                             </div>
 
@@ -170,6 +176,41 @@ if (!$is_logged_in) {
                         $('#share-whatsapp').attr('href', `https://wa.me/?text=${encodeURIComponent(shareText + '\nView Profile: ' + shareUrl + '\nRegister: ' + registerUrl)}`);
                         $('#share-telegram').attr('href', `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`);
                         $('#share-twitter').attr('href', `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`);
+
+                        // Facebook Messenger: use mobile deep link and fallback to Facebook sharer (no app_id required)
+                        const messengerDeep = `fb-messenger://share?link=${encodeURIComponent(shareUrl)}`;
+                        const fbSharer = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
+                        $('#share-messenger').attr('href', messengerDeep);
+                        // Try deep link first; if it fails (desktop browsers), open Facebook sharer as fallback
+                        $('#share-messenger').off('click').on('click', function (e) {
+                            e.preventDefault();
+                            // Attempt to open the messenger app via deep link
+                            const start = Date.now();
+                            // For some browsers, assigning window.location will attempt to open the app
+                            window.location = messengerDeep;
+                            // After a short delay open the fallback sharer in a new tab
+                            setTimeout(function () {
+                                // If still on the page, open fallback
+                                if (Date.now() - start > 50) {
+                                    window.open(fbSharer, '_blank');
+                                }
+                            }, 700);
+                        });
+
+                        // Instagram: Instagram web doesn't support direct URL sharing via intent.
+                        // We'll make the button copy the message to clipboard and then open Instagram web profile.
+                        $('#share-instagram').attr('href', '#');
+                        $('#share-instagram').on('click', function (e) {
+                            e.preventDefault();
+                            const fullMessage = `${shareText}\nView Profile: ${shareUrl}\nRegister: ${registerUrl}`;
+                            navigator.clipboard.writeText(fullMessage).then(() => {
+                                window.open('https://www.instagram.com', '_blank');
+                                alert('Share text copied to clipboard. Paste it in Instagram to share.');
+                            }).catch(() => {
+                                window.open('https://www.instagram.com', '_blank');
+                                alert('Unable to copy automatically. Please paste your referral message manually in Instagram.');
+                            });
+                        });
                     }
                 },
                 error: function () {

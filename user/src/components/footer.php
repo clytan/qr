@@ -31,8 +31,94 @@ div, section, article, aside, header, nav {
 }
 </style>
 
+<!-- Coming Soon Toast -->
+<div id="coming-soon-toast" style="position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;padding:10px 16px;border-radius:8px;display:none;z-index:1100;box-shadow:0 6px 18px rgba(0,0,0,0.4);">
+    <strong id="coming-soon-text">Coming soon</strong>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+    function showToast(text){
+        var toast = document.getElementById('coming-soon-toast');
+        var txt = document.getElementById('coming-soon-text');
+        txt.textContent = text + ' coming soon';
+        toast.style.display = 'block';
+        toast.style.opacity = 1;
+        setTimeout(function(){
+            toast.style.transition = 'opacity 300ms ease';
+            toast.style.opacity = 0;
+            setTimeout(function(){ toast.style.display = 'none'; toast.style.transition = ''; }, 300);
+        }, 1500);
+    }
+
+    var coming = document.querySelectorAll('.coming-soon');
+    coming.forEach(function(el){
+        el.addEventListener('click', function(e){
+            e.preventDefault();
+            var name = el.getAttribute('data-name') || 'This feature';
+            showToast(name);
+        });
+    });
+    // More popover toggle
+    var moreToggles = document.querySelectorAll('.nav-item-more');
+    moreToggles.forEach(function(toggle){
+        toggle.addEventListener('click', function(e){
+            e.preventDefault();
+            var container = toggle.closest('.more-container');
+            var pop = container.querySelector('.more-popover');
+            var expanded = toggle.getAttribute('aria-expanded') === 'true';
+            if(!expanded) {
+                pop.style.display = 'block';
+                toggle.setAttribute('aria-expanded','true');
+                pop.setAttribute('aria-hidden','false');
+            } else {
+                pop.style.display = 'none';
+                toggle.setAttribute('aria-expanded','false');
+                pop.setAttribute('aria-hidden','true');
+            }
+        });
+    });
+
+    // Close popovers when clicking outside and handle desktop "More"
+    document.addEventListener('click', function(e){
+        document.querySelectorAll('.more-popover').forEach(function(pop){
+            var container = pop.closest('.more-container');
+            if(!container) return;
+            if(!container.contains(e.target)){
+                pop.style.display = 'none';
+                var toggle = container.querySelector('.nav-item-more');
+                if(toggle) toggle.setAttribute('aria-expanded','false');
+                pop.setAttribute('aria-hidden','true');
+            }
+        });
+
+        // desktop more close
+        document.querySelectorAll('.more-desktop').forEach(function(md){
+            var wrap = md.closest('.more-desktop-wrapper');
+            if(!wrap) return;
+            if(!wrap.contains(e.target)){
+                md.style.display = 'none';
+                md.setAttribute('aria-hidden','true');
+            }
+        });
+    });
+
+    // desktop more toggle
+    document.querySelectorAll('.desktop-more-toggle').forEach(function(btn){
+        btn.addEventListener('click', function(e){
+            e.preventDefault();
+            var wrap = btn.closest('.more-desktop-wrapper');
+            var panel = wrap.querySelector('.more-desktop');
+            if(panel.style.display === 'block'){
+                panel.style.display = 'none'; panel.setAttribute('aria-hidden','true');
+            } else { panel.style.display = 'block'; panel.setAttribute('aria-hidden','false'); }
+        });
+    });
+});
+</script>
+
 <br>
-<!-- Mobile Footer - Jeeto Daily Inspired -->
+<!-- Mobile Footer - Reordered Tabs (visible on mobile) -->
 <footer class="mobile-footer d-md-none">
     <div class="mobile-nav">
         <a href="/user/src/ui/index.php" class="nav-item" data-page="home">
@@ -41,17 +127,17 @@ div, section, article, aside, header, nav {
             </div>
             <span>Home</span>
         </a>
-        <a href="/user/src/ui/wallet.php" class="nav-item" data-page="spin">
+        <a href="/user/src/ui/profile.php" class="nav-item" data-page="profile">
             <div class="nav-icon-wrapper">
-                <i class="fas fa-coins"></i>
+                <i class="fas fa-user"></i>
             </div>
-            <span>Wallet</span>
+            <span>Profile</span>
         </a>
-        <a href="/user/src/ui/referral_leaderboard.php" class="nav-item nav-item-center" data-page="referral">
-            <div class="nav-icon-wrapper nav-icon-center">
-                <i class="fas fa-trophy"></i>
+        <a href="/user/src/ui/wallet.php" class="nav-item" data-page="rewards">
+            <div class="nav-icon-wrapper">
+                <i class="fas fa-gift"></i>
             </div>
-            <span>Leaderboard</span>
+            <span>Rewards</span>
         </a>
         <a href="/user/src/ui/community.php" class="nav-item" data-page="community">
             <div class="nav-icon-wrapper">
@@ -59,12 +145,26 @@ div, section, article, aside, header, nav {
             </div>
             <span>Community</span>
         </a>
-        <a href="/user/src/ui/profile.php" class="nav-item" data-page="profile">
+        <a href="/user/src/ui/referral_leaderboard.php" class="nav-item" data-page="reference">
             <div class="nav-icon-wrapper">
-                <i class="fas fa-user"></i>
+                <i class="fas fa-book"></i>
             </div>
-            <span>Profile</span>
+            <span>Reference</span>
         </a>
+        <div class="nav-item more-container">
+            <a href="#" class="nav-item-more" aria-expanded="false" aria-haspopup="true">
+                <div class="nav-icon-wrapper">
+                    <i class="fas fa-ellipsis-h"></i>
+                </div>
+                <span>More</span>
+            </a>
+            <div class="more-popover" role="menu" aria-hidden="true">
+                <a href="#" class="more-item coming-soon" data-name="Biz">Biz</a>
+                <a href="#" class="more-item coming-soon" data-name="Poll">Poll</a>
+                <a href="#" class="more-item coming-soon" data-name="Game">Game</a>
+                <a href="#" class="more-item coming-soon" data-name="Influencer Program">Influencer Program</a>
+            </div>
+        </div>
     </div>
 </footer>
 
@@ -74,10 +174,19 @@ div, section, article, aside, header, nav {
         <div class="footer-content">
             <div class="footer-nav">
                 <a href="/user/src/ui/index.php">Home</a>
-                <a href="/user/src/ui/community.php">Community</a>
-                <a href="/user/src/ui/referral_leaderboard.php">Referral Program</a>
                 <a href="/user/src/ui/profile.php">Profile</a>
-                <a href="/user/src/ui/wallet.php">Wallet</a>
+                <a href="/user/src/ui/referral_leaderboard.php">Rewards</a>
+                <a href="/user/src/ui/community.php">Community</a>
+                <a href="/user/src/ui/reference.php">Reference</a>
+                <div class="more-desktop-wrapper">
+                    <a href="#" class="desktop-more-toggle">More</a>
+                    <div class="more-desktop" aria-hidden="true">
+                        <a href="#" class="coming-soon" data-name="Biz">Biz</a>
+                        <a href="#" class="coming-soon" data-name="Poll">Poll</a>
+                        <a href="#" class="coming-soon" data-name="Game">Game</a>
+                        <a href="#" class="coming-soon" data-name="Influencer Program">Influencer Program</a>
+                    </div>
+                </div>
             </div>
             <div class="footer-links">
                 <a href="/user/src/ui/privacy.php">Privacy Policy</a>
@@ -130,6 +239,27 @@ div, section, article, aside, header, nav {
     flex: 1;
     max-width: 80px;
 }
+
+.more-container { position: relative; }
+.nav-item-more { display:flex; flex-direction:column; align-items:center; color:#94a3b8; text-decoration:none; }
+.more-popover {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(6,10,20,0.95);
+    border-radius: 10px;
+    padding: 6px;
+    display: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    min-width: 120px;
+    z-index: 1200;
+}
+.more-popover .more-item {
+    display:block; padding:8px 10px; color:#e2e8f0; text-decoration:none; font-size:0.85rem; border-radius:6px;
+}
+.more-popover .more-item:not(:last-child){ margin-bottom:6px; }
+.more-popover .more-item:hover { background: rgba(255,255,255,0.03); color:#667eea }
 
 .nav-icon-wrapper {
     width: 45px;
@@ -255,6 +385,13 @@ div, section, article, aside, header, nav {
     justify-content: center;
 }
 
+/* Desktop 'More' control */
+.more-desktop-wrapper { position: relative; }
+.desktop-more-toggle { color:#e2e8f0; text-decoration:none; cursor:pointer }
+.more-desktop { position:absolute; top:36px; left:0; background: rgba(6,10,20,0.95); padding:8px; border-radius:8px; display:none; box-shadow:0 8px 24px rgba(0,0,0,0.6); }
+.more-desktop a { display:block; padding:6px 10px; color:#e2e8f0; text-decoration:none }
+.more-desktop a:hover { color:#667eea }
+
 .footer-nav a {
     color: #e2e8f0;
     text-decoration: none;
@@ -328,9 +465,9 @@ div, section, article, aside, header, nav {
 @media (max-width: 767px) {
     /* Slightly smaller nav text and tighter padding */
     .mobile-nav .nav-item {
-        font-size: 0.6rem; /* reduced from 0.7rem */
-        padding: 6px 6px;
-        max-width: 70px;
+        font-size: 0.56rem; /* further reduced */
+        padding: 4px 6px;
+        max-width: 64px;
     }
 
     /* Smaller icon wrapper */
@@ -360,6 +497,9 @@ div, section, article, aside, header, nav {
     .nav-icon-center i {
         font-size: 1.4rem; /* reduced from 1.8rem */
     }
+
+    /* show popover full width on very small screens */
+    .more-popover { left: 50%; bottom: 72px; transform: translateX(-50%); }
 
     /* Keep the back-to-top hidden on mobile */
     #back-to-top {

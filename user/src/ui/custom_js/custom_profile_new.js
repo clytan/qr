@@ -1050,7 +1050,11 @@ const profileFunction = {
                     const img = new Image();
                     img.onload = function () {
                         // Image loaded successfully
-                        $('#click_profile_img').attr('src', imagePath);
+                        if (typeof setProfileImage === 'function') {
+                            setProfileImage(imagePath);
+                        } else {
+                            $('#click_profile_img').attr('src', imagePath);
+                        }
                     };
                     img.onerror = function () {
                         // Image failed to load, keep initials

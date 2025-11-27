@@ -1378,7 +1378,7 @@ $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type
 
             <div class="profile-container">
                 <!-- Navigation Tabs -->
-                <div class="nav-tabs-container">
+                <!-- <div class="nav-tabs-container">
                     <ul class="nav nav-tabs mb-4">
                         <li class="nav-item">
                             <a class="nav-link" href="/user/src/ui/index.php">
@@ -1396,7 +1396,7 @@ $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type
                             </a>
                         </li>
                     </ul>
-                </div>
+                </div> -->
 
                 <!-- Page Title -->
                 <div class="page-title">
@@ -1408,9 +1408,56 @@ $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type
                     <!-- Left side: Profile Info -->
                     <div class="profile-card">
                         <div class="profile-image-container">
-                            <img src="" alt="Profile" class="profile-image" id="click_profile_img">
+                            <img src="assets/images/user.jpg" alt="Profile" class="profile-image" id="click_profile_img">
                             <input type="file" id="upload_profile_img" hidden accept="image/*">
                         </div>
+
+                        <script>
+                        // Robust avatar fallback: generate initials SVG and set as src on error or when default image is used.
+                        (function(){
+                            try {
+                                var img = document.getElementById('click_profile_img');
+                                var nameEl = document.getElementById('full_name');
+
+                                function generateInitialsDataUrl(name, size) {
+                                    name = (name || 'U').trim();
+                                    var initials = name.split(/\s+/).map(function(n){return n.charAt(0).toUpperCase();}).slice(0,2).join('');
+                                    var r = size/2;
+                                    var stroke = Math.max(2, Math.round(size*0.06));
+                                    var innerR = r - stroke/1.5;
+                                    var fontSize = Math.round(size*0.38);
+                                    var svg = "<svg xmlns='http://www.w3.org/2000/svg' width='"+size+"' height='"+size+"' viewBox='0 0 "+size+" "+size+"'>"+
+                                              "<defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'><stop offset='0' stop-color='#667eea'/><stop offset='1' stop-color='#764ba2'/></linearGradient></defs>"+
+                                              "<circle cx='"+r+"' cy='"+r+"' r='"+innerR+"' fill='url(#g)' stroke='rgba(0,0,0,0.28)' stroke-width='"+stroke+"' />"+
+                                              "<text x='50%' y='50%' dy='.36em' text-anchor='middle' font-family='Inter, Arial, sans-serif' font-size='"+fontSize+"' font-weight='700' fill='rgba(255,255,255,0.95)'>"+initials+"</text></svg>";
+                                    return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+                                }
+
+                                if (img) {
+                                    // onerror handler for missing/404 images
+                                    img.onerror = function(){
+                                        try {
+                                            this.onerror = null;
+                                            var name = nameEl ? nameEl.value : '';
+                                                    this.src = generateInitialsDataUrl(name || 'U', 160);
+                                                    this.setAttribute('data-generated-initials', '1');
+                                        } catch(e) {
+                                            this.src = 'assets/images/user.jpg';
+                                        }
+                                    };
+
+                                    // If the current src is the default placeholder, replace it with initials SVG when name is available
+                                    try {
+                                        var currentName = nameEl ? nameEl.value : '';
+                                        if (currentName && img.src && img.src.indexOf('user.jpg') !== -1) {
+                                            img.src = generateInitialsDataUrl(currentName, 160);
+                                            img.setAttribute('data-generated-initials', '1');
+                                        }
+                                    } catch(e){}
+                                }
+                            } catch(e){}
+                        })();
+                        </script>
 
                         <h2 class="text-center" id="user-name">Loading</h2>
 
@@ -1696,8 +1743,8 @@ $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type
                         </div>
 
                         <!-- Profile Booster Section (for Gold/Silver users) -->
-                        <div id="profile-booster-section" class="profile-booster-section"
-                            style="display: <?php echo ($user_id ? 'block' : 'none'); ?>">
+                        <div id="profile-booster-section" class="profile-booster-section d-none"
+                            style="display: <?php echo ($user_id ? 'block' : 'none'); ?>" >
                             <div class="booster-header">
                                 <i class="fas fa-rocket"></i>
                                 <h4>Super Charge Your Profile</h4>

@@ -30,14 +30,7 @@ $user_id = $_SESSION['user_id'];
             <div id="top"></div>
             <section id="section-community" aria-label="section">
                 <div class="container">
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="community-tabs" id="communityTabs">
-                                <!-- Communities will be loaded here -->
-                                <div class="text-center">Loading communities...</div>
-                            </div>
-                        </div>
-                    </div>
+
                     <!-- Discord-Style Chat Layout -->
                     <div class="discord-chat-layout">
                         <!-- Chat Section -->
@@ -53,37 +46,39 @@ $user_id = $_SESSION['user_id'];
                                         <button class="btn-remove" onclick="removeAttachment()">×</button>
                                     </div>
                                 </div>
-                                
+
                                 <div class="chat-input">
                                     <!-- Expandable Actions Button -->
-                                    <button class="input-toggle-btn" id="toggleActionsBtn" onclick="toggleInputActions()" title="Actions">
+                                    <button class="input-toggle-btn" id="toggleActionsBtn"
+                                        onclick="toggleInputActions()" title="Actions">
                                         <i class="fa fa-plus"></i>
                                     </button>
-                                    
+
                                     <!-- Hidden Actions (expand on click) -->
                                     <div class="input-actions-group" id="inputActionsGroup" style="display: none;">
                                         <button class="input-action-btn" onclick="toggleEmojiPicker()" title="Emoji">
                                             <i class="fa fa-smile-o"></i>
                                         </button>
-                                        
+
                                         <button class="input-action-btn" onclick="toggleGifPicker()" title="GIF">
                                             <i class="fa fa-gift"></i>
                                         </button>
-                                        
+
                                         <label for="attachment" class="input-action-btn" title="Attach file">
                                             <i class="fa fa-paperclip"></i>
                                         </label>
-                                        <input type="file" id="attachment" accept="image/*,.pdf,.doc,.docx,.txt" style="display: none;">
+                                        <input type="file" id="attachment" accept="image/*,.pdf,.doc,.docx,.txt"
+                                            style="display: none;">
                                     </div>
-                                    
+
                                     <input type="text" id="messageInput" placeholder="Message in Community Chat">
-                                    
+
                                     <button class="btn-send" onclick="sendMessage()" title="Send">
                                         <i class="fa fa-paper-plane"></i>
                                     </button>
                                 </div>
                             </div>
-                            
+
                             <!-- Emoji Picker -->
                             <div id="emojiPicker" class="emoji-picker" style="display: none;">
                                 <div class="picker-header">
@@ -100,7 +95,7 @@ $user_id = $_SESSION['user_id'];
                                     <!-- Emojis will be populated here -->
                                 </div>
                             </div>
-                            
+
                             <!-- GIF Picker -->
                             <div id="gifPicker" class="gif-picker" style="display: none;">
                                 <div class="picker-header">
@@ -108,20 +103,28 @@ $user_id = $_SESSION['user_id'];
                                     <button class="picker-close" onclick="closeGifPicker()">×</button>
                                 </div>
                                 <div class="gif-search">
-                                    <input type="text" id="gifSearchInput" placeholder="Search GIFs..." onkeyup="searchGifs(this.value)">
+                                    <input type="text" id="gifSearchInput" placeholder="Search GIFs..."
+                                        onkeyup="searchGifs(this.value)">
                                 </div>
                                 <div class="gif-grid" id="gifGrid">
                                     <div class="gif-loading">Loading GIFs...</div>
                                 </div>
                             </div>
                         </div>
-                        
-                        <!-- Members Sidebar -->
-                        <div class="discord-members-section">
-                            <div class="members-header">Community Members</div>
-                            <div class="members-list" id="membersList">
-                                <!-- Members will be loaded here -->
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="community-tabs" id="communityTabs">
+                                <!-- Communities will be loaded here -->
+                                <div class="text-center">Loading communities...</div>
                             </div>
+                        </div>
+                    </div>
+                    <!-- Members Sidebar -->
+                    <div class="discord-members-section">
+                        <div class="members-header">Community Members</div>
+                        <div class="members-list" id="membersList">
+                            <!-- Members will be loaded here -->
                         </div>
                     </div>
                 </div>
@@ -131,8 +134,8 @@ $user_id = $_SESSION['user_id'];
 
     </div>
 
-<!-- Report Modal (outside wrapper for proper positioning) -->
-<div id="reportModal" class="report-modal">
+    <!-- Report Modal (outside wrapper for proper positioning) -->
+    <div id="reportModal" class="report-modal">
         <div class="report-modal-content">
             <div class="report-modal-header">
                 <div class="report-modal-title">Report Message</div>

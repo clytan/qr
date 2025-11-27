@@ -6,19 +6,7 @@
             <div class="col-md-12">
                 <div class="header-content d-flex align-items-center justify-content-between">
                     <div class="left-section">
-                        <!-- Placeholder for balance -->
-                    </div>
-                    <div class="logo-wrapper text-center">
-                        <!-- logo begin -->
-                        <div id="logo">
-                            <a href="index.php">
-                                <img alt="Logo" class="centered-logo" src="../assets/logo.png" />
-                            </a>
-                        </div>
-                        <!-- logo close -->
-                    </div>
-                    <div class="right-section">
-                        <!-- Notifications Dropdown -->
+                        <!-- Notifications Dropdown (moved to left) -->
                         <div class="notification-dropdown">
                             <a href="javascript:void(0)" class="btn-main btn-notification" id="notificationBtn">
                                 <i class="fas fa-bell"></i>
@@ -33,6 +21,22 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="logo-wrapper text-center">
+                        <!-- logo begin -->
+                        <div id="logo">
+                            <a href="index.php">
+                                <img alt="Logo" class="centered-logo" src="../assets/logo.png" />
+                            </a>
+                        </div>
+                        <!-- logo close -->
+                    </div>
+                    <div class="right-section">
+                        <!-- Wallet Button (top-right) -->
+                        <a href="wallet.php" class="btn-main btn-wallet" id="walletBtn" title="Wallet">
+                            <i class="fas fa-wallet"></i>
+                            <span class="wallet-balance" style="display:none;"></span>
+                        </a>
                     </div>
                     <style>
                     header {
@@ -61,20 +65,31 @@
 
                     .left-section,
                     .right-section {
-                        position: relative;
+                        position: absolute;
+                        top: 50%;
+                        transform: translateY(-50%);
                         z-index: 2;
                         min-width: 50px;
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    }
+
+                    .left-section {
+                        left: 8px;
+                        padding-left: 0;
+                        justify-content: flex-start;
                     }
 
                     .right-section {
-                        display: flex;
-                        align-items: center;
+                        right: 8px;
+                        padding-right: 0;
                         justify-content: flex-end;
                     }
 
                     .notification-dropdown {
                         position: relative;
-                        margin-right: 15px;
+                        margin-left: 0;
                         z-index: 9999;
                     }
 
@@ -107,11 +122,19 @@
                         right: 0;
                         top: 50px;
                         width: 300px;
+                                        min-width: 220px;
                         background: white;
                         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
                         border-radius: 8px;
                         display: none;
-                        z-index: 99999;
+                        z-index: 999999;
+                        opacity: 0;
+                        transition: opacity 0.12s ease-in-out;
+                    }
+
+                    .notification-content.open {
+                        display: block !important;
+                        opacity: 1 !important;
                     }
 
                     @media screen and (min-width: 769px) {
@@ -126,6 +149,12 @@
                             right: 0;
                             top: 50px;
                             width: 300px;
+                        }
+
+                        /* When notification dropdown is in left-section, open to the right of the button */
+                        .left-section .notification-dropdown .notification-content {
+                            left: 0;
+                            right: auto;
                         }
 
                         .btn-notification {
@@ -270,6 +299,27 @@
         box-shadow: 0 0 0 2px #1a1a1a;
     }
 
+    /* Wallet button styles */
+    .btn-wallet {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(131, 100, 226, 0.1);
+        color: #fff;
+        text-decoration: none;
+        position: relative;
+        z-index: 9999;
+        margin-left: 8px;
+    }
+
+    .btn-wallet i {
+        font-size: 18px;
+        color: #fff;
+    }
+
     .notification-content {
         background: white;
         border-radius: 5px;
@@ -333,6 +383,16 @@
         const notificationCount = document.querySelector('.notification-count');
         const notificationList = document.querySelector('.notification-list');
 
+        // Safety guards and diagnostics
+        if (!notificationBtn) console.warn('notificationBtn element not found');
+        if (!notificationContent) console.warn('notificationContent element not found');
+        if (!notificationList) console.warn('notificationList element not found');
+
+        if (!notificationBtn || !notificationContent || !notificationList) {
+            console.error('Notification UI elements missing — aborting notification setup');
+            return;
+        }
+
         function formatTimeAgo(dateString) {
             const now = new Date();
             const date = new Date(dateString);
@@ -361,31 +421,78 @@
             }
         }
 
-        // Set initial display state
-        notificationContent.style.display = 'none';
+        // Ensure panel starts closed
+        notificationContent.classList.remove('open');
 
-        // Toggle notification panel
+        // Toggle notification panel using class for reliability
+        let notificationAppendedToBody = false;
+
+        function positionNotificationPanel() {
+            const rect = notificationBtn.getBoundingClientRect();
+            const panelWidth = 300;
+            let left = rect.left;
+            // keep panel on-screen
+            if (left + panelWidth > window.innerWidth - 8) {
+                left = window.innerWidth - panelWidth - 8;
+            }
+            notificationContent.style.position = 'fixed';
+            notificationContent.style.top = (rect.bottom + 8) + 'px';
+            notificationContent.style.left = left + 'px';
+            notificationContent.style.right = 'auto';
+            notificationContent.style.width = panelWidth + 'px';
+        }
+
         notificationBtn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
 
-            // Direct toggle without checking current state
-            if (notificationContent.style.display === 'block') {
-                notificationContent.style.display = 'none';
+            const isOpen = notificationContent.classList.contains('open');
+            console.debug('notificationBtn clicked, isOpen=', isOpen);
+            if (isOpen) {
+                notificationContent.classList.remove('open');
+                if (notificationAppendedToBody) {
+                    document.body.appendChild(notificationContent); // ensure it's still in body
+                }
             } else {
-                notificationContent.style.display = 'block';
+                // Move panel into body to avoid clipping by parent containers
+                if (!notificationAppendedToBody) {
+                    document.body.appendChild(notificationContent);
+                    notificationAppendedToBody = true;
+                }
+                positionNotificationPanel();
+                notificationContent.classList.add('open');
+                // show a small loading placeholder
+                if (notificationList) notificationList.innerHTML = '<div class="notification-item">Loading...</div>';
                 fetchNotifications();
             }
         });
 
+        // Reposition on resize/scroll while open
+        window.addEventListener('resize', function() {
+            if (notificationContent.classList.contains('open')) positionNotificationPanel();
+        });
+        window.addEventListener('scroll', function() {
+            if (notificationContent.classList.contains('open')) positionNotificationPanel();
+        }, true);
+
         // Close notifications when clicking outside
         document.addEventListener('click', function(e) {
             if (!notificationContent.contains(e.target) && e.target !== notificationBtn) {
-                notificationContent.style.display = 'none';
+                notificationContent.classList.remove('open');
+                // optional: move panel back to original container if desired
+                try {
+                    notificationContent.style.position = '';
+                    notificationContent.style.top = '';
+                    notificationContent.style.left = '';
+                    notificationContent.style.width = '';
+                } catch (err) {
+                    console.debug('Error resetting notification content styles', err);
+                }
             }
         });
 
         function fetchNotifications() {
+            console.debug('fetchNotifications called');
             fetch('../backend/get_user_notifications.php')
                 .then(response => {
                     if (!response.ok) {

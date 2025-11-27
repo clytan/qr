@@ -61,6 +61,28 @@ function resetPolling() {
     }
 }
 
+// Generate an SVG data URL avatar with initials and gradient
+function generateInitialsAvatar(name, size = 64) {
+        const initials = (name || 'U').split(' ').map(n => n.charAt(0).toUpperCase()).slice(0,2).join('');
+        const colors = [ ['#667eea','#764ba2'], ['#f093fb','#f5576c'], ['#10b981','#06b6d4'], ['#f59e0b','#ef4444'] ];
+        const pick = colors[(initials.charCodeAt(0) + (initials.charCodeAt(1) || 0)) % colors.length];
+        const r = size/2;
+        const stroke = Math.max(2, Math.round(size * 0.06));
+        const innerR = r - stroke/1.5;
+        const fontSize = Math.round(size * 0.38);
+        const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}' viewBox='0 0 ${size} ${size}'>
+            <defs>
+                <linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
+                    <stop offset='0' stop-color='${pick[0]}' />
+                    <stop offset='1' stop-color='${pick[1]}' />
+                </linearGradient>
+            </defs>
+            <circle cx='${r}' cy='${r}' r='${innerR}' fill='url(#g)' stroke='rgba(0,0,0,0.28)' stroke-width='${stroke}' />
+            <text x='50%' y='50%' dy='.36em' text-anchor='middle' font-family='Inter, Arial, sans-serif' font-size='${fontSize}' font-weight='700' fill='rgba(255,255,255,0.95)'>${initials}</text>
+        </svg>`;
+        return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+}
+
 let currentCommunityId = null;
 let lastMessageTime = null;
 let isSendingMessage = false;
@@ -209,12 +231,35 @@ function renderMessage(msg) {
         return message.replace(/</g, '&lt;').replace(/>/g, '&gt;');
     };
 
+    // Normalize image path returned from backend:
+    // - If path is absolute (starts with http(s)://) or starts with '/', or already relative ('../'), return as-is.
+    // - Otherwise prefix with '../' to point to the correct directory relative to the JS file.
+    function resolveImagePath(p) {
+        if (!p) return null;
+        try {
+            p = p.toString();
+            if (/^https?:\/\//i.test(p)) return p;
+            // If backend returned an absolute project path like '/user/src/backend/...',
+            // normalize it to a relative path from this UI file: '../backend/...'
+            if (p.startsWith('/user/src/')) {
+                return '..' + p.replace(/^\/user\/src/, '');
+            }
+            if (p.startsWith('/')) return p;
+            if (p.startsWith('../') || p.startsWith('./')) return p;
+            // otherwise assume it's a relative path from project root under user/src
+            return '../' + p;
+        } catch (e) {
+            return p;
+        }
+    }
+
+    const avatarSrc = msg.user_image_path ? resolveImagePath(msg.user_image_path) : generateInitialsAvatar(msg.user_name, 56);
     return `
         <div class="message" data-message-id="${msg.id}">
-            <img src="${msg.user_image_path ? '../' + msg.user_image_path : 'assets/images/user.jpg'}" 
+            <img src="${avatarSrc}" 
                  alt="${msg.user_qr_id}" 
                  class="message-avatar"
-                 onerror="this.src='assets/images/user.jpg'">
+                 onerror="this.onerror=null;this.src='${generateInitialsAvatar(msg.user_name,56)}'">
             <div class="message-content">
                 <div class="message-header">
                     <a href="profile.php?qr=${msg.user_qr_id}" class="message-username">@${msg.user_qr_id}</a>
@@ -447,17 +492,18 @@ function loadMembers() {
         .then(data => {
             if (data.status) {
                 const membersList = document.getElementById('membersList');
-                membersList.innerHTML = data.members.map(member => `
-                    <div class="member-item" title="${member.user_full_name || member.user_qr_id}">
-                        <img src="${member.user_image_path ? '../' + member.user_image_path : 'assets/images/user.jpg'}" 
-                             class="member-avatar" 
-                             alt="${member.user_qr_id}"
-                             onerror="this.src='assets/images/user.jpg'">
-                        <div class="member-info">
-                            <div class="member-qr-id">@${member.user_qr_id}</div>
-                        </div>
-                    </div>
-                `).join('');
+                membersList.innerHTML = data.members.map(member => {
+                    const memberAvatar = member.user_image_path ? resolveImagePath(member.user_image_path) : generateInitialsAvatar(member.user_full_name || member.user_qr_id, 48);
+                    return `<div class="member-item" title="${member.user_full_name || member.user_qr_id}">
+                                <img src="${memberAvatar}" 
+                                     class="member-avatar" 
+                                     alt="${member.user_qr_id}"
+                                     onerror="this.onerror=null;this.src='${generateInitialsAvatar(member.user_full_name || member.user_qr_id,48)}'">
+                                <div class="member-info">
+                                    <div class="member-qr-id">@${member.user_qr_id}</div>
+                                </div>
+                            </div>`;
+                }).join('');
             }
         })
         .catch(error => console.error('Error:', error));

@@ -192,6 +192,15 @@ body {
     background: #1DA1F2;
 }
 
+/* Messenger and Instagram buttons */
+.share-btn.messenger {
+    background: #0084FF; /* Messenger brand blue */
+}
+
+.share-btn.instagram {
+    background: linear-gradient(45deg, #f58529 0%, #dd2a7b 30%, #8134af 60%, #515bd4 100%);
+}
+
 .share-btn:hover {
     transform: translateY(-5px) scale(1.1);
 }

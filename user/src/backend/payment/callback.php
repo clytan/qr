@@ -2,6 +2,7 @@
 require_once('../dbconfig/connection.php');
 require_once('./session_config.php');
 require_once('../auto_community_helper.php');
+require_once(__DIR__ . '/../../mailer/send_welcome_email.php');
 error_log("Payment callback received - Method: " . $_SERVER['REQUEST_METHOD']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -181,8 +182,8 @@ function processRegistration($data, $payment_id, $bank_reference, $order_id)
         }
 
         // Create invoice
-        $cgst = $amount * 0.09;
-        $sgst = $amount * 0.09;
+        $cgst = $amount;
+        $sgst = $amount;
         $igst = 0.00;
         $gst_total = $cgst + $sgst + $igst;
         $total_amount = $amount + $gst_total;
@@ -212,6 +213,13 @@ function processRegistration($data, $payment_id, $bank_reference, $order_id)
             error_log("Failed to auto-assign community for user $user_id: " . $communityResult['error']);
         }
         
+        // Send welcome email (best effort)
+        try {
+            sendWelcomeEmail($email, $full_name ?? '');
+        } catch (Exception $e) {
+            error_log('Failed to send welcome email: ' . $e->getMessage());
+        }
+
         return ['status' => true, 'message' => 'Registration successful'];
 
     } catch (Exception $e) {
@@ -246,11 +254,23 @@ function processReferral($conn, $referred_by_user_id, $new_user_id)
 
         if ($resultSlab->num_rows > 0) {
             $rowSlab = $resultSlab->fetch_assoc();
-            $commission_percent = floatval($rowSlab['ref_commission']);
+                // Quick slab-name based fixed commission rule
+                $slabName = strtolower($rowSlab['name'] ?? $rowSlab['slab_name'] ?? '');
+                if (in_array($slabName, ['creator', 'gold', 'silver'])) {
+                    $commission_amount = 200.0;
+                } else {
+                    $commission_amount = 100.0;
+                }
+                // If a percentage commission is configured, use that instead
+                if (!empty($rowSlab['ref_commission']) && is_numeric($rowSlab['ref_commission'])) {
+                    $commission_percent = floatval($rowSlab['ref_commission']);
+                    $base_amount = 100;
+                    $commission_amount = $base_amount * ($commission_percent / 100);
+                }
 
             // Calculate commission
             $base_amount = 100; // Adjust this based on your business logic
-            $commission_amount = $base_amount * ($commission_percent / 100);
+                // $commission_amount = $base_amount * ($commission_percent / 100); // This line is now handled above
 
             // Update or create wallet
             $sqlWallet = "SELECT id, balance FROM user_wallet WHERE user_id = ? AND is_deleted = 0";
