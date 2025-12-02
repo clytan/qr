@@ -273,17 +273,17 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                 font-size: 0.8rem;
                 margin-right: 0.2rem;
             }
-        
-        .btn-danger {
-            background: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%) !important;
-            border: none !important;
-            color: white !important;
-        }
-        
-        .btn-danger:hover {
-            opacity: 0.9;
-            transform: translateY(-1px);
-        }
+
+            .btn-danger {
+                background: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%) !important;
+                border: none !important;
+                color: white !important;
+            }
+
+            .btn-danger:hover {
+                opacity: 0.9;
+                transform: translateY(-1px);
+            }
 
             .qr-actions .btn {
                 padding: 0.625rem 1rem;
@@ -1037,23 +1037,23 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
             font-size: 0 !important;
             overflow: hidden;
         }
-        
+
         #follow-btn-container .btn i {
             margin: 0 !important;
             font-size: 18px !important;
         }
-        
+
         #follow-btn-container .btn:hover {
             transform: scale(1.1);
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
         }
-        
+
         #follow-btn-container .btn-outline-secondary {
             background: rgba(255, 255, 255, 0.9);
             border: 2px solid #E9437A;
             color: #E9437A;
         }
-        
+
         #follow-btn-container .btn-outline-secondary:hover {
             background: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%);
             color: white !important;
@@ -1635,8 +1635,8 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                                             <i class="fas fa-map-marker-alt"></i> Address Information
                                         </label>
                                         <div class="public-toggle">
-                                            <input type="checkbox" id="public_address"
-                                                class="public-toggle-input" data-field="address" checked>
+                                            <input type="checkbox" id="public_address" class="public-toggle-input"
+                                                data-field="address" checked>
                                             <span class="toggle-label">Public</span>
                                         </div>
                                     </div>
@@ -1897,7 +1897,7 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                                     <span class="price-value">₹199</span>
                                 </div>
                             </div>
-                            
+
                             <!-- Existing Links List -->
                             <div id="supercharge-links-list" class="d-none" style="margin-bottom: 1rem;">
                                 <h5 style="font-size: 1rem; margin-bottom: 0.75rem; color: var(--text-color);">
@@ -1905,16 +1905,17 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                                 </h5>
                                 <div id="links-container"></div>
                             </div>
-                            
+
                             <!-- Add New Link Form -->
                             <div id="supercharge-form" class="d-none">
                                 <div class="form-group">
                                     <label class="form-label">
                                         <i class="fas fa-link"></i> Add New Supercharge Link
                                     </label>
-                                    <input type="url" class="form-control" id="supercharge_link" 
-                                           placeholder="Enter your link to supercharge your profile">
-                                    <small class="form-text text-muted">Provide a link that showcases your work, portfolio, or content</small>
+                                    <input type="url" class="form-control" id="supercharge_link"
+                                        placeholder="Enter your link to supercharge your profile">
+                                    <small class="form-text text-muted">Provide a link that showcases your work,
+                                        portfolio, or content</small>
                                 </div>
                             </div>
                             <button class="btn btn-boost" id="btn-super-charge">
@@ -1923,17 +1924,17 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                         </div>
 
                         <?php if (!$viewing_qr): ?>
-                        <div class="action-buttons">
-                            <button type="submit" class="btn btn-primary" id="update-profile-btn">
-                                <i class="fas fa-save"></i> Save All Changes
-                            </button>
-                            <button type="button" class="btn btn-secondary" onclick="location.reload()">
-                                <i class="fas fa-undo"></i> Reset Form
-                            </button>
-                            <a href="../backend/logout.php" class="btn btn-danger">
-                                <i class="fas fa-sign-out-alt"></i> Logout
-                            </a>
-                        </div>
+                            <div class="action-buttons">
+                                <button type="submit" class="btn btn-primary" id="update-profile-btn">
+                                    <i class="fas fa-save"></i> Save All Changes
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="location.reload()">
+                                    <i class="fas fa-undo"></i> Reset Form
+                                </button>
+                                <a href="../backend/logout.php" class="btn btn-danger">
+                                    <i class="fas fa-sign-out-alt"></i> Logout
+                                </a>
+                            </div>
                         <?php endif; ?>
                     </form>
                 </div>
@@ -2027,10 +2028,10 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
 
             // Profile Booster functionality
             checkAndShowBooster();
-            
+
             // Load followers count on page load
             loadFollowersCount();
-            
+
             // Initialize follow button if viewing another profile
             if (isViewingOtherProfile) {
                 checkFollowStatus();
@@ -2084,16 +2085,16 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
         // Handle Super Charge button
         const boostBtn = document.getElementById('btn-super-charge');
         let superchargeFormVisible = false;
-        
+
         if (boostBtn) {
             console.log('Boost button found, attaching click handler');
-            
+
             // Check existing supercharge status on load
             checkSuperchargeStatus();
-            
+
             boostBtn.addEventListener('click', function () {
                 console.log('Super Charge button clicked');
-                
+
                 // Toggle form visibility
                 const form = document.getElementById('supercharge-form');
                 if (!superchargeFormVisible) {
@@ -2106,27 +2107,27 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                 }
             });
         }
-        
+
         function checkSuperchargeStatus() {
             $.ajax({
                 url: '../backend/profile_new/get_supercharge_status.php',
                 type: 'GET',
                 dataType: 'json',
-                success: function(response) {
+                success: function (response) {
                     if (response.success && response.has_request && response.requests.length > 0) {
                         const requests = response.requests;
                         const linksList = $('#supercharge-links-list');
                         const linksContainer = $('#links-container');
-                        
+
                         // Show links list
                         linksList.removeClass('d-none');
                         linksContainer.empty();
-                        
+
                         // Display each link with its status
-                        requests.forEach(function(request) {
+                        requests.forEach(function (request) {
                             let statusBadge = '';
                             let statusClass = '';
-                            
+
                             if (request.status === 'pending') {
                                 statusBadge = '<span class="badge" style="background: #fbbf24; color: #000;"><i class="fas fa-clock"></i> Pending</span>';
                                 statusClass = 'border-warning';
@@ -2137,7 +2138,7 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                                 statusBadge = '<span class="badge" style="background: #ef4444; color: #fff;"><i class="fas fa-times-circle"></i> Rejected</span>';
                                 statusClass = 'border-danger';
                             }
-                            
+
                             let linkHtml = `
                                 <div class="supercharge-link-item ${statusClass}" style="padding: 0.75rem; margin-bottom: 0.75rem; border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; background: rgba(255,255,255,0.03);">
                                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
@@ -2156,25 +2157,25 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                                     </div>
                                 </div>
                             `;
-                            
+
                             linksContainer.append(linkHtml);
                         });
                     }
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.error('Error checking supercharge status:', error);
                 }
             });
         }
-        
+
         function submitSuperchargeRequest() {
             const link = $('#supercharge_link').val().trim();
-            
+
             if (!link) {
                 alert('Please enter a valid link');
                 return;
             }
-            
+
             // Validate URL format
             try {
                 new URL(link);
@@ -2182,7 +2183,7 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                 alert('Please enter a valid URL (must start with http:// or https://)');
                 return;
             }
-            
+
             $.ajax({
                 url: '../backend/profile_new/submit_supercharge.php',
                 type: 'POST',
@@ -2191,7 +2192,7 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                     supercharge_link: link
                 }),
                 dataType: 'json',
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
                         alert(response.message);
                         $('#supercharge_link').val(''); // Clear the input field
@@ -2200,7 +2201,7 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                         alert('Error: ' + response.message);
                     }
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.error('Error submitting supercharge:', error);
                     alert('Failed to submit supercharge request. Please try again.');
                 }
@@ -2237,28 +2238,28 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
         const isViewingOtherProfile = <?php echo $is_viewing_other_profile ? 'true' : 'false'; ?>;
         const viewedQr = '<?php echo $viewed_qr; ?>';
         const currentUserQr = '<?php echo $user_qr; ?>';
-        
+
         function loadFollowersCount() {
             const targetQr = viewedQr || currentUserQr;
             if (!targetQr) return;
-            
+
             $.ajax({
                 url: '../backend/get_followers_count.php',
                 method: 'POST',
-                data: JSON.stringify({ 
+                data: JSON.stringify({
                     qr_id: targetQr,
                     follower_id: '<?php echo $user_id; ?>'
                 }),
                 contentType: 'application/json',
-                success: function(response) {
+                success: function (response) {
                     updateFollowersCount(response.total_count);
                 },
-                error: function() {
+                error: function () {
                     console.error('Failed to load followers count');
                 }
             });
         }
-        
+
         function checkFollowStatus() {
             // Get the user_id for the viewed profile
             $.ajax({
@@ -2266,83 +2267,83 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                 method: 'POST',
                 data: JSON.stringify({ qr_id: viewedQr }),
                 contentType: 'application/json',
-                success: function(userResponse) {
+                success: function (userResponse) {
                     if (userResponse.status && userResponse.user_id) {
                         const targetUserId = userResponse.user_id;
-                        
+
                         // Now check follow status
                         $.ajax({
                             url: '../backend/get_followers_count.php',
                             method: 'POST',
-                            data: JSON.stringify({ 
+                            data: JSON.stringify({
                                 qr_id: viewedQr,
                                 follower_id: '<?php echo $user_id; ?>'
                             }),
                             contentType: 'application/json',
-                            success: function(response) {
+                            success: function (response) {
                                 renderFollowButton(response.following, targetUserId);
                                 updateFollowersCount(response.total_count);
                             },
-                            error: function() {
+                            error: function () {
                                 console.error('Failed to check follow status');
                             }
                         });
                     }
                 },
-                error: function() {
+                error: function () {
                     console.error('Failed to get user ID');
                 }
             });
         }
-        
+
         function renderFollowButton(isFollowing, targetUserId) {
-            const btnClass = isFollowing 
-                ? 'btn btn-outline-secondary' 
+            const btnClass = isFollowing
+                ? 'btn btn-outline-secondary'
                 : 'btn';
-            const btnStyle = isFollowing 
-                ? '' 
+            const btnStyle = isFollowing
+                ? ''
                 : 'background: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%); color: white;';
             const iconClass = isFollowing ? 'fas fa-user-check' : 'fas fa-user-plus';
             const title = isFollowing ? 'Following' : 'Follow';
-            
+
             const button = $('<button>')
                 .addClass(btnClass)
                 .attr('style', btnStyle)
                 .attr('onclick', `toggleFollow(${targetUserId})`)
                 .attr('title', title)
                 .html(`<i class="${iconClass}"></i>`);
-            
+
             $('#follow-btn-container').html(button);
         }
-        
+
         function toggleFollow(targetUserId) {
             $.ajax({
                 url: '../backend/profile/toggle_follow.php',
                 method: 'POST',
                 data: JSON.stringify({ target_user_id: targetUserId }),
                 contentType: 'application/json',
-                success: function(response) {
+                success: function (response) {
                     if (response.success) {
                         const isFollowing = response.data.following;
                         renderFollowButton(isFollowing, targetUserId);
-                        
+
                         // Update followers count
                         checkFollowStatus();
                     } else {
                         alert('Error: ' + response.message);
                     }
                 },
-                error: function() {
+                error: function () {
                     alert('Failed to update follow status. Please try again.');
                 }
             });
         }
-        
+
         function updateFollowersCount(count) {
             // Update the followers count display
             $('#followers-count .stat-value').text(count);
         }
-        
+
         function showNotification(message) {
             // Simple notification - you can enhance this with a toast library
             const notification = $('<div>')
@@ -2359,11 +2360,11 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                     'animation': 'slideIn 0.3s ease-out'
                 })
                 .text(message);
-            
+
             $('body').append(notification);
-            
-            setTimeout(function() {
-                notification.fadeOut(300, function() {
+
+            setTimeout(function () {
+                notification.fadeOut(300, function () {
                     $(this).remove();
                 });
             }, 3000);
