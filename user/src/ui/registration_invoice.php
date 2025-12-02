@@ -2,6 +2,13 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+// Redirect to index if not logged in
+if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
+    header('Location: index.php');
+    exit();
+}
+
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : '';
 
 // Company info (static)

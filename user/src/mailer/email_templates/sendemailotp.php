@@ -62,6 +62,12 @@ if ($stmtCheck) {
     }
 }
 
+// Embed logo image
+$logoPath = __DIR__ . '/../../assets/logo.png';
+if (file_exists($logoPath)) {
+    $mail->AddEmbeddedImage($logoPath, 'logo', 'logo.png', 'base64', 'image/png');
+}
+
 $content = '<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -83,7 +89,8 @@ $content = '<!DOCTYPE html>
             margin-bottom: 24px;
         }
         .logo img {
-            max-width: 120px;
+            max-width: 140px;
+            height: auto;
         }
         h2 {
             color: #002E5B;
@@ -118,20 +125,20 @@ $content = '<!DOCTYPE html>
 <body>
     <div class="container">
         <div class="logo">
-            <img src="https://i.imgur.com/8Km9tLL.png" alt="Company Logo" />
+            <img src="cid:logo" alt="Zokli Logo" />
         </div>
         <h2>Email Verification</h2>
         <div class="info">Your One Time Password (OTP) for email verification is:</div>
         <div class="otp-box">' . $otp . '</div>
         <div class="info">This OTP is valid for 10 minutes. Please do not share it with anyone.</div>
-        <div class="footer">If you did not request this, please ignore this email.<br>iGoalZERO &copy; 2025</div>
+        <div class="footer">If you did not request this, please ignore this email.<br>Zokli &copy; 2025</div>
     </div>
 </body>
 </html>';
 
 $mail->AddAddress($email, $email);
 // $mail->AddAddress("walter.pinto@pennpetchem.com", "walter.pinto@pennpetchem.com");
-$mail->SetFrom("support@codersdek.com", "support@codersdek.com");
+$mail->SetFrom("support@codersdek.com", "Zokli Support");
 $mail->AddReplyTo($email, $email);
 $mail->Subject = 'OTP for Email Verification';
 $mail->MsgHTML($content);

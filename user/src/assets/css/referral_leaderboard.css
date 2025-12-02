@@ -13,15 +13,15 @@ body {
 
 /* CSS Variables */
 :root {
-    --primary: #667eea;
-    --primary-dark: #5568d3;
-    --secondary: #764ba2;
-    --accent: #f093fb;
+    --primary: #e67753;
+    --primary-dark: #d6653f;
+    --secondary: #E2AD2A;
+    --accent: #E9437A;
     --dark: #0f172a;
     --darker: #0a0e27;
     --light: #f8fafc;
-    --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    --gradient-2: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    --gradient-1: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%);
+    --gradient-2: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%);
     --gradient-3: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
     --gold: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
     --silver: linear-gradient(135deg, #C0C0C0 0%, #808080 100%);
@@ -80,7 +80,7 @@ body {
 
 /* Referral Card */
 .referral-card {
-    background: rgba(255, 255, 255, 0.03);
+    background: transparent;
     backdrop-filter: blur(10px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 20px;
@@ -88,18 +88,6 @@ body {
     margin-bottom: 60px;
     position: relative;
     overflow: hidden;
-}
-
-.referral-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: var(--gradient-1);
-    opacity: 0.05;
-    z-index: 0;
 }
 
 .referral-card-content {
@@ -156,7 +144,7 @@ body {
 
 .copy-btn:hover {
     transform: scale(1.1);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 5px 15px rgba(230, 119, 83, 0.4);
 }
 
 /* Share Buttons */

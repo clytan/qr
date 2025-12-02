@@ -56,6 +56,7 @@ if (!$user_data) {
 // Map DB type names to frontend keys
 $typeMap = [
     'Website' => 'website',
+    'Facebook' => 'facebook_username',
     'Twitter' => 'twitter_username',
     'Instagram' => 'instagram_username',
     'Youtube' => 'youtube_username',

@@ -1,4 +1,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+<?php
+// Check if user is logged in
+$header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
+?>
 
 <header class="transparent scroll-dark">
     <div class="container">
@@ -6,7 +10,17 @@
             <div class="col-md-12">
                 <div class="header-content d-flex align-items-center justify-content-between">
                     <div class="left-section">
-                        <!-- Notifications Dropdown (moved to left) -->
+                        <!-- logo begin -->
+                        <div id="logo">
+                            <a href="index.php">
+                                <img alt="Logo" class="logo-image" src="../assets/logo.png" />
+                            </a>
+                        </div>
+                        <!-- logo close -->
+                    </div>
+                    <div class="right-section">
+                        <?php if ($header_is_logged_in): ?>
+                        <!-- Notifications Dropdown -->
                         <div class="notification-dropdown">
                             <a href="javascript:void(0)" class="btn-main btn-notification" id="notificationBtn">
                                 <i class="fas fa-bell"></i>
@@ -21,22 +35,12 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="logo-wrapper text-center">
-                        <!-- logo begin -->
-                        <div id="logo">
-                            <a href="index.php">
-                                <img alt="Logo" class="centered-logo" src="../assets/logo.png" />
-                            </a>
-                        </div>
-                        <!-- logo close -->
-                    </div>
-                    <div class="right-section">
-                        <!-- Wallet Button (top-right) -->
+                        <!-- Wallet Button -->
                         <a href="wallet.php" class="btn-main btn-wallet" id="walletBtn" title="Wallet">
                             <i class="fas fa-wallet"></i>
                             <span class="wallet-balance" style="display:none;"></span>
                         </a>
+                        <?php endif; ?>
                     </div>
                     <style>
                     header {
@@ -48,76 +52,89 @@
 
                     .header-content {
                         min-height: 80px;
-                        position: relative;
                         width: 100%;
                         display: flex;
                         justify-content: space-between;
                         align-items: center;
                     }
 
-                    .logo-wrapper {
-                        position: absolute;
-                        left: 50%;
-                        top: 50%;
-                        transform: translate(-50%, -50%);
-                        z-index: 1;
-                    }
-
-                    .left-section,
-                    .right-section {
-                        position: absolute;
-                        top: 50%;
-                        transform: translateY(-50%);
-                        z-index: 2;
-                        min-width: 50px;
+                    .left-section {
                         display: flex;
                         align-items: center;
-                        gap: 8px;
+                        gap: 15px;
                     }
 
-                    .left-section {
-                        left: 8px;
-                        padding-left: 0;
-                        justify-content: flex-start;
+    .right-section {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }                    #logo {
+                        display: flex;
+                        align-items: center;
                     }
 
-                    .right-section {
-                        right: 8px;
-                        padding-right: 0;
-                        justify-content: flex-end;
+                    .logo-image {
+                        height: 50px;
+                        width: auto;
                     }
 
                     .notification-dropdown {
                         position: relative;
-                        margin-left: 0;
                         z-index: 9999;
                     }
 
-                    .btn-notification {
-                        display: flex !important;
-                        align-items: center;
-                        justify-content: center;
-                        width: 40px;
-                        height: 40px;
-                        border-radius: 50%;
-                        background: rgba(131, 100, 226, 0.1);
-                        color: #ffffffff !important;
-                        text-decoration: none;
-                        position: relative;
-                        z-index: 9999;
-                    }
+    header a.btn-notification,
+    header a.btn-wallet,
+    header .btn-notification,
+    header .btn-wallet,
+    a.btn-notification,
+    a.btn-wallet,
+    .btn-notification,
+    .btn-wallet {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 38px !important;
+        height: 38px !important;
+        border-radius: 12px !important;
+        background: transparent !important;
+        border: 1.5px solid rgba(255, 255, 255, 0.8) !important;
+        color: #ffffff !important;
+        text-decoration: none !important;
+        position: relative;
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+        padding: 0 !important;
+        min-width: auto !important;
+    }
 
-                    .btn-notification i {
-                        font-size: 20px;
-                        display: inline-block !important;
-                        color: #ffffffff !important;
-                    }
+    header a.btn-notification i,
+    header a.btn-wallet i,
+    header .btn-notification i,
+    header .btn-wallet i,
+    a.btn-notification i,
+    a.btn-wallet i,
+    .btn-notification i,
+    .btn-wallet i {
+        font-size: 17px !important;
+        display: inline-block !important;
+        color: #ffffff !important;
+    }
 
-                    .btn-notification:hover {
-                        background: rgba(131, 100, 226, 0.2);
-                    }
-
-                    .notification-content {
+    header a.btn-notification:hover,
+    header a.btn-wallet:hover,
+    header .btn-notification:hover,
+    header .btn-wallet:hover,
+    a.btn-notification:hover,
+    a.btn-wallet:hover,
+    .btn-notification:hover,
+    .btn-wallet:hover {
+        background: rgba(255, 255, 255, 0.15) !important;
+        border-color: rgba(255, 255, 255, 1) !important;
+        transform: translateY(-2px) !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    }                    .notification-content {
                         position: absolute;
                         right: 0;
                         top: 50px;
@@ -151,19 +168,15 @@
                             width: 300px;
                         }
 
-                        /* When notification dropdown is in left-section, open to the right of the button */
-                        .left-section .notification-dropdown .notification-content {
-                            left: 0;
-                            right: auto;
-                        }
-
-                        .btn-notification {
+                        .btn-notification,
+                        .btn-wallet {
                             color: #ffffffff !important;
                             opacity: 1 !important;
                             visibility: visible !important;
                         }
 
-                        .btn-notification i {
+                        .btn-notification i,
+                        .btn-wallet i {
                             color: #ffffffff !important;
                             opacity: 1 !important;
                             visibility: visible !important;
@@ -184,13 +197,16 @@
                             top: 70px;
                         }
 
-                        .btn-notification {
+                        .btn-notification,
+                        .btn-wallet {
                             color: #fff !important;
-                            background: rgba(255, 255, 255, 0.1);
+                            background: transparent !important;
+                            border-radius: 12px !important;
                         }
 
-                        .btn-notification:hover {
-                            background: rgba(255, 255, 255, 0.2);
+                        .btn-notification:hover,
+                        .btn-wallet:hover {
+                            background: rgba(255, 255, 255, 0.15) !important;
                         }
                     }
 
@@ -240,6 +256,11 @@
 
                         .header-content {
                             min-height: 60px;
+                        }
+
+                        .btn-notification,
+                        .btn-wallet {
+                            border-radius: 12px !important;
                         }
                     }
                     </style>
@@ -297,27 +318,6 @@
         text-align: center;
         line-height: 1;
         box-shadow: 0 0 0 2px #1a1a1a;
-    }
-
-    /* Wallet button styles */
-    .btn-wallet {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: rgba(131, 100, 226, 0.1);
-        color: #fff;
-        text-decoration: none;
-        position: relative;
-        z-index: 9999;
-        margin-left: 8px;
-    }
-
-    .btn-wallet i {
-        font-size: 18px;
-        color: #fff;
     }
 
     .notification-content {

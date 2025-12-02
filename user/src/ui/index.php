@@ -8,14 +8,14 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
 ?>
 
 <head>
-    <title>ZQR - Connect Through QR Codes</title>
+    <title>Zokli - Digital Social Community for Dynamic Generation</title>
     <link rel="icon" href="../assets/logo2.png" type="image/gif" sizes="16x16">
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <meta content="ZQR - Create your QR profile, connect instantly, join communities and manage your digital wallet"
+    <meta content="Zokli - Join 10 million Zoks in the hyper-connected knowledge nexus. A digital community for learning, creating, and collective action."
         name="description" />
-    <meta content="QR code, digital profile, community, chat, wallet, instant connection" name="keywords" />
-    <meta content="ZQR" name="author" />
+    <meta content="Zokli, digital community, social media, Zoks, knowledge sharing, networking, skill development" name="keywords" />
+    <meta content="Zokli" name="author" />
     <!-- CSS Files -->
     <?php include('../components/csslinks.php') ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -68,10 +68,10 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
     .hero-badge {
         display: inline-block;
         padding: 8px 20px;
-        background: rgba(102, 126, 234, 0.1);
-        border: 1px solid rgba(102, 126, 234, 0.3);
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.3);
         border-radius: 50px;
-        color: var(--primary);
+        color: white;
         font-size: 0.9rem;
         font-weight: 600;
         margin-bottom: 2rem;
@@ -87,7 +87,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
     }
 
     .hero-title .gradient-text {
-        background: var(--gradient-1);
+        background: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -123,25 +123,28 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
     }
 
     .btn-primary {
-        background: var(--gradient-1);
+        background: linear-gradient(135deg, #E9437A 0%, #E2AD2A 100%);
         color: white;
-        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        box-shadow: 0 10px 30px rgba(233, 67, 122, 0.4);
+        border: none;
     }
 
     .btn-primary:hover {
         transform: translateY(-3px);
-        box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        box-shadow: 0 15px 40px rgba(233, 67, 122, 0.6);
     }
 
     .btn-outline {
         background: transparent;
         color: white;
-        border: 2px solid var(--primary);
+        border: 2px solid rgba(255, 255, 255, 0.3);
     }
 
     .btn-outline:hover {
-        background: rgba(102, 126, 234, 0.1);
+        background: linear-gradient(135deg, #E9437A 0%, #E2AD2A 100%);
+        border-color: transparent;
         transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(233, 67, 122, 0.4);
     }
 
     /* Floating Elements */
@@ -240,7 +243,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
     }
 
     .carousel-section {
-        padding: 40px 0;
+        padding: 30px 0;
         background: var(--darker);
         position: relative;
         overflow: hidden;
@@ -248,14 +251,14 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
 
     .section-header {
         text-align: center;
-        margin-bottom: 30px;
+        margin-bottom: 20px;
     }
 
     .section-title {
         font-size: 3rem;
         font-weight: 700;
         margin-bottom: 1rem;
-        background: var(--gradient-1);
+        background: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -321,7 +324,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
 
     /* Features Grid with Parallax */
     .features-parallax {
-        padding: 100px 0;
+        padding: 60px 0;
         background: var(--dark);
         position: relative;
     }
@@ -406,7 +409,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
 
     /* Stats Counter */
     .stats-section {
-        padding: 40px 0;
+        padding: 30px 0;
         background: var(--gradient-1);
     }
 
@@ -436,7 +439,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
     /* CTA Section with Image */
     .cta-parallax {
         position: relative;
-        padding: 60px 0;
+        padding: 40px 0;
         background: linear-gradient(135deg, rgba(240, 147, 251, 0.95) 0%, rgba(245, 87, 108, 0.95) 100%),
             url('../assets/images/background/5.jpg') center/cover fixed;
         text-align: center;
@@ -518,7 +521,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
 
         <!-- content begin -->
         <div class="no-bottom no-top" id="content">
-            <section class="carousel-section">
+            <section class="carousel-section" style="">
                 <div class="hero-content-wrapper welcome-margin">
                     <?php if ($is_logged_in): ?>
                     <div class="hero-badge">
@@ -534,52 +537,52 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                     <div class="enhanced-carousel">
                         <div id="feature-carousel" class="owl-carousel owl-theme">
                             <div class="carousel-item-enhanced">
-                                <img src="../assets/images/carousel/crs-1.jpg" alt="QR Profile Creation">
+                                <img src="../assets/images/carousel/crs-1.jpg" alt="Knowledge Sharing">
                                 <div class="carousel-overlay">
-                                    <h3><i class="fas fa-qrcode"></i> Instant QR Profiles</h3>
-                                    <p>Create your personalized QR code profile in seconds and share with anyone</p>
+                                    <h3><i class="fas fa-book-reader"></i> Knowledge Nexus</h3>
+                                    <p>Access curated learning paths, expert workshops, and peer-to-peer tutoring from 10 million minds</p>
                                 </div>
                             </div>
 
                             <div class="carousel-item-enhanced">
-                                <img src="../assets/images/carousel/crs-2.jpg" alt="Community Chat">
+                                <img src="../assets/images/carousel/crs-2.jpg" alt="Community Connection">
                                 <div class="carousel-overlay">
-                                    <h3><i class="fas fa-users"></i> Community Connections</h3>
-                                    <p>Join communities, engage in conversations, and build meaningful relationships
+                                    <h3><i class="fas fa-users"></i> A Continent of Connection</h3>
+                                    <p>Join Zoks from diverse ages, geographies, interests, and backgrounds in one vibrant community
                                     </p>
                                 </div>
                             </div>
 
                             <div class="carousel-item-enhanced">
-                                <img src="../assets/images/carousel/crs-3.jpg" alt="Digital Wallet">
+                                <img src="../assets/images/carousel/crs-3.jpg" alt="Rewards System">
                                 <div class="carousel-overlay">
-                                    <h3><i class="fas fa-wallet"></i> Secure Wallet</h3>
-                                    <p>Manage your digital assets with our secure and easy-to-use wallet system</p>
+                                    <h3><i class="fas fa-coins"></i> Economic Empowerment</h3>
+                                    <p>Get rewarded for your contributions in our transparent, reward-based ecosystem</p>
                                 </div>
                             </div>
 
                             <div class="carousel-item-enhanced">
-                                <img src="../assets/images/carousel/crs-4.jpg" alt="Customization">
+                                <img src="../assets/images/carousel/crs-4.jpg" alt="Creative Collaboration">
                                 <div class="carousel-overlay">
-                                    <h3><i class="fas fa-palette"></i> Custom Themes</h3>
-                                    <p>Personalize your QR code colors and profile theme to match your style</p>
+                                    <h3><i class="fas fa-palette"></i> Creator's Marketplace</h3>
+                                    <p>Collaborate on art, music, writing, and innovation with talented Zoks nationwide</p>
                                 </div>
                             </div>
 
                             <div class="carousel-item-enhanced">
-                                <img src="../assets/images/carousel/crs-5.jpg" alt="Analytics">
+                                <img src="../assets/images/carousel/crs-5.jpg" alt="Collective Intelligence">
                                 <div class="carousel-overlay">
-                                    <h3><i class="fas fa-chart-line"></i> Smart Analytics</h3>
-                                    <p>Track your profile views, connections, and engagement with detailed insights
+                                    <h3><i class="fas fa-brain"></i> Collective Intelligence</h3>
+                                    <p>Solve complex challenges together by mobilizing 10 million minds for real-world impact
                                     </p>
                                 </div>
                             </div>
 
                             <div class="carousel-item-enhanced">
-                                <img src="../assets/images/carousel/crs-6.jpg" alt="Security">
+                                <img src="../assets/images/carousel/crs-6.jpg" alt="Democratic Governance">
                                 <div class="carousel-overlay">
-                                    <h3><i class="fas fa-shield-alt"></i> Top Security</h3>
-                                    <p>Your data is protected with enterprise-level security and privacy controls
+                                    <h3><i class="fas fa-balance-scale"></i> Decentralized Governance</h3>
+                                    <p>Participate in transparent, democratic processes to shape the community's future
                                     </p>
                                 </div>
                             </div>
@@ -588,7 +591,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                 </div>
             </section>
             <!-- Hero Section with Parallax -->
-            <section class="hero-parallax" data-parallax="scroll">
+            <section class="hero-parallax" data-parallax="scroll" style="margin-top: -110px;">
                 <div class="parallax-bg"></div>
 
                 <div class="floating-shapes">
@@ -600,29 +603,29 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                 <div class="hero-content-wrapper">
 
                     <h1 class="hero-title">
-                        Connect Through<br>
-                        <span class="gradient-text">QR Codes</span>
+                        Welcome to<br>
+                        <span class="gradient-text">Community Zokli</span>
                     </h1>
 
                     <p class="hero-subtitle">
-                        Create your unique QR profile, share instantly with anyone, join vibrant communities,
-                        and manage your digital wallet — all in one powerful platform.
+                        A digital social community for the young, pro-tech & dynamic generation.
+                        Join 10 million Zoks to express, connect, learn, create, and grow together.
                     </p>
 
                     <div class="hero-buttons">
                         <?php if (!$is_logged_in): ?>
                         <a href="register.php" class="btn-hero btn-primary">
-                            <i class="fas fa-rocket"></i> Get Started Free
+                            <i class="fas fa-rocket"></i> Become a Zok
                         </a>
                         <a href="login.php" class="btn-hero btn-outline">
-                            <i class="fas fa-sign-in-alt"></i> Sign In
+                            <i class="fas fa-sign-in-alt"></i> Zok Sign In
                         </a>
                         <?php else: ?>
                         <a href="profile.php" class="btn-hero btn-primary">
-                            <i class="fas fa-user"></i> My Profile
+                            <i class="fas fa-user"></i> My Zoks Profile
                         </a>
                         <a href="community.php" class="btn-hero btn-outline">
-                            <i class="fas fa-comments"></i> Join Community
+                            <i class="fas fa-comments"></i> Community Chat
                         </a>
                         <?php endif; ?>
                     </div>
@@ -633,76 +636,155 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
 
 
             <!-- Features with Parallax -->
-            <section class="features-parallax">
+            <section class="features-parallax" style="margin-top: -110px;">
                 <div class="container">
                     <div class="section-header">
-                        <h2 class="section-title">Why Choose ZQR?</h2>
+                        <h2 class="section-title">Community Zokli Goals</h2>
                         <p class="section-subtitle">
-                            Everything you need to manage your digital presence in one place
+                            Building a hyper-connected knowledge nexus for 10 million members across the nation
                         </p>
                     </div>
 
                     <div class="features-grid">
                         <div class="feature-card wow fadeInUp" data-wow-delay="0.1s">
                             <div class="feature-icon">
-                                <i class="fas fa-bolt"></i>
+                                <i class="fas fa-graduation-cap"></i>
                             </div>
-                            <h3 class="feature-title">Lightning Fast</h3>
+                            <h3 class="feature-title">Knowledge Sharing</h3>
                             <p class="feature-description">
-                                Create and share your QR profile in seconds. No complicated setup, just instant
-                                connections.
+                                Access curated learning paths, expert-led workshops, and peer-to-peer tutoring on any subject. Get help from seasoned professionals and native speakers.
                             </p>
                         </div>
 
                         <div class="feature-card wow fadeInUp" data-wow-delay="0.2s">
                             <div class="feature-icon">
-                                <i class="fas fa-mobile-alt"></i>
+                                <i class="fas fa-palette"></i>
                             </div>
-                            <h3 class="feature-title">Mobile First</h3>
+                            <h3 class="feature-title">Creative Collaboration</h3>
                             <p class="feature-description">
-                                Optimized for mobile devices. Access your profile anywhere, anytime from any device.
+                                Artists collaborate on digital canvases, musicians jam across regions, writers co-author novels, and innovators pitch concepts to potential partners.
                             </p>
                         </div>
 
                         <div class="feature-card wow fadeInUp" data-wow-delay="0.3s">
                             <div class="feature-icon">
-                                <i class="fas fa-lock"></i>
+                                <i class="fas fa-lightbulb"></i>
                             </div>
-                            <h3 class="feature-title">Secure & Private</h3>
+                            <h3 class="feature-title">Collective Intelligence</h3>
                             <p class="feature-description">
-                                Your privacy matters. Control who sees your information and keep your data secure.
+                                When challenges arise, 10 million minds mobilize together, brainstorming solutions, crowdsourcing data, and driving real-world impact.
                             </p>
                         </div>
 
                         <div class="feature-card wow fadeInUp" data-wow-delay="0.4s">
                             <div class="feature-icon">
-                                <i class="fas fa-infinity"></i>
+                                <i class="fas fa-coins"></i>
                             </div>
-                            <h3 class="feature-title">Unlimited Sharing</h3>
+                            <h3 class="feature-title">Economic Empowerment</h3>
                             <p class="feature-description">
-                                Share your QR code unlimited times. No restrictions on how many people you connect with.
+                                A transparent, reward-based economy where members are rewarded for contributions, fostering sustainable talent recognition and compensation.
                             </p>
                         </div>
 
                         <div class="feature-card wow fadeInUp" data-wow-delay="0.5s">
                             <div class="feature-icon">
-                                <i class="fas fa-paint-brush"></i>
+                                <i class="fas fa-users"></i>
                             </div>
-                            <h3 class="feature-title">Full Customization</h3>
+                            <h3 class="feature-title">Decentralized Governance</h3>
                             <p class="feature-description">
-                                Make it yours! Customize colors, themes, and design to reflect your unique personality.
+                                Participate in transparent, democratic processes to shape the community's future, allocate resources, and influence policy.
                             </p>
                         </div>
 
                         <div class="feature-card wow fadeInUp" data-wow-delay="0.6s">
                             <div class="feature-icon">
-                                <i class="fas fa-headset"></i>
+                                <i class="fas fa-hands-helping"></i>
                             </div>
-                            <h3 class="feature-title">24/7 Support</h3>
+                            <h3 class="feature-title">Culture of Generosity</h3>
                             <p class="feature-description">
-                                Need help? Our support team is always here to assist you with any questions.
+                                Thrive in a community built on sharing expertise, offering support, and celebrating each other's successes. A digital sanctuary fostering belonging.
                             </p>
                         </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Vision Section -->
+            <section class="features-parallax" style="margin-top: -110px; background: var(--darker);">
+                <div class="container">
+                    <div class="section-header">
+                        <h2 class="section-title">Our Vision</h2>
+                        <p class="section-subtitle">
+                            The Hyper-Connected Knowledge Nexus for 10 Million Zoks
+                        </p>
+                    </div>
+
+                    <div class="features-grid">
+                        <div class="feature-card wow fadeInUp" data-wow-delay="0.1s">
+                            <div class="feature-icon">
+                                <i class="fas fa-user-graduate"></i>
+                            </div>
+                            <h3 class="feature-title">For Learners</h3>
+                            <p class="feature-description">
+                                Access curated learning paths, expert-led workshops, and peer-to-peer tutoring on any subject imaginable. Get help from seasoned developers, master new languages with native speakers, and grow your skills continuously.
+                            </p>
+                        </div>
+
+                        <div class="feature-card wow fadeInUp" data-wow-delay="0.2s">
+                            <div class="feature-icon">
+                                <i class="fas fa-paint-brush"></i>
+                            </div>
+                            <h3 class="feature-title">For Creators</h3>
+                            <p class="feature-description">
+                                A curated marketplace for ideas and talent. Artists collaborate on digital canvases, musicians jam across regions, writers co-author novels, and innovators pitch groundbreaking concepts to potential investors and partners.
+                            </p>
+                        </div>
+
+                        <div class="feature-card wow fadeInUp" data-wow-delay="0.3s">
+                            <div class="feature-icon">
+                                <i class="fas fa-puzzle-piece"></i>
+                            </div>
+                            <h3 class="feature-title">For Problem Solvers</h3>
+                            <p class="feature-description">
+                                A powerful collective intelligence engine. When significant challenges arise, 10 million minds mobilize, brainstorming solutions, crowdsourcing data, and driving real-world impact on social issues and community needs.
+                            </p>
+                        </div>
+
+                        <div class="feature-card wow fadeInUp" data-wow-delay="0.4s">
+                            <div class="feature-icon">
+                                <i class="fas fa-compass"></i>
+                            </div>
+                            <h3 class="feature-title">Personalized Discovery</h3>
+                            <p class="feature-description">
+                                Sophisticated algorithms curate content, connections, and opportunities tailored to each individual's evolving needs and interests, ensuring every member feels seen, valued, and consistently engaged.
+                            </p>
+                        </div>
+
+                        <div class="feature-card wow fadeInUp" data-wow-delay="0.5s">
+                            <div class="feature-icon">
+                                <i class="fas fa-heart"></i>
+                            </div>
+                            <h3 class="feature-title">The Spirit of Generosity</h3>
+                            <p class="feature-description">
+                                A culture where sharing expertise, offering support, and celebrating each other's successes are the norm. A digital sanctuary that fosters belonging and amplifies individual potential through collective goodwill.
+                            </p>
+                        </div>
+
+                        <div class="feature-card wow fadeInUp" data-wow-delay="0.6s">
+                            <div class="feature-icon">
+                                <i class="fas fa-globe-americas"></i>
+                            </div>
+                            <h3 class="feature-title">Power of Collective Action</h3>
+                            <p class="feature-description">
+                                By pooling resources, knowledge, and intent, this community becomes a formidable force for positive change, driving innovation, promoting social justice, and fostering a more equitable and sustainable world.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="section-header" style="margin-top: 60px;">
+                        <h3 class="section-subtitle" style="font-size: 1.3rem; color: var(--text-color); max-width: 900px; margin: 0 auto; line-height: 1.8;">
+                            Built on principles of <strong style="color: #e67753;">open access</strong>, <strong style="color: #e67753;">intellectual curiosity</strong>, <strong style="color: #e67753;">mutual respect</strong>, and a shared commitment to <strong style="color: #e67753;">positive contribution</strong>. A testament to the power of collective human ingenuity when amplified by technology.
+                        </h3>
                     </div>
                 </div>
             </section>
@@ -712,40 +794,40 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                 <div class="container">
                     <div class="stats-grid">
                         <div class="stat-item">
-                            <span class="stat-number counter" data-count="10000">0</span>
-                            <span class="stat-label">Active Users</span>
+                            <span class="stat-number">10M</span>
+                            <span class="stat-label">Target Members (Zoks)</span>
                         </div>
                         <div class="stat-item">
                             <span class="stat-number counter" data-count="50000">0</span>
-                            <span class="stat-label">Connections Made</span>
+                            <span class="stat-label">Active Collaborations</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-number counter" data-count="100">0</span>
-                            <span class="stat-label">Communities</span>
+                            <span class="stat-number counter" data-count="1000">0</span>
+                            <span class="stat-label">Learning Workshops</span>
                         </div>
                         <div class="stat-item">
-                            <span class="stat-number">99.9%</span>
-                            <span class="stat-label">Uptime</span>
+                            <span class="stat-number">100%</span>
+                            <span class="stat-label">Community Driven</span>
                         </div>
                     </div>
                 </div>
             </section>
 
             <!-- CTA Section with Parallax -->
-            <section class="cta-parallax">
+            <section class="cta-parallax" style="">
                 <div class="cta-content">
-                    <h2 class="cta-title">Ready to Get Started?</h2>
+                    <h2 class="cta-title">Become a Proud Zok Today!</h2>
                     <p class="cta-text">
-                        Join thousands of users who are already connecting smarter with ZQR.
-                        Create your profile today and experience the future of networking.
+                        Join the hyper-connected knowledge nexus where 10 million members from across the nation converge to learn, create, and drive positive change.
+                        Be part of Community Zokli and amplify your potential.
                     </p>
                     <?php if (!$is_logged_in): ?>
-                    <a href="register.php" class="btn-hero btn-primary" style="background: white; color: #f5576c;">
-                        <i class="fas fa-user-plus"></i> Create Free Account
+                    <a href="register.php" class="btn-hero btn-primary" style="background: white; color: #e67753;">
+                        <i class="fas fa-user-plus"></i> Join Community Zokli
                     </a>
                     <?php else: ?>
-                    <a href="profile.php" class="btn-hero btn-primary" style="background: white; color: #f5576c;">
-                        <i class="fas fa-arrow-right"></i> Go to My Profile
+                    <a href="profile.php" class="btn-hero btn-primary" style="background: white; color: #e67753;">
+                        <i class="fas fa-arrow-right"></i> My Zoks Profile
                     </a>
                     <?php endif; ?>
                 </div>
@@ -816,7 +898,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         $('#feature-carousel').owlCarousel({
             loop: true,
             margin: 20,
-            nav: true,
+            nav: false,
             dots: true,
             autoplay: true,
             autoplayTimeout: 5000,

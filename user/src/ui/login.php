@@ -12,9 +12,70 @@
     ================================================== -->
     <?php include('../components/csslinks.php') ?>
     <style>
+        body, #wrapper, #content, .no-bottom.no-top {
+            background: #1A1A1B !important;
+        }
+        
+        html {
+            background: #1A1A1B !important;
+        }
+        
         .centered-logo { width: 240px !important; height: auto !important; min-width: 180px !important; display:block !important; margin:0 auto !important; }
         @media (max-width: 768px) { .centered-logo { width:180px !important; } }
         .logo-container-hero { text-align:center; margin: 10px 0 20px; }
+        
+        /* Form styling to match index.php */
+        .box-rounded {
+            background: rgba(30, 41, 59, 0.8) !important;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .box-rounded h3 {
+            color: #e2e8f0 !important;
+        }
+        
+        .box-rounded p {
+            color: #94a3b8 !important;
+        }
+        
+        .box-rounded p a {
+            background: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 600;
+        }
+        
+        .form-control {
+            background: rgba(15, 23, 42, 0.6) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #e2e8f0 !important;
+        }
+        
+        .form-control::placeholder {
+            color: #64748b !important;
+        }
+        
+        .form-control:focus {
+            background: rgba(30, 41, 59, 0.8) !important;
+            border-color: #e67753 !important;
+            box-shadow: 0 0 0 3px rgba(230, 119, 83, 0.1) !important;
+        }
+        
+        /* Gradient button */
+        .btn-main {
+            background: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%) !important;
+            border: none !important;
+            color: white !important;
+            font-weight: 600 !important;
+            transition: transform 0.2s, box-shadow 0.2s !important;
+        }
+        
+        .btn-main:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(230, 119, 83, 0.4) !important;
+        }
     </style>
 </head>
 

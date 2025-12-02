@@ -96,6 +96,12 @@ try {
             
             $mail = new PHPMailer();
             
+            // Embed logo image
+            $logoPath = __DIR__ . '/../assets/logo.png';
+            if (file_exists($logoPath)) {
+                $mail->AddEmbeddedImage($logoPath, 'logo', 'logo.png', 'base64', 'image/png');
+            }
+            
             // SMTP Configuration with shorter timeouts
             $mail->isSMTP();
             $mail->SMTPOptions = array(
@@ -119,9 +125,9 @@ try {
             $mail->SMTPKeepAlive = false;
             
             $mail->isHTML(true);
-            $mail->setFrom("support@codersdek.com", "iGoalZERO Support");
+            $mail->setFrom("support@codersdek.com", "Zokli Support");
             $mail->addAddress($email);
-            $mail->Subject = 'Email Verification OTP';
+            $mail->Subject = 'Email Verification OTP - Zokli';
             
             // Simple email content for faster processing
             $content = '<!DOCTYPE html>
@@ -130,19 +136,25 @@ try {
                 <meta charset="UTF-8">
                 <title>Email Verification OTP</title>
                 <style>
-                    body { font-family: Arial, sans-serif; margin: 20px; }
-                    .container { max-width: 400px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
-                    .otp { font-size: 24px; font-weight: bold; color: #002E5B; text-align: center; padding: 15px; background: #f0f4ff; border-radius: 5px; margin: 15px 0; letter-spacing: 3px; }
-                    .text { text-align: center; margin: 10px 0; }
+                    body { font-family: Arial, sans-serif; margin: 20px; background: #f4f6fb; }
+                    .container { max-width: 400px; margin: 0 auto; padding: 30px 20px; background: #fff; border-radius: 12px; box-shadow: 0 4px 24px rgba(0,0,0,0.08); }
+                    .logo { text-align: center; margin-bottom: 20px; }
+                    .logo img { max-width: 120px; height: auto; }
+                    .otp { font-size: 28px; font-weight: bold; color: #667eea; text-align: center; padding: 15px; background: linear-gradient(135deg, #f0f4ff 0%, #e8ecff 100%); border-radius: 8px; margin: 20px 0; letter-spacing: 5px; }
+                    .text { text-align: center; margin: 10px 0; color: #34495e; }
+                    h2 { text-align: center; color: #667eea; margin: 0 0 20px 0; }
                 </style>
             </head>
             <body>
                 <div class="container">
-                    <h2 style="text-align: center; color: #002E5B;">Email Verification</h2>
+                    <div class="logo">
+                        <img src="cid:logo" alt="Zokli Logo" />
+                    </div>
+                    <h2>Email Verification</h2>
                     <div class="text">Your OTP for email verification:</div>
                     <div class="otp">' . $otp . '</div>
                     <div class="text">This OTP is valid for 10 minutes.</div>
-                    <div class="text" style="font-size: 12px; color: #666; margin-top: 20px;">iGoalZERO &copy; 2025</div>
+                    <div class="text" style="font-size: 12px; color: #666; margin-top: 20px;">Zokli &copy; 2025</div>
                 </div>
             </body>
             </html>';

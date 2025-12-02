@@ -29,6 +29,13 @@ function sendWelcomeEmail($toEmail, $toName = '') {
     $mail->SetFrom($mail->Username, 'Zokli');
     $mail->AddReplyTo($mail->Username, 'Zokli');
     $mail->Subject = 'Welcome to Zokli - Make Every Day Your Lucky Day';
+    
+    // Embed logo image
+    $logoPath = __DIR__ . '/../assets/logo.png';
+    if (file_exists($logoPath)) {
+        $mail->AddEmbeddedImage($logoPath, 'logo', 'logo.png', 'base64', 'image/png');
+    }
+    
     $mail->MsgHTML($content);
 
     if (!$mail->Send()) {

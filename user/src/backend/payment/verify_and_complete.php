@@ -24,11 +24,14 @@ error_log("verify_and_complete called with orderId: " . $orderId);
 // Check if pending registration exists - with retry for potential race condition
 $regData = null;
 $regStatus = null;
+$promoCode = null;
+$discountAmount = 0;
+$originalAmount = null;
 $retries = 3;
 $retryCount = 0;
 
 while ($retryCount < $retries && !$regData) {
-    $sqlCheck = "SELECT registration_data, status FROM user_pending_registration WHERE order_id = ? LIMIT 1";
+    $sqlCheck = "SELECT registration_data, status, promo_code, discount_amount, original_amount FROM user_pending_registration WHERE order_id = ? LIMIT 1";
     $stmt = $conn->prepare($sqlCheck);
     $stmt->bind_param('s', $orderId);
     $stmt->execute();
@@ -37,8 +40,14 @@ while ($retryCount < $retries && !$regData) {
     if ($result->num_rows > 0) {
         $row = $result->fetch_assoc();
         $regStatus = $row['status'];
+        $promoCode = $row['promo_code'];
+        $discountAmount = $row['discount_amount'] ?? 0;
+        $originalAmount = $row['original_amount'];
         $regData = json_decode($row['registration_data'], true);
         error_log("✓ Found pending registration on attempt " . ($retryCount + 1));
+        if ($promoCode) {
+            error_log("  Promo code: $promoCode, Discount: ₹$discountAmount");
+        }
         break;
     }
 
@@ -201,7 +210,7 @@ try {
     $stmtUpd->bind_param('isssi', $user_id, $user_id, $now, $now, $user_id);
     $stmtUpd->execute();
 
-    // Create invoice
+    // Create invoice with promo code details
     $base_amount = round($amount / 1.18, 2);
     $cgst = round(($base_amount * 9.0) / 100, 2);
     $sgst = round(($base_amount * 9.0) / 100, 2);
@@ -211,11 +220,28 @@ try {
     }
 
     $invoice_num = 'INV' . date('Ymd') . '-' . str_pad($user_id, 3, '0', STR_PAD_LEFT);
-    $sqlInv = "INSERT INTO user_invoice (user_id, invoice_number, invoice_type, amount, cgst, sgst, igst, gst_total, total_amount, status, payment_mode, payment_reference, created_on, updated_on, is_deleted) VALUES (?, ?, 'registration', ?, ?, ?, 0, ?, ?, 'Paid', 'UPI', ?, ?, ?, 0)";
+    $sqlInv = "INSERT INTO user_invoice (user_id, invoice_number, invoice_type, amount, cgst, sgst, igst, gst_total, total_amount, status, payment_mode, payment_reference, promo_code, discount_amount, original_amount, created_on, updated_on, is_deleted) VALUES (?, ?, 'registration', ?, ?, ?, 0, ?, ?, 'Paid', 'UPI', ?, ?, ?, ?, ?, ?, 0)";
     $stmtInv = $conn->prepare($sqlInv);
     $cgst_sgst = $cgst + $sgst;
-    $stmtInv->bind_param('isddddsss', $user_id, $invoice_num, $base_amount, $cgst, $sgst, $cgst_sgst, $amount, $payment_id, $now, $now);
+    $stmtInv->bind_param('isddddsssddsss', $user_id, $invoice_num, $base_amount, $cgst, $sgst, $cgst_sgst, $amount, $payment_id, $promoCode, $discountAmount, $originalAmount, $now, $now);
     $stmtInv->execute();
+    
+    // If promo code was used, increment usage count and log it
+    if ($promoCode) {
+        $sqlUpdatePromo = "UPDATE promo_codes SET current_uses = current_uses + 1 WHERE code = ?";
+        $stmtUpdatePromo = $conn->prepare($sqlUpdatePromo);
+        $stmtUpdatePromo->bind_param('s', $promoCode);
+        $stmtUpdatePromo->execute();
+        
+        // Log promo code usage
+        $sqlLogPromo = "INSERT INTO promo_code_usage (promo_code_id, user_id, email, order_id, discount_amount, original_amount, final_amount) 
+                        SELECT id, ?, ?, ?, ?, ?, ? FROM promo_codes WHERE code = ? LIMIT 1";
+        $stmtLogPromo = $conn->prepare($sqlLogPromo);
+        $stmtLogPromo->bind_param('issddds', $user_id, $email, $orderId, $discountAmount, $originalAmount, $amount, $promoCode);
+        $stmtLogPromo->execute();
+        
+        error_log("✓ Promo code usage logged: $promoCode");
+    }
 
     // Update pending registration
     $sqlUpd2 = "UPDATE user_pending_registration SET status = 'completed' WHERE order_id = ?";

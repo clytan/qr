@@ -1,4 +1,8 @@
 // Enhanced JavaScript with college name functionality
+var appliedPromoCode = null;
+var promoDiscount = 0;
+var originalAmount = 0;
+
 var eventHandler = {
     init: () => {
         eventHandler.onChange();
@@ -9,6 +13,99 @@ var eventHandler = {
         eventHandler.referenceEvents();
         eventHandler.membershipTierEvents();
         eventHandler.studentLeaderEvents();
+        eventHandler.promoCodeEvents();
+    },
+    
+    promoCodeEvents: () => {
+        let promoTimeout = null;
+        
+        $('#promo_code').on('input', function() {
+            const promoCode = $(this).val().trim().toUpperCase();
+            const statusEl = $('#promo-status');
+            
+            // Clear previous timeout
+            clearTimeout(promoTimeout);
+            
+            // Reset if empty
+            if (!promoCode) {
+                if (appliedPromoCode) {
+                    appliedPromoCode = null;
+                    promoDiscount = 0;
+                    originalAmount = 0;
+                    $('#promo_code').prop('readonly', false);
+                    statusEl.html('');
+                    eventHandler.updatePayAmount();
+                }
+                return;
+            }
+            
+            // Show checking status
+            statusEl.html('<span style="color: #94a3b8;">⏳ Checking...</span>');
+            
+            // Debounce the API call
+            promoTimeout = setTimeout(function() {
+                // Get current amount
+                let amount = parseInt($('#pay-amount').text());
+                
+                $.ajax({
+                    url: '../backend/payment/validate_promo.php',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        code: promoCode,
+                        amount: amount
+                    }),
+                    success: function(response) {
+                        if (response.success) {
+                            appliedPromoCode = response.promo_code;
+                            promoDiscount = response.discount_amount;
+                            originalAmount = response.original_amount;
+                            
+                            $('#pay-amount').text(response.final_amount.toFixed(0));
+                            
+                            let discountText = response.discount_type === 'percentage' 
+                                ? response.discount_value + '% off' 
+                                : '₹' + response.discount_value + ' off';
+                                
+                            statusEl.html(`<span style="color: #10b981;">✓ ${discountText} applied! You save ₹${promoDiscount.toFixed(2)}</span>`);
+                        } else {
+                            appliedPromoCode = null;
+                            promoDiscount = 0;
+                            originalAmount = 0;
+                            statusEl.html(`<span style="color: #ef4444;">✗ ${response.message}</span>`);
+                            eventHandler.updatePayAmount();
+                        }
+                    },
+                    error: function() {
+                        appliedPromoCode = null;
+                        promoDiscount = 0;
+                        originalAmount = 0;
+                        statusEl.html('<span style="color: #ef4444;">✗ Error validating promo code</span>');
+                        eventHandler.updatePayAmount();
+                    }
+                });
+            }, 800); // Wait 800ms after user stops typing
+        });
+    },
+    
+    updatePayAmount: () => {
+        let checkedTier = $('input[name="user_tag"]:checked').val();
+        let amount = 999;
+        if (checkedTier === 'gold') amount = 9999;
+        else if (checkedTier === 'silver') amount = 5555;
+        if ($('#student_leader').val() === 'yes') amount = 999;
+        
+        // Reset promo if amount changes
+        if (appliedPromoCode && originalAmount !== amount) {
+            appliedPromoCode = null;
+            promoDiscount = 0;
+            originalAmount = 0;
+            $('#promo_code').val('').prop('readonly', false);
+            $('#apply-promo-btn').prop('disabled', false).text('Apply').css('background', '');
+            $('#promo-status').html('');
+        }
+        
+        $('#pay-amount').text(amount);
     },
 
     studentLeaderEvents: () => {
@@ -17,17 +114,13 @@ var eventHandler = {
                 $('#college_field').addClass('show');
                 $('#college_name').prop('required', true);
                 $('#membership_tier_section').hide();
-                $('#pay-amount').text(999);
+                eventHandler.updatePayAmount();
             } else {
                 $('#college_field').removeClass('show');
                 $('#college_name').prop('required', false);
                 $('#college_name').val('');
                 $('#membership_tier_section').show();
-                let checkedTier = $('input[name="user_tag"]:checked').val();
-                let amount = 999;
-                if (checkedTier === 'gold') amount = 9999;
-                else if (checkedTier === 'silver') amount = 5555;
-                $('#pay-amount').text(amount);
+                eventHandler.updatePayAmount();
             }
             registerFunction.updateSubmitState();
         });
@@ -266,16 +359,8 @@ var eventHandler = {
         });
 
         // Always update price on load and on membership/student leader change
-        function updatePayAmount() {
-            let checkedTier = $('input[name="user_tag"]:checked').val();
-            let amount = 999;
-            if (checkedTier === 'gold') amount = 9999;
-            else if (checkedTier === 'silver') amount = 5555;
-            if ($('#student_leader').val() === 'yes') amount = 999;
-            $('#pay-amount').text(amount);
-        }
-        updatePayAmount();
-        $('input[name="user_tag"], #student_leader').on('change click', updatePayAmount);
+        eventHandler.updatePayAmount();
+        $('input[name="user_tag"], #student_leader').on('change click', eventHandler.updatePayAmount);
     },
 
     onInput: () => {
@@ -331,12 +416,16 @@ var eventHandler = {
                 user_slab: $('#user_slab').val(),
                 college_name: $('#college_name').val().trim(),
                 reference_code: $('#reference_code').val().trim(),
-                referred_by_user_id: registerFunction.referredByUserId || null
+                referred_by_user_id: registerFunction.referredByUserId || null,
+                promo_code: appliedPromoCode || null
             };
             // Calculate amount based on user type and membership tier
             const amount = registerFunction.calculateAmount(finalUserType, finalUserTag);
-            formData.amount = amount;
-            console.log('Form submission - User Type:', finalUserType, 'Membership Tier:', finalUserTag, 'Amount:', amount);
+            formData.amount = appliedPromoCode ? parseInt($('#pay-amount').text()) : amount;
+            console.log('Form submission - User Type:', finalUserType, 'Membership Tier:', finalUserTag, 'Amount:', formData.amount);
+            if (appliedPromoCode) {
+                console.log('Promo code applied:', appliedPromoCode, 'Discount:', promoDiscount);
+            }
             // First check if user already exists
             $.ajax({
                 url: '../backend/check_user_exists.php',

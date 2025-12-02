@@ -235,6 +235,7 @@ const profileFunction = {
     setupSocialLinks: function () {
         const socialLinksConfig = {
             website: { field: 'website', base: '' },
+            facebook_username: { field: 'facebook_username', base: 'https://www.facebook.com/' },
             whatsapp_link: { field: 'whatsapp_link', base: 'https://wa.me/' },
             telegram_link: { field: 'telegram_link', base: 'https://t.me/' },
             twitter_username: { field: 'twitter_username', base: 'https://twitter.com/' },
@@ -327,10 +328,10 @@ const profileFunction = {
             dataType: 'json',
             success: function (resp) {
                 if (typeof resp.total_count !== 'undefined') {
-                    $('#followers-count').text(resp.total_count);
+                    $('#followers-count .stat-value').text(resp.total_count);
                 }
                 if (typeof resp.following_count !== 'undefined') {
-                    $('#following-count').text(resp.following_count);
+                    $('#following-count .stat-value').text(resp.following_count);
                 }
             }
         });
@@ -712,6 +713,7 @@ const profileFunction = {
             user_address: $('#address').val(),
             user_pincode: $('#pincode').val(),
             user_landmark: $('#landmark').val(),
+            is_public_address: $('#public_address').is(':checked') ? 1 : 0,
             links: {},
             fields: []
         };
@@ -719,6 +721,7 @@ const profileFunction = {
         // Collect social media links
         const fields = [
             'website',
+            'facebook_username',
             'whatsapp_link',
             'telegram_link',
             'twitter_username',
@@ -801,6 +804,11 @@ const profileFunction = {
                     $('#pincode').val(user.user_pincode || '');
                     $('#user-name').text(fullName);
 
+                    // Set public toggle for address
+                    if (!window.PUBLIC_PROFILE) {
+                        $('#public_address').prop('checked', user.is_public_address == 1);
+                    }
+
                     // Update the profile image with correct initials based on loaded name
                     profileFunction.updateProfileImageWithInitials(fullName);
 
@@ -851,26 +859,35 @@ const profileFunction = {
     },
 
     hideEmptyFields: function (user) {
-        // Hide basic info fields that are empty
+        // Hide basic info fields that are empty OR not public in public view
+        const isAddressPublic = user.is_public_address == 1;
+        
         const basicFields = {
-            'full_name': user.user_full_name,
-            'phone_number': user.user_phone,
-            'email_address': user.user_email,
-            'address': user.user_address,
-            'landmark': user.user_landmark,
-            'pincode': user.user_pincode
+            'full_name': { value: user.user_full_name, isPublic: true }, // Always show name
+            'phone_number': { value: user.user_phone, isPublic: true }, // Always show phone
+            'email_address': { value: user.user_email, isPublic: true }, // Always show email
+            'address': { value: user.user_address, isPublic: isAddressPublic },
+            'landmark': { value: user.user_landmark, isPublic: isAddressPublic },
+            'pincode': { value: user.user_pincode, isPublic: isAddressPublic }
         };
 
-        Object.entries(basicFields).forEach(([fieldId, value]) => {
-            if (!value || value.trim() === '') {
+        Object.entries(basicFields).forEach(([fieldId, field]) => {
+            // Hide if empty OR if not public in public view
+            if (!field.value || field.value.trim() === '' || (window.PUBLIC_PROFILE && !field.isPublic)) {
                 $(`#${fieldId}`).closest('.col-md-3, .form-group').hide();
             }
         });
+
+        // Hide "Address Information" header if address is not public in public view
+        if (window.PUBLIC_PROFILE && !isAddressPublic) {
+            $('.address-header-group').hide();
+        }
     },
     hideEmptySocialFields: function (links) {
         // Define all possible social media fields
         const allSocialFields = [
             'website',
+            'facebook_username',
             'whatsapp_link',
             'telegram_link',
             'twitter_username',

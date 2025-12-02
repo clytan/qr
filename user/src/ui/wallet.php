@@ -1,5 +1,12 @@
 <!DOCTYPE html>
 <html lang="zxx">
+<?php
+session_start();
+if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
+    header('Location: index.php');
+    exit();
+}
+?>
 
 <head>
     <title>Gigaland - NFT Marketplace Website</title>
@@ -49,7 +56,7 @@
                             </div>
                             <!-- Wallet Balance Card -->
                             <div class="card text-center mb-4"
-                                style="background: linear-gradient(90deg, #4e54c8 0%, #8f94fb 100%); color: #fff; border-radius: 24px; box-shadow: 0 6px 32px rgba(0,0,0,0.25);">
+                                style="background: linear-gradient(135deg, #E9437A 0%, #E2AD2A 100%); color: #fff; border-radius: 24px; box-shadow: 0 6px 32px rgba(233, 67, 122, 0.4);">
                                 <div class="card-body" style="padding: 2.5rem 1.5rem;">
                                     <div id="wallet-balance"
                                         style="font-size: 2.8rem; font-weight: bold; margin: 0 0 8px 0; letter-spacing:1px;">
@@ -63,14 +70,14 @@
                             <div class="d-flex justify-content-center mb-4">
                                 <div class="text-center mx-3">
                                     <button class="btn mb-2"
-                                        style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#4e54c8 0%,#8f94fb 100%);box-shadow:0 2px 8px rgba(79,84,200,0.25);border:2px solid #5a5e8c;display:flex;align-items:center;justify-content:center;transition:box-shadow 0.2s;">
+                                        style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg, #E9437A 0%, #E2AD2A 100%);box-shadow:0 4px 12px rgba(233, 67, 122, 0.4);border:2px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;transition:box-shadow 0.2s;">
                                         <i class="fas fa-exchange-alt" style="color:#fff;font-size:1.3rem;"></i>
                                     </button>
                                     <div style="font-size:0.95rem;">Transfer</div>
                                 </div>
                                 <div class="text-center mx-3">
                                     <button class="btn mb-2"
-                                        style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#8f94fb 0%,#4e54c8 100%);box-shadow:0 2px 8px rgba(79,84,200,0.25);border:2px solid #5a5e8c;display:flex;align-items:center;justify-content:center;transition:box-shadow 0.2s;">
+                                        style="width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg, #E9437A 0%, #E2AD2A 100%);box-shadow:0 4px 12px rgba(233, 67, 122, 0.4);border:2px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;transition:box-shadow 0.2s;">
                                         <i class="fa fa-gift" style="color:#fff;font-size:1.3rem;"></i>
                                     </button>
                                     <div style="font-size:0.95rem;">Redeem</div>

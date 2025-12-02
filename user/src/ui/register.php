@@ -15,6 +15,14 @@
     <link rel="stylesheet" href="../assets/css/register-form.css">
 
     <style>
+        body, #wrapper, #content, .no-bottom.no-top {
+            background: #1A1A1B !important;
+        }
+        
+        html {
+            background: #1A1A1B !important;
+        }
+        
         .centered-logo {
             width: 240px !important;
             height: auto !important;
@@ -32,6 +40,20 @@
         .logo-container-hero {
             text-align: center;
             margin: 10px 0 20px;
+        }
+        
+        /* Gradient button */
+        .btn-main {
+            background: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%) !important;
+            border: none !important;
+            color: white !important;
+            font-weight: 600 !important;
+            transition: transform 0.2s, box-shadow 0.2s !important;
+        }
+        
+        .btn-main:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(230, 119, 83, 0.4) !important;
         }
     </style>
 
@@ -121,7 +143,7 @@
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
-            color: #2c3e50;
+            color: #e2e8f0 !important;
             font-size: 14px;
         }
 
@@ -145,15 +167,20 @@
             margin-top: 8px;
             font-size: 18px;
             font-weight: 700;
-            color: #27ae60;
+            color: #16a34a;
         }
 
         .card-features {
             display: block;
             margin-top: 6px;
             font-size: 12px;
-            color: #7f8c8d;
+            color: #64748b;
             font-weight: 500;
+        }
+        
+        /* Make all labels white */
+        label {
+            color: #e2e8f0 !important;
         }
 
         /* Common selection card styling */
@@ -168,6 +195,23 @@
             border-radius: 8px;
             transition: all 0.3s ease;
             background: white;
+        }
+        
+        .selection-card .card-text {
+            color: #2c3e50;
+            font-weight: 600;
+            font-size: 14px;
+            margin-top: 8px;
+        }
+        
+        .selection-card .card-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .selection-card .card-icon span {
+            transition: all 0.3s ease;
         }
 
         .selection-card input[type="radio"] {
@@ -188,34 +232,39 @@
 
         /* User type card styling */
         .type-card input:checked~.card-icon span {
-            color: #3498db;
+            color: #2563eb;
             transform: scale(1.2);
         }
 
         .type-card input:checked~.card-text {
-            color: #3498db;
+            color: #2563eb;
             font-weight: 700;
         }
 
         /* Tier card styling with specific colors */
         .tier-card[data-tier="normal"]:has(input:checked) {
-            border-color: #3498db !important;
-            background: #f0f8ff;
+            border-color: #2563eb !important;
+            background: #eff6ff;
         }
 
         .tier-card[data-tier="silver"]:has(input:checked) {
-            border-color: #c0c0c0 !important;
-            background: #f8f8f8;
+            border-color: #94a3b8 !important;
+            background: #f1f5f9;
         }
 
         .tier-card[data-tier="gold"]:has(input:checked) {
-            border-color: #ffd700 !important;
-            background: #fffef0;
+            border-color: #eab308 !important;
+            background: #fefce8;
         }
 
         .tier-card input:checked~.card-price {
-            color: #27ae60;
+            color: #16a34a;
             font-weight: 800;
+        }
+        
+        .tier-card input:checked~.card-text {
+            color: #1e293b;
+            font-weight: 700;
         }
 
         /* ==================== MOBILE RESPONSIVE STYLES ==================== */
@@ -224,6 +273,25 @@
             /* Adjust padding for mobile */
             .box-rounded {
                 padding: 25px 15px !important;
+                background: rgba(30, 41, 59, 0.8) !important;
+                backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            
+            .box-rounded h3 {
+                color: #e2e8f0 !important;
+            }
+            
+            .box-rounded p {
+                color: #94a3b8 !important;
+            }
+            
+            .box-rounded p a {
+                background: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                background-clip: text;
+                font-weight: 600;
             }
 
             /* Full width form on mobile */
@@ -303,10 +371,12 @@
             /* Adjust reference section checkbox on mobile */
             .reference-section label {
                 font-size: 15px !important;
+                color: #e2e8f0 !important;
             }
 
             .reference-section label span {
                 font-size: 15px !important;
+                color: #e2e8f0 !important;
             }
 
             /* Input field adjustments */
@@ -353,6 +423,7 @@
 
             .field-set label {
                 font-size: 13px !important;
+                color: #e2e8f0 !important;
             }
         }
 
@@ -508,7 +579,7 @@
                                             <!-- Register As Section with Better Responsive Design -->
                                             <div class="field-set" style="margin-bottom:8%;">
                                                 <label
-                                                    style="margin-bottom:20px;display:block;font-weight:600;color:#2c3e50;font-size:16px;">👤
+                                                    style="margin-bottom:20px;display:block;font-weight:600;color:#e2e8f0;font-size:16px;">👤
                                                     Register as</label>
 
                                                 <!-- Basic User Types - Compact grid layout -->
@@ -551,7 +622,7 @@
                                             <div class="field-set" id="membership_tier_section"
                                                 style="margin-top: -5%;">
                                                 <label
-                                                    style="margin-bottom:15px;display:block;font-weight:600;color:#2c3e50;font-size:16px;">💎
+                                                    style="margin-bottom:15px;display:block;font-weight:600;color:#e2e8f0;font-size:16px;">💎
                                                     Select Your Membership Tier</label>
 
 
@@ -598,10 +669,22 @@
                                                     class="college-input">
                                             </div>
 
+                                            <!-- Promo Code Section -->
+                                            <div class="field-set" style="margin-bottom:20px;">
+                                                <label for="promo_code"
+                                                    style="font-weight:600;color:#e2e8f0;font-size:15px;">🎁 Promo Code (Optional)</label>
+                                                <input type="text" name="promo_code" id="promo_code"
+                                                    class="form-input" 
+                                                    placeholder="Enter promo code"
+                                                    style="text-transform: uppercase;">
+                                                <span id="promo-status"
+                                                    style="margin-top:10px; display:block; font-size:14px; font-weight:600;"></span>
+                                            </div>
+
                                             <!-- Reference Code Section (Always Visible, 10 digits) -->
                                             <div class="field-set" style="margin-bottom:20px;">
                                                 <label for="reference_code"
-                                                    style="font-weight:600;color:#2c3e50;font-size:15px;">🎯 Reference
+                                                    style="font-weight:600;color:#e2e8f0;font-size:15px;">🎯 Reference
                                                     Code (if any)</label>
                                                 <input type="text" name="reference_code" id="reference_code"
                                                     class="reference-input" maxlength="10" pattern="[0-9]{10}"

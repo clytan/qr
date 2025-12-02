@@ -1,3 +1,15 @@
+<?php
+// Hide footer if user is not logged in
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
+    // User not logged in - don't show footer
+    return;
+}
+?>
+
 <style>
 /* Global Dark Theme for All Pages */
 body {
@@ -133,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function(){
             </div>
             <span>Profile</span>
         </a>
-        <a href="/user/src/ui/wallet.php" class="nav-item" data-page="rewards">
+        <a href="#" class="nav-item coming-soon" data-name="Rewards" data-page="rewards">
             <div class="nav-icon-wrapper">
                 <i class="fas fa-gift"></i>
             </div>
@@ -145,7 +157,7 @@ document.addEventListener('DOMContentLoaded', function(){
             </div>
             <span>Community</span>
         </a>
-        <a href="/user/src/ui/referral_leaderboard.php" class="nav-item" data-page="reference">
+        <a href="/user/src/ui/reference.php" class="nav-item" data-page="reference">
             <div class="nav-icon-wrapper">
                 <i class="fas fa-book"></i>
             </div>
@@ -175,7 +187,7 @@ document.addEventListener('DOMContentLoaded', function(){
             <div class="footer-nav">
                 <a href="/user/src/ui/index.php">Home</a>
                 <a href="/user/src/ui/profile.php">Profile</a>
-                <a href="/user/src/ui/referral_leaderboard.php">Rewards</a>
+                <a href="/user/src/ui/rewards.php">Rewards</a>
                 <a href="/user/src/ui/community.php">Community</a>
                 <a href="/user/src/ui/reference.php">Reference</a>
                 <div class="more-desktop-wrapper">
@@ -259,7 +271,7 @@ document.addEventListener('DOMContentLoaded', function(){
     display:block; padding:8px 10px; color:#e2e8f0; text-decoration:none; font-size:0.85rem; border-radius:6px;
 }
 .more-popover .more-item:not(:last-child){ margin-bottom:6px; }
-.more-popover .more-item:hover { background: rgba(255,255,255,0.03); color:#667eea }
+.more-popover .more-item:hover { background: rgba(255,255,255,0.03); color:#e67753 }
 
 .nav-icon-wrapper {
     width: 45px;
@@ -324,26 +336,26 @@ document.addEventListener('DOMContentLoaded', function(){
 /* Hover and Active States */
 .mobile-nav .nav-item:hover .nav-icon-wrapper,
 .mobile-nav .nav-item.active .nav-icon-wrapper {
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
-    border-color: rgba(102, 126, 234, 0.5);
+    background: linear-gradient(135deg, rgba(233, 67, 122, 0.2) 0%, rgba(230, 119, 83, 0.2) 50%, rgba(226, 173, 42, 0.2) 100%);
+    border-color: rgba(230, 119, 83, 0.5);
     transform: translateY(-2px);
 }
 
 .mobile-nav .nav-item:hover,
 .mobile-nav .nav-item.active {
-    color: #667eea;
+    color: #e67753;
 }
 
 .mobile-nav .nav-item:hover .nav-icon-wrapper i,
 .mobile-nav .nav-item.active .nav-icon-wrapper i {
-    color: #667eea;
+    color: #e67753;
     transform: scale(1.1);
 }
 
 .mobile-nav .nav-item-center:hover .nav-icon-center,
 .mobile-nav .nav-item-center.active .nav-icon-center {
     transform: scale(1.1);
-    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.6), 0 0 30px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 10px 30px rgba(230, 119, 83, 0.6), 0 0 30px rgba(230, 119, 83, 0.4);
 }
 
 .mobile-nav .nav-item span {
@@ -390,7 +402,7 @@ document.addEventListener('DOMContentLoaded', function(){
 .desktop-more-toggle { color:#e2e8f0; text-decoration:none; cursor:pointer }
 .more-desktop { position:absolute; top:36px; left:0; background: rgba(6,10,20,0.95); padding:8px; border-radius:8px; display:none; box-shadow:0 8px 24px rgba(0,0,0,0.6); }
 .more-desktop a { display:block; padding:6px 10px; color:#e2e8f0; text-decoration:none }
-.more-desktop a:hover { color:#667eea }
+.more-desktop a:hover { color:#e67753 }
 
 .footer-nav a {
     color: #e2e8f0;
@@ -404,16 +416,16 @@ document.addEventListener('DOMContentLoaded', function(){
 .footer-nav a::after {
     content: '';
     position: absolute;
-    bottom: -5px;
+    bottom: -4px;
     left: 0;
     width: 0;
     height: 2px;
-    background: linear-gradient(90deg, #667eea, #764ba2);
+    background: linear-gradient(90deg, #E9437A, #e67753, #E2AD2A);
     transition: width 0.3s ease;
 }
 
 .footer-nav a:hover {
-    color: #667eea;
+    color: #e67753;
 }
 
 .footer-nav a:hover::after {
@@ -437,7 +449,7 @@ document.addEventListener('DOMContentLoaded', function(){
 }
 
 .footer-links a:hover {
-    color: #667eea;
+    color: #e67753;
 }
 
 .footer-bottom {

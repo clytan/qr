@@ -73,9 +73,59 @@ try {
     $order_id = 'REG_' . time() . '_' . rand(1000, 9999);
     $customer_id = 'CUST_' . time() . '_' . rand(1000, 9999);
 
-    // Store registration data in DATABASE (more reliable than session after redirect)
+    // Handle promo code if provided
+    $promoCode = isset($data['promo_code']) ? strtoupper(trim($data['promo_code'])) : null;
+    $originalAmount = $data['amount'];
+    $discountAmount = 0;
+    $finalAmount = $originalAmount;
+
+    if ($promoCode) {
+        // Validate and apply promo code
+        $sqlPromo = "SELECT * FROM promo_codes 
+                     WHERE code = ? 
+                     AND is_active = 1 
+                     AND (valid_from IS NULL OR valid_from <= NOW()) 
+                     AND (valid_until IS NULL OR valid_until >= NOW())
+                     LIMIT 1";
+        
+        $stmtPromo = $conn->prepare($sqlPromo);
+        $stmtPromo->bind_param('s', $promoCode);
+        $stmtPromo->execute();
+        $promoResult = $stmtPromo->get_result();
+        
+        if ($promoResult->num_rows > 0) {
+            $promo = $promoResult->fetch_assoc();
+            
+            // Check usage limit
+            if ($promo['current_uses'] < $promo['max_uses']) {
+                // Check minimum amount
+                if ($originalAmount >= $promo['min_amount']) {
+                    // Calculate discount
+                    if ($promo['discount_type'] === 'percentage') {
+                        $discountAmount = ($originalAmount * $promo['discount_value']) / 100;
+                        if ($promo['max_discount'] !== null && $discountAmount > $promo['max_discount']) {
+                            $discountAmount = $promo['max_discount'];
+                        }
+                    } else {
+                        $discountAmount = $promo['discount_value'];
+                        if ($discountAmount > $originalAmount) {
+                            $discountAmount = $originalAmount;
+                        }
+                    }
+                    
+                    $discountAmount = round($discountAmount, 2);
+                    $finalAmount = round($originalAmount - $discountAmount, 2);
+                    
+                    error_log("✓ Promo code applied: $promoCode - Discount: ₹$discountAmount");
+                }
+            }
+        }
+        $stmtPromo->close();
+    }
+
+    // Store registration data with promo code info in DATABASE
     $registrationJson = json_encode($data);
-    $sqlStore = "INSERT INTO user_pending_registration (order_id, registration_data, status) VALUES (?, ?, 'pending')";
+    $sqlStore = "INSERT INTO user_pending_registration (order_id, registration_data, status, promo_code, discount_amount, original_amount) VALUES (?, ?, 'pending', ?, ?, ?)";
     $stmtStore = $conn->prepare($sqlStore);
 
     if (!$stmtStore) {
@@ -83,7 +133,7 @@ try {
         throw new Exception('Database error: Unable to store registration data');
     }
 
-    $stmtStore->bind_param('ss', $order_id, $registrationJson);
+    $stmtStore->bind_param('sssdd', $order_id, $registrationJson, $promoCode, $discountAmount, $originalAmount);
 
     if (!$stmtStore->execute()) {
         error_log("Failed to store registration data: " . $stmtStore->error);
@@ -92,7 +142,9 @@ try {
 
     error_log("✓ Registration data stored in database for order: " . $order_id);
     error_log("  Email: " . $data['email']);
-    error_log("  Amount: " . $data['amount']);
+    error_log("  Original Amount: ₹" . $originalAmount);
+    error_log("  Discount: ₹" . $discountAmount);
+    error_log("  Final Amount: ₹" . $finalAmount);
 
     $stmtStore->close();
 
@@ -108,7 +160,7 @@ try {
         $data['full_name'],
         $data['email'],
         $data['phone'],
-        $data['amount']
+        $finalAmount  // Use discounted amount for payment
     );
 
     echo json_encode($data);

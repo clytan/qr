@@ -15,18 +15,19 @@ $user_email = $data['user_email'] ?? '';
 $user_address = $data['user_address'] ?? '';
 $user_pincode = $data['user_pincode'] ?? '';
 $user_landmark = $data['user_landmark'] ?? '';
+$is_public_address = isset($data['is_public_address']) ? (int)$data['is_public_address'] : 1;
 $fields = $data['fields'] ?? [];
 $links = $data['links'] ?? [];
 
 // Update user_user table
 global $conn;
-$user_sql = "UPDATE user_user SET user_full_name=?, user_phone=?, user_email=?, user_address=?, user_pincode=?, user_landmark=? WHERE id=?";
+$user_sql = "UPDATE user_user SET user_full_name=?, user_phone=?, user_email=?, user_address=?, user_pincode=?, user_landmark=?, is_public_address=? WHERE id=?";
 $user_stmt = $conn->prepare($user_sql);
 if (!$user_stmt) {
     echo json_encode(['status' => 0, 'message' => 'DB error: ' . $conn->error]);
     exit;
 }
-$user_stmt->bind_param('ssssssi', $user_full_name, $phone_number, $user_email, $user_address, $user_pincode, $user_landmark, $user_id);
+$user_stmt->bind_param('ssssssii', $user_full_name, $phone_number, $user_email, $user_address, $user_pincode, $user_landmark, $is_public_address, $user_id);
 $user_stmt->execute();
 $user_stmt->close();
 
@@ -35,6 +36,7 @@ $user_stmt->close();
 // Map frontend keys to DB type names
 $typeMap = [
     'website' => 'Website',
+    'facebook_username' => 'Facebook',
     'twitter_username' => 'Twitter',
     'instagram_username' => 'Instagram',
     'youtube_username' => 'Youtube',
