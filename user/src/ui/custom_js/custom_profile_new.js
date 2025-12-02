@@ -861,7 +861,7 @@ const profileFunction = {
     hideEmptyFields: function (user) {
         // Hide basic info fields that are empty OR not public in public view
         const isAddressPublic = user.is_public_address == 1;
-        
+
         const basicFields = {
             'full_name': { value: user.user_full_name, isPublic: true }, // Always show name
             'phone_number': { value: user.user_phone, isPublic: true }, // Always show phone

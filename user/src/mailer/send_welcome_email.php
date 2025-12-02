@@ -2,7 +2,8 @@
 require_once __DIR__ . '/PHPMailerAutoload.php';
 require_once __DIR__ . '/email_templates/welcome_email.php';
 
-function sendWelcomeEmail($toEmail, $toName = '') {
+function sendWelcomeEmail($toEmail, $toName = '')
+{
     $mail = new PHPMailer();
     $mail->IsSMTP();
     $mail->SMTPOptions = array(
@@ -22,7 +23,7 @@ function sendWelcomeEmail($toEmail, $toName = '') {
     $mail->Username = getenv('SMTP_USER') ?: 'support@codersdek.com';
     $mail->Password = getenv('SMTP_PASS') ?: 'Cdek@2020*';
     $mail->IsHTML(true);
-    
+
     // Set UTF-8 charset to properly handle Unicode characters and emoji
     $mail->CharSet = 'UTF-8';
     $mail->Encoding = 'base64';
@@ -33,13 +34,13 @@ function sendWelcomeEmail($toEmail, $toName = '') {
     $mail->SetFrom($mail->Username, 'Zokli');
     $mail->AddReplyTo($mail->Username, 'Zokli');
     $mail->Subject = 'Welcome to Zokli - Make Every Day Your Lucky Day';
-    
+
     // Embed logo image
     $logoPath = __DIR__ . '/../assets/logo.png';
     if (file_exists($logoPath)) {
         $mail->AddEmbeddedImage($logoPath, 'logo', 'logo.png', 'base64', 'image/png');
     }
-    
+
     $mail->MsgHTML($content);
 
     if (!$mail->Send()) {
