@@ -12,16 +12,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($data && isset($data['payment']['payment_status'])) {
         error_log("Payment status: " . $data['payment']['payment_status']);
-        
+
         // Get order_id from callback data
         $order_id = $data['order']['order_id'] ?? null;
-        
+
         if (!$order_id) {
             error_log("Order ID not found in callback data");
             echo json_encode(['status' => false, 'message' => 'Order ID missing']);
             exit;
         }
-        
+
         error_log("Order ID from callback: " . $order_id);
 
         // Get registration data from database (more reliable than session)
@@ -30,17 +30,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmtGetReg->bind_param('s', $order_id);
         $stmtGetReg->execute();
         $resultGetReg = $stmtGetReg->get_result();
-        
+
         if ($resultGetReg->num_rows === 0) {
             error_log("No pending registration found for order: " . $order_id);
             echo json_encode(['status' => false, 'message' => 'Registration data not found']);
             exit;
         }
-        
+
         $rowReg = $resultGetReg->fetch_assoc();
         $regData = json_decode($rowReg['registration_data'], true);
         $stmtGetReg->close();
-        
+
         error_log("Registration data retrieved from database: " . print_r($regData, true));
 
         if ($data['payment']['payment_status'] == "SUCCESS") {
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmtUpdate->bind_param('s', $order_id);
                 $stmtUpdate->execute();
                 $stmtUpdate->close();
-                
+
                 echo json_encode(['status' => true, 'message' => 'Registration successful']);
             } else {
                 echo json_encode(['status' => false, 'message' => $result['message']]);
@@ -158,7 +158,7 @@ function processRegistration($data, $payment_id, $bank_reference, $order_id)
         $columnsList = implode(', ', $columns);
         $placeholders = implode(', ', array_fill(0, count($columns), '?'));
         $sqlInsert = "INSERT INTO user_user($columnsList) VALUES ($placeholders)";
-        
+
         $stmtInsert = $conn->prepare($sqlInsert);
         $stmtInsert->bind_param($types, ...$values);
 
@@ -183,23 +183,23 @@ function processRegistration($data, $payment_id, $bank_reference, $order_id)
         // Amount from UI is the TOTAL amount (GST inclusive)
         // We need to extract the base amount and GST components
         $total_amount = $amount; // e.g., ₹999 (this is what user pays)
-        
+
         // Calculate base amount (reverse calculation)
         // Total = Base + (Base × 18%)
         // Total = Base × 1.18
         // Base = Total ÷ 1.18
         $base_amount = round($total_amount / 1.18, 2);
-        
+
         // Calculate GST: CGST 9% + SGST 9% = 18% total
         $cgst_rate = 9.0; // 9%
         $sgst_rate = 9.0; // 9%
-        
+
         $cgst = round(($base_amount * $cgst_rate) / 100, 2);
         $sgst = round(($base_amount * $sgst_rate) / 100, 2);
         $igst = 0.00; // IGST not applicable for intra-state transactions
-        
+
         $gst_total = $cgst + $sgst + $igst;
-        
+
         // Adjust for rounding differences to ensure total matches exactly
         $calculated_total = $base_amount + $gst_total;
         if ($calculated_total != $total_amount) {
@@ -226,7 +226,7 @@ function processRegistration($data, $payment_id, $bank_reference, $order_id)
         }
 
         $conn->commit();
-        
+
         // AUTO-ASSIGN USER TO COMMUNITY (100 users per community)
         $communityResult = assignUserToCommunity($conn, $user_id);
         if ($communityResult['status']) {
@@ -234,7 +234,7 @@ function processRegistration($data, $payment_id, $bank_reference, $order_id)
         } else {
             error_log("Failed to auto-assign community for user $user_id: " . $communityResult['error']);
         }
-        
+
         // Send welcome email (best effort)
         try {
             sendWelcomeEmail($email, $full_name ?? '');
@@ -276,23 +276,23 @@ function processReferral($conn, $referred_by_user_id, $new_user_id)
 
         if ($resultSlab->num_rows > 0) {
             $rowSlab = $resultSlab->fetch_assoc();
-                // Quick slab-name based fixed commission rule
-                $slabName = strtolower($rowSlab['name'] ?? $rowSlab['slab_name'] ?? '');
-                if (in_array($slabName, ['creator', 'gold', 'silver'])) {
-                    $commission_amount = 200.0;
-                } else {
-                    $commission_amount = 100.0;
-                }
-                // If a percentage commission is configured, use that instead
-                if (!empty($rowSlab['ref_commission']) && is_numeric($rowSlab['ref_commission'])) {
-                    $commission_percent = floatval($rowSlab['ref_commission']);
-                    $base_amount = 100;
-                    $commission_amount = $base_amount * ($commission_percent / 100);
-                }
+            // Quick slab-name based fixed commission rule
+            $slabName = strtolower($rowSlab['name'] ?? $rowSlab['slab_name'] ?? '');
+            if (in_array($slabName, ['creator', 'gold', 'silver'])) {
+                $commission_amount = 200.0;
+            } else {
+                $commission_amount = 100.0;
+            }
+            // If a percentage commission is configured, use that instead
+            if (!empty($rowSlab['ref_commission']) && is_numeric($rowSlab['ref_commission'])) {
+                $commission_percent = floatval($rowSlab['ref_commission']);
+                $base_amount = 100;
+                $commission_amount = $base_amount * ($commission_percent / 100);
+            }
 
             // Calculate commission
             $base_amount = 100; // Adjust this based on your business logic
-                // $commission_amount = $base_amount * ($commission_percent / 100); // This line is now handled above
+            // $commission_amount = $base_amount * ($commission_percent / 100); // This line is now handled above
 
             // Update or create wallet
             $sqlWallet = "SELECT id, balance FROM user_wallet WHERE user_id = ? AND is_deleted = 0";

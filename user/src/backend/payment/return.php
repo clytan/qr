@@ -379,19 +379,19 @@ if (isset($_GET['orderId'])) {
     <title>Processing Registration...</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-    @keyframes spin {
-        0% {
-            transform: rotate(0deg);
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
-        100% {
-            transform: rotate(360deg);
+        .spin {
+            animation: spin 1s linear infinite;
         }
-    }
-
-    .spin {
-        animation: spin 1s linear infinite;
-    }
     </style>
 </head>
 
@@ -402,9 +402,9 @@ if (isset($_GET['orderId'])) {
         <p class="text-sm text-gray-500">Please do not close this window</p>
     </div>
     <script>
-    setTimeout(() => {
-        window.location.href = '<?php echo $redirect; ?>';
-    }, 2000);
+        setTimeout(() => {
+            window.location.href = '<?php echo $redirect; ?>';
+        }, 2000);
     </script>
 </body>
 

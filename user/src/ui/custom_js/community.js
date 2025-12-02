@@ -6,7 +6,7 @@ let pollingTimer = null;
 
 document.addEventListener('DOMContentLoaded', function () {
     loadCommunities();
-    
+
     // Track user activity
     ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'].forEach(event => {
         document.addEventListener(event, () => {
@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }, true);
     });
-    
+
     // Check for inactivity every 30 seconds
     setInterval(() => {
         const inactiveTime = Date.now() - lastActivityTime;
@@ -32,22 +32,22 @@ document.addEventListener('DOMContentLoaded', function () {
             pollingInterval = 5000; // Active - 5 seconds
         }
     }, 30000);
-    
+
     // Smart polling function
     function smartPoll() {
         loadMessages(false).then(() => {
             pollingTimer = setTimeout(smartPoll, pollingInterval);
         });
     }
-    
+
     // Start smart polling
     smartPoll();
-    
+
     // Full refresh every 30 seconds for timeout/ban status
     setInterval(() => loadMessages(true), 30000);
-    
+
     // Add keyboard support for lightbox
-    document.addEventListener('keydown', function(e) {
+    document.addEventListener('keydown', function (e) {
         if (e.key === 'Escape') {
             closeLightbox();
         }
@@ -63,14 +63,14 @@ function resetPolling() {
 
 // Generate an SVG data URL avatar with initials and gradient
 function generateInitialsAvatar(name, size = 64) {
-        const initials = (name || 'U').split(' ').map(n => n.charAt(0).toUpperCase()).slice(0,2).join('');
-        const colors = [ ['#667eea','#764ba2'], ['#f093fb','#f5576c'], ['#10b981','#06b6d4'], ['#f59e0b','#ef4444'] ];
-        const pick = colors[(initials.charCodeAt(0) + (initials.charCodeAt(1) || 0)) % colors.length];
-        const r = size/2;
-        const stroke = Math.max(2, Math.round(size * 0.06));
-        const innerR = r - stroke/1.5;
-        const fontSize = Math.round(size * 0.38);
-        const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}' viewBox='0 0 ${size} ${size}'>
+    const initials = (name || 'U').split(' ').map(n => n.charAt(0).toUpperCase()).slice(0, 2).join('');
+    const colors = [['#667eea', '#764ba2'], ['#f093fb', '#f5576c'], ['#10b981', '#06b6d4'], ['#f59e0b', '#ef4444']];
+    const pick = colors[(initials.charCodeAt(0) + (initials.charCodeAt(1) || 0)) % colors.length];
+    const r = size / 2;
+    const stroke = Math.max(2, Math.round(size * 0.06));
+    const innerR = r - stroke / 1.5;
+    const fontSize = Math.round(size * 0.38);
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}' viewBox='0 0 ${size} ${size}'>
             <defs>
                 <linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
                     <stop offset='0' stop-color='${pick[0]}' />
@@ -80,7 +80,7 @@ function generateInitialsAvatar(name, size = 64) {
             <circle cx='${r}' cy='${r}' r='${innerR}' fill='url(#g)' stroke='rgba(0,0,0,0.28)' stroke-width='${stroke}' />
             <text x='50%' y='50%' dy='.36em' text-anchor='middle' font-family='Inter, Arial, sans-serif' font-size='${fontSize}' font-weight='700' fill='rgba(255,255,255,0.95)'>${initials}</text>
         </svg>`;
-        return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
 }
 
 let currentCommunityId = null;
@@ -132,7 +132,7 @@ function closeLightbox() {
 function toggleInputActions() {
     const actionsGroup = document.getElementById('inputActionsGroup');
     const toggleBtn = document.getElementById('toggleActionsBtn');
-    
+
     if (actionsGroup.style.display === 'none' || actionsGroup.style.display === '') {
         actionsGroup.style.display = 'flex';
         toggleBtn.classList.add('active');
@@ -219,21 +219,21 @@ function renderMessage(msg) {
         const now = new Date();
         const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const messageDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
-        
+
         if (messageDate.getTime() === today.getTime()) {
             return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
         } else if (messageDate.getTime() === today.getTime() - 86400000) {
             return 'Yesterday ' + date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
         } else {
-            return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) + ' ' + 
-                   date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
+            return date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) + ' ' +
+                date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
         }
     };
-    
+
     // Format message content - detect GIF URLs and render as images
     const formatMessageContent = (message) => {
         if (!message) return '';
-        
+
         // Check if message contains HTML img tag (from GIF picker)
         if (message.includes('<img') && message.includes('class="gif-message"')) {
             // Extract the src URL
@@ -242,13 +242,13 @@ function renderMessage(msg) {
                 return `<div class="message-gif"><img src="${srcMatch[1]}" alt="GIF" class="gif-content" onclick="openLightbox('${srcMatch[1]}')"></div>`;
             }
         }
-        
+
         // Check if message is a direct GIF URL (from Giphy/Tenor)
         const gifUrlPattern = /^https?:\/\/(media\d*\.giphy\.com|media\.tenor\.com|i\.giphy\.com)\/.*\.(gif|mp4|webp)/i;
         if (gifUrlPattern.test(message.trim())) {
             return `<div class="message-gif"><img src="${message.trim()}" alt="GIF" class="gif-content" onclick="openLightbox('${message.trim()}')"></div>`;
         }
-        
+
         // Regular text message - escape HTML to prevent XSS
         return message.replace(/</g, '&lt;').replace(/>/g, '&gt;');
     };
@@ -259,7 +259,7 @@ function renderMessage(msg) {
             <img src="${avatarSrc}" 
                  alt="${msg.user_qr_id}" 
                  class="message-avatar"
-                 onerror="this.onerror=null;this.src='${generateInitialsAvatar(msg.user_name,56)}'">
+                 onerror="this.onerror=null;this.src='${generateInitialsAvatar(msg.user_name, 56)}'">
             <div class="message-content">
                 <div class="message-header">
                     <a href="profile.php?qr=${msg.user_qr_id}" class="message-username">@${msg.user_qr_id}</a>
@@ -420,7 +420,7 @@ function loadMessages(forceRefresh = false) {
                         if (!msg || !msg.id) {
                             return;
                         }
-                        
+
                         const existingMessage = document.querySelector(`[data-message-id="${msg.id}"]`);
                         if (!existingMessage) {
                             chatMessages.insertAdjacentHTML('beforeend', renderMessage(msg));
@@ -498,7 +498,7 @@ function loadMembers() {
                                 <img src="${memberAvatar}" 
                                      class="member-avatar" 
                                      alt="${member.user_qr_id}"
-                                     onerror="this.onerror=null;this.src='${generateInitialsAvatar(member.user_full_name || member.user_qr_id,48)}'">
+                                     onerror="this.onerror=null;this.src='${generateInitialsAvatar(member.user_full_name || member.user_qr_id, 48)}'">
                                 <div class="member-info">
                                     <div class="member-qr-id">@${member.user_qr_id}</div>
                                 </div>
@@ -515,12 +515,12 @@ document.getElementById('attachment').addEventListener('change', function (e) {
     if (file) {
         const preview = document.getElementById('attachmentPreview');
         const previewContent = preview.querySelector('.preview-content');
-        
+
         // Check if it's an image
         if (file.type.startsWith('image/')) {
             // Create image preview
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 previewContent.innerHTML = `
                     <div class="preview-image-wrapper">
                         <img src="${e.target.result}" alt="${file.name}" class="preview-image">
@@ -537,9 +537,9 @@ document.getElementById('attachment').addEventListener('change', function (e) {
                 <button class="btn-remove" onclick="removeAttachment()">×</button>
             `;
         }
-        
+
         preview.style.display = 'block';
-        
+
         // Close the actions group after selecting file
         const actionsGroup = document.getElementById('inputActionsGroup');
         const toggleBtn = document.getElementById('toggleActionsBtn');
@@ -564,7 +564,7 @@ function removeAttachment() {
 function sendMessage() {
     // Prevent duplicate sends
     if (isSendingMessage) return;
-    
+
     const input = document.getElementById('messageInput');
     const fileInput = document.getElementById('attachment');
     const message = input.value.trim();
@@ -659,12 +659,12 @@ function updateMessageReactions(msg) {
     if (!messageElement) {
         return;
     }
-    
+
     const reactionButtons = messageElement.querySelectorAll('.btn-reaction');
     if (reactionButtons.length < 2) {
         return;
     }
-    
+
     const likeButton = reactionButtons[0];
     const dislikeButton = reactionButtons[1];
 
@@ -675,11 +675,11 @@ function updateMessageReactions(msg) {
     // Update counts safely
     const likeCount = likeButton.querySelector('.reaction-count');
     const dislikeCount = dislikeButton.querySelector('.reaction-count');
-    
+
     if (likeCount) {
         likeCount.textContent = msg.like_count || 0;
     }
-    
+
     if (dislikeCount) {
         dislikeCount.textContent = msg.dislike_count || 0;
     }
@@ -714,7 +714,7 @@ function reactToMessage(messageId, reactionType) {
                         // Update counts
                         const likeCount = likeButton.querySelector('.reaction-count');
                         const dislikeCount = dislikeButton.querySelector('.reaction-count');
-                        
+
                         if (likeCount) likeCount.textContent = data.likes_count;
                         if (dislikeCount) dislikeCount.textContent = data.dislikes_count;
 
@@ -853,10 +853,10 @@ let currentCategory = 'smileys';
 function toggleEmojiPicker() {
     const emojiPicker = document.getElementById('emojiPicker');
     const gifPicker = document.getElementById('gifPicker');
-    
+
     // Close GIF picker if open
     if (gifPicker) gifPicker.style.display = 'none';
-    
+
     if (emojiPicker.style.display === 'none' || !emojiPicker.style.display) {
         emojiPicker.style.display = 'flex';
         showEmojiCategory(currentCategory);
@@ -873,15 +873,15 @@ function showEmojiCategory(category) {
     currentCategory = category;
     const grid = document.getElementById('emojiGrid');
     const tabs = document.querySelectorAll('.emoji-tab');
-    
+
     // Update active tab
     tabs.forEach(tab => tab.classList.remove('active'));
     if (event && event.target) {
         event.target.classList.add('active');
     }
-    
+
     // Populate emoji grid
-    grid.innerHTML = emojiCategories[category].map(emoji => 
+    grid.innerHTML = emojiCategories[category].map(emoji =>
         `<div class="emoji-item" onclick="insertEmoji('${emoji}')">${emoji}</div>`
     ).join('');
 }
@@ -899,10 +899,10 @@ let gifSearchTimeout;
 function toggleGifPicker() {
     const gifPicker = document.getElementById('gifPicker');
     const emojiPicker = document.getElementById('emojiPicker');
-    
+
     // Close emoji picker if open
     if (emojiPicker) emojiPicker.style.display = 'none';
-    
+
     if (gifPicker.style.display === 'none' || !gifPicker.style.display) {
         gifPicker.style.display = 'flex';
         loadTrendingGifs();
@@ -918,7 +918,7 @@ function closeGifPicker() {
 function loadTrendingGifs() {
     const grid = document.getElementById('gifGrid');
     grid.innerHTML = '<div class="gif-loading">Loading trending GIFs...</div>';
-    
+
     // Using Giphy API - trending endpoint
     fetch(`https://api.giphy.com/v1/gifs/trending?api_key=${GIPHY_API_KEY}&limit=25&rating=g`)
         .then(response => {
@@ -943,16 +943,16 @@ function loadTrendingGifs() {
 
 function searchGifs(query) {
     clearTimeout(gifSearchTimeout);
-    
+
     if (!query.trim()) {
         loadTrendingGifs();
         return;
     }
-    
+
     gifSearchTimeout = setTimeout(() => {
         const grid = document.getElementById('gifGrid');
         grid.innerHTML = '<div class="gif-loading">Searching...</div>';
-        
+
         // Using Giphy API search
         fetch(`https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API_KEY}&q=${encodeURIComponent(query)}&limit=25&rating=g`)
             .then(response => {
@@ -978,12 +978,12 @@ function searchGifs(query) {
 
 function displayGifs(gifs) {
     const grid = document.getElementById('gifGrid');
-    
+
     if (!gifs || gifs.length === 0) {
         grid.innerHTML = '<div class="gif-loading">No GIFs available</div>';
         return;
     }
-    
+
     grid.innerHTML = gifs.map(gif => {
         try {
             // Giphy API format: gif.images.fixed_height_small.url (preview) and gif.images.downsized.url (full)
@@ -991,16 +991,16 @@ function displayGifs(gifs) {
                 console.warn('Missing images object:', gif);
                 return '';
             }
-            
+
             // Get URLs - Giphy has multiple sizes
             const gifUrl = gif.images.downsized?.url || gif.images.original?.url;
             const preview = gif.images.fixed_height_small?.url || gif.images.preview_gif?.url || gifUrl;
-            
+
             if (!gifUrl || !preview) {
                 console.warn('Missing URLs:', gif.images);
                 return '';
             }
-            
+
             return `
                 <div class="gif-item" onclick="insertGif('${gifUrl.replace(/'/g, "\\'")}')">
                     <img src="${preview}" loading="lazy" alt="${gif.title || 'GIF'}" onerror="this.parentElement.style.display='none'">
@@ -1011,7 +1011,7 @@ function displayGifs(gifs) {
             return '';
         }
     }).filter(html => html !== '').join('');
-    
+
     if (grid.innerHTML === '') {
         grid.innerHTML = '<div class="gif-loading">Failed to load GIF images</div>';
     }
@@ -1023,7 +1023,7 @@ function insertGif(gifUrl) {
     // Use HTML img tag so it displays as image
     input.value = `<img src="${gifUrl}" alt="GIF" class="gif-message">`;
     closeGifPicker();
-    
+
     // Close action buttons
     const actionsGroup = document.getElementById('inputActionsGroup');
     const toggleBtn = document.getElementById('toggleActionsBtn');
@@ -1031,25 +1031,25 @@ function insertGif(gifUrl) {
         actionsGroup.style.display = 'none';
         toggleBtn.classList.remove('active');
     }
-    
+
     sendMessage();
 }
 
 // Close pickers when clicking outside
-document.addEventListener('click', function(event) {
+document.addEventListener('click', function (event) {
     const emojiPicker = document.getElementById('emojiPicker');
     const gifPicker = document.getElementById('gifPicker');
     const emojiBtn = document.querySelector('.input-action-btn[onclick*="toggleEmojiPicker"]');
     const gifBtn = document.querySelector('.input-action-btn[onclick*="toggleGifPicker"]');
-    
-    if (emojiPicker && emojiBtn && 
-        !emojiPicker.contains(event.target) && 
+
+    if (emojiPicker && emojiBtn &&
+        !emojiPicker.contains(event.target) &&
         !emojiBtn.contains(event.target)) {
         emojiPicker.style.display = 'none';
     }
-    
-    if (gifPicker && gifBtn && 
-        !gifPicker.contains(event.target) && 
+
+    if (gifPicker && gifBtn &&
+        !gifPicker.contains(event.target) &&
         !gifBtn.contains(event.target)) {
         gifPicker.style.display = 'none';
     }
