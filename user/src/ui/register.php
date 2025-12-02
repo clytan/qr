@@ -36,6 +36,60 @@
     </style>
 
     <style>
+        /* Password toggle button styling */
+        .password-toggle-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translate(0, -50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 8px 10px;
+            color: #666;
+            transition: color 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+            height: 100%;
+        }
+
+        .password-toggle-btn:hover {
+            color: #333;
+        }
+
+        .password-toggle-btn.active {
+            color: #3498db;
+        }
+
+        .form-input.with-toggle {
+            padding-right: 45px;
+        }
+
+        .password-toggle-container .form-input {
+            height: 44px;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Standard field-set styling for consistent spacing */
+        .field-set {
+            margin-bottom: 18px !important;
+        }
+
+        .field-set .form-input {
+            height: 44px;
+            padding: 12px 14px !important;
+        }
+
         /* College name field styling */
         .college-field {
             display: none;
@@ -423,14 +477,25 @@
 
                                             <!-- Password Field -->
                                             <div class="field-set">
-                                                <input type='password' name='password' id='password'
-                                                    placeholder="🔒 Password" class="form-input" required>
+                                                <div class="password-toggle-container">
+                                                    <input type='password' name='password' id='password'
+                                                        placeholder="🔒 Password" class="form-input with-toggle"
+                                                        required>
+                                                    <button type='button' class='password-toggle-btn'
+                                                        id='password-toggle' title='Show/Hide Password'>👁️</button>
+                                                </div>
                                             </div>
 
                                             <!-- Confirm Password Field -->
                                             <div class="field-set">
-                                                <input type='password' name='confirmpassword' id='confirmpassword'
-                                                    placeholder="🔐 Confirm Password" class="form-input" required>
+                                                <div class="password-toggle-container">
+                                                    <input type='password' name='confirmpassword' id='confirmpassword'
+                                                        placeholder="🔐 Confirm Password" class="form-input with-toggle"
+                                                        required>
+                                                    <button type='button' class='password-toggle-btn'
+                                                        id='confirmpassword-toggle'
+                                                        title='Show/Hide Password'>👁️</button>
+                                                </div>
                                                 <span id="password-match-status"
                                                     style="margin-bottom:20px; display:block; font-weight:600;"></span>
                                             </div>
@@ -635,6 +700,32 @@
     <script src="../assets/js/register-form.js"></script>
     <script src="./custom_js/custom_register.js"></script>
 
+    <!-- Password Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Password toggle functionality
+            const passwordToggle = document.getElementById('password-toggle');
+            const passwordInput = document.getElementById('password');
+            const confirmPasswordToggle = document.getElementById('confirmpassword-toggle');
+            const confirmPasswordInput = document.getElementById('confirmpassword');
+
+            // Toggle password visibility
+            function setupPasswordToggle(toggleBtn, inputField) {
+                toggleBtn.addEventListener('click', function (e) {
+                    e.preventDefault();
+
+                    const isPassword = inputField.type === 'password';
+                    inputField.type = isPassword ? 'text' : 'password';
+
+                    toggleBtn.classList.toggle('active');
+                    toggleBtn.textContent = isPassword ? '👁️‍🗨️' : '👁️';
+                });
+            }
+
+            setupPasswordToggle(passwordToggle, passwordInput);
+            setupPasswordToggle(confirmPasswordToggle, confirmPasswordInput);
+        });
+    </script>
 
 </body>
 

@@ -1399,7 +1399,7 @@ $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type
                 </div> -->
 
                 <!-- Page Title -->
-                <div class="page-title">
+                <div class="page-title d-none">
                     <h1><i class="fas fa-user-circle"></i> My Profile</h1>
                     <p>Manage your QR profile, customize your settings, and connect with others</p>
                 </div>
@@ -1408,54 +1408,61 @@ $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type
                     <!-- Left side: Profile Info -->
                     <div class="profile-card">
                         <div class="profile-image-container">
-                            <img src="assets/images/user.jpg" alt="Profile" class="profile-image" id="click_profile_img">
+                            <img src="" alt="Profile" class="profile-image" id="click_profile_img">
                             <input type="file" id="upload_profile_img" hidden accept="image/*">
                         </div>
 
                         <script>
                         // Robust avatar fallback: generate initials SVG and set as src on error or when default image is used.
-                        (function(){
+                        (function() {
                             try {
                                 var img = document.getElementById('click_profile_img');
                                 var nameEl = document.getElementById('full_name');
 
                                 function generateInitialsDataUrl(name, size) {
-                                    name = (name || 'U').trim();
-                                    var initials = name.split(/\s+/).map(function(n){return n.charAt(0).toUpperCase();}).slice(0,2).join('');
-                                    var r = size/2;
-                                    var stroke = Math.max(2, Math.round(size*0.06));
-                                    var innerR = r - stroke/1.5;
-                                    var fontSize = Math.round(size*0.38);
-                                    var svg = "<svg xmlns='http://www.w3.org/2000/svg' width='"+size+"' height='"+size+"' viewBox='0 0 "+size+" "+size+"'>"+
-                                              "<defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'><stop offset='0' stop-color='#667eea'/><stop offset='1' stop-color='#764ba2'/></linearGradient></defs>"+
-                                              "<circle cx='"+r+"' cy='"+r+"' r='"+innerR+"' fill='url(#g)' stroke='rgba(0,0,0,0.28)' stroke-width='"+stroke+"' />"+
-                                              "<text x='50%' y='50%' dy='.36em' text-anchor='middle' font-family='Inter, Arial, sans-serif' font-size='"+fontSize+"' font-weight='700' fill='rgba(255,255,255,0.95)'>"+initials+"</text></svg>";
+                                    name = (name || 'User').trim();
+                                    if (!name || name.length === 0) {
+                                        name = 'User';
+                                    }
+                                    var initials = name.split(/\s+/).map(function(n) {
+                                        return n.charAt(0).toUpperCase();
+                                    }).slice(0, 2).join('');
+                                    var r = size / 2;
+                                    var stroke = Math.max(2, Math.round(size * 0.06));
+                                    var innerR = r - stroke / 1.5;
+                                    var fontSize = Math.round(size * 0.38);
+                                    var svg = "<svg xmlns='http://www.w3.org/2000/svg' width='" + size +
+                                        "' height='" + size + "' viewBox='0 0 " + size + " " + size + "'>" +
+                                        "<defs><linearGradient id='g' x1='0' x2='1' y1='0' y2='1'><stop offset='0' stop-color='#667eea'/><stop offset='1' stop-color='#764ba2'/></linearGradient></defs>" +
+                                        "<circle cx='" + r + "' cy='" + r + "' r='" + innerR +
+                                        "' fill='url(#g)' stroke='rgba(0,0,0,0.28)' stroke-width='" + stroke +
+                                        "' />" +
+                                        "<text x='50%' y='50%' dy='.36em' text-anchor='middle' font-family='Inter, Arial, sans-serif' font-size='" +
+                                        fontSize + "' font-weight='700' fill='rgba(255,255,255,0.95)'>" + initials +
+                                        "</text></svg>";
                                     return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
                                 }
 
                                 if (img) {
+                                    // Set initial avatar immediately since src is empty
+                                    img.src = generateInitialsDataUrl('User', 160);
+                                    img.setAttribute('data-generated-initials', '1');
+
                                     // onerror handler for missing/404 images
-                                    img.onerror = function(){
+                                    img.onerror = function() {
                                         try {
                                             this.onerror = null;
                                             var name = nameEl ? nameEl.value : '';
-                                                    this.src = generateInitialsDataUrl(name || 'U', 160);
-                                                    this.setAttribute('data-generated-initials', '1');
-                                        } catch(e) {
-                                            this.src = 'assets/images/user.jpg';
+                                            this.src = generateInitialsDataUrl(name || 'User', 160);
+                                            this.setAttribute('data-generated-initials', '1');
+                                        } catch (e) {
+                                            console.error('Error generating initials avatar:', e);
                                         }
                                     };
-
-                                    // If the current src is the default placeholder, replace it with initials SVG when name is available
-                                    try {
-                                        var currentName = nameEl ? nameEl.value : '';
-                                        if (currentName && img.src && img.src.indexOf('user.jpg') !== -1) {
-                                            img.src = generateInitialsDataUrl(currentName, 160);
-                                            img.setAttribute('data-generated-initials', '1');
-                                        }
-                                    } catch(e){}
                                 }
-                            } catch(e){}
+                            } catch (e) {
+                                console.error('Profile image initialization error:', e);
+                            }
                         })();
                         </script>
 
@@ -1744,7 +1751,7 @@ $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type
 
                         <!-- Profile Booster Section (for Gold/Silver users) -->
                         <div id="profile-booster-section" class="profile-booster-section d-none"
-                            style="display: <?php echo ($user_id ? 'block' : 'none'); ?>" >
+                            style="display: <?php echo ($user_id ? 'block' : 'none'); ?>">
                             <div class="booster-header">
                                 <i class="fas fa-rocket"></i>
                                 <h4>Super Charge Your Profile</h4>
@@ -1921,11 +1928,11 @@ $user_user_type = isset($_SESSION['user_user_type']) ? $_SESSION['user_user_type
             // First confirmation
             if (confirm(
                     '🚀 Super Charge your profile for ₹199?\n\nYour profile will be boosted to the top of search results for 7 days!'
-                    )) {
+                )) {
                 // Second confirmation (double confirmation as requested)
                 if (confirm(
                         '⚡ Confirm Super Charge?\n\nThis action will deduct ₹199 from your wallet and boost your profile immediately.'
-                        )) {
+                    )) {
                     // Proceed with boosting
                     boostProfile();
                 }

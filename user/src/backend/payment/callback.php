@@ -98,18 +98,14 @@ function processRegistration($data, $payment_id, $bank_reference, $order_id)
         $college_name = $data['college_name'] ?? null;
         $amount = $data['amount'];
 
-        // Generate user_qr_id (ZOK format - 10 digits total)
-        do {
-            $random_digits = str_pad(strval(mt_rand(0, 9999999)), 7, '0', STR_PAD_LEFT);
-            $user_qr_id = 'ZOK' . $random_digits;
-            $sqlCheckQr = "SELECT 1 FROM user_user WHERE user_qr_id = ?";
-            $stmtCheckQr = $conn->prepare($sqlCheckQr);
-            $stmtCheckQr->bind_param('s', $user_qr_id);
-            $stmtCheckQr->execute();
-            $resultCheckQr = $stmtCheckQr->get_result();
-            $exists = $resultCheckQr->num_rows > 0;
-            $stmtCheckQr->close();
-        } while ($exists);
+        // Generate sequential QR ID
+        // Get the highest existing ZOK ID and increment
+        $sqlMaxQr = "SELECT MAX(CAST(SUBSTRING(user_qr_id, 4) AS UNSIGNED)) as max_num FROM user_user WHERE user_qr_id LIKE 'ZOK%'";
+        $resultMaxQr = $conn->query($sqlMaxQr);
+        $rowMaxQr = $resultMaxQr->fetch_assoc();
+        $nextNum = ($rowMaxQr['max_num'] ?? 0) + 1;
+        $user_qr_id = 'ZOK' . str_pad(strval($nextNum), 7, '0', STR_PAD_LEFT);
+        error_log("Generated sequential QR ID: " . $user_qr_id . " (Next number: " . $nextNum . ")");
 
         // Build INSERT query using actual column names from database
         $columns = ['user_email', 'user_password', 'user_user_type', 'user_tag', 'user_slab_id', 'user_qr_id', 'referred_by_user_id'];
@@ -181,18 +177,44 @@ function processRegistration($data, $payment_id, $bank_reference, $order_id)
             throw new Exception("Failed to update user metadata");
         }
 
-        // Create invoice
-        $cgst = $amount;
-        $sgst = $amount;
-        $igst = 0.00;
+        // ========================================
+        // GST CALCULATION (Indian Tax Structure - GST INCLUSIVE)
+        // ========================================
+        // Amount from UI is the TOTAL amount (GST inclusive)
+        // We need to extract the base amount and GST components
+        $total_amount = $amount; // e.g., ₹999 (this is what user pays)
+        
+        // Calculate base amount (reverse calculation)
+        // Total = Base + (Base × 18%)
+        // Total = Base × 1.18
+        // Base = Total ÷ 1.18
+        $base_amount = round($total_amount / 1.18, 2);
+        
+        // Calculate GST: CGST 9% + SGST 9% = 18% total
+        $cgst_rate = 9.0; // 9%
+        $sgst_rate = 9.0; // 9%
+        
+        $cgst = round(($base_amount * $cgst_rate) / 100, 2);
+        $sgst = round(($base_amount * $sgst_rate) / 100, 2);
+        $igst = 0.00; // IGST not applicable for intra-state transactions
+        
         $gst_total = $cgst + $sgst + $igst;
-        $total_amount = $amount + $gst_total;
+        
+        // Adjust for rounding differences to ensure total matches exactly
+        $calculated_total = $base_amount + $gst_total;
+        if ($calculated_total != $total_amount) {
+            $difference = $total_amount - $calculated_total;
+            $base_amount = round($base_amount + $difference, 2);
+        }
+
+        // Log GST calculation for debugging
+        error_log("GST Calculation (Inclusive) - Total: ₹{$total_amount}, Base: ₹{$base_amount}, CGST (9%): ₹{$cgst}, SGST (9%): ₹{$sgst}, Total GST: ₹{$gst_total}");
 
         $invoice_number = 'INV' . date('Ymd') . '-' . str_pad($user_id, 3, '0', STR_PAD_LEFT);
 
         $sqlInvoice = "INSERT INTO user_invoice (user_id, invoice_number, invoice_type, amount, cgst, sgst, igst, gst_total, total_amount, status, payment_mode, payment_reference, created_on, updated_on, is_deleted) VALUES (?, ?, 'registration', ?, ?, ?, ?, ?, ?, 'Paid', 'UPI', ?, ?, ?, 0)";
         $stmtInvoice = $conn->prepare($sqlInvoice);
-        $stmtInvoice->bind_param('isdddddssss', $user_id, $invoice_number, $amount, $cgst, $sgst, $igst, $gst_total, $total_amount, $payment_id, $now, $now);
+        $stmtInvoice->bind_param('isdddddssss', $user_id, $invoice_number, $base_amount, $cgst, $sgst, $igst, $gst_total, $total_amount, $payment_id, $now, $now);
 
         if (!$stmtInvoice->execute()) {
             throw new Exception("Failed to create invoice");

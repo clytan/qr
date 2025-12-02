@@ -801,6 +801,9 @@ const profileFunction = {
                     $('#pincode').val(user.user_pincode || '');
                     $('#user-name').text(fullName);
 
+                    // Update the profile image with correct initials based on loaded name
+                    profileFunction.updateProfileImageWithInitials(fullName);
+
                     // Hide empty fields in public view
                     if (window.PUBLIC_PROFILE) {
                         profileFunction.hideEmptyFields(user);
@@ -833,6 +836,18 @@ const profileFunction = {
                 console.error('Error fetching profile data:', error);
             }
         });
+    },
+
+    updateProfileImageWithInitials: function (fullName) {
+        const profileImg = $('#click_profile_img');
+        const currentSrc = profileImg.attr('src') || '';
+        const isGenerated = profileImg.attr('data-generated-initials') === '1';
+
+        // If no image or already showing generated initials, update with the correct name
+        if (!currentSrc || currentSrc.startsWith('data:image/svg') || isGenerated) {
+            profileImg.attr('src', profileFunction.generateInitialsAvatar(fullName, 160));
+            profileImg.attr('data-generated-initials', '1');
+        }
     },
 
     hideEmptyFields: function (user) {
@@ -1050,26 +1065,69 @@ const profileFunction = {
                     const img = new Image();
                     img.onload = function () {
                         // Image loaded successfully
-                        if (typeof setProfileImage === 'function') {
-                            setProfileImage(imagePath);
-                        } else {
-                            $('#click_profile_img').attr('src', imagePath);
-                        }
+                        $('#click_profile_img').attr('src', imagePath).removeAttr('data-generated-initials');
                     };
                     img.onerror = function () {
-                        // Image failed to load, keep initials
-                        console.log('Profile image failed to load, showing initials');
-                        console.log('Attempted path:', imagePath);
+                        // Image failed to load, show initials instead
+                        console.log('No profile image found, showing initials');
+                        profileFunction.showInitialsAvatar();
                     };
                     img.src = imagePath;
                 } else {
                     console.log('No profile image found, showing initials');
+                    profileFunction.showInitialsAvatar();
                 }
             },
             error: function () {
                 console.log('Error fetching profile image, showing initials');
+                profileFunction.showInitialsAvatar();
             }
         });
+    },
+
+    showInitialsAvatar: function () {
+        const fullName = $('#full_name').val() || $('#user_qr').val() || 'User';
+        const initials = fullName.split(' ')
+            .map(word => word.charAt(0).toUpperCase())
+            .slice(0, 2)
+            .join('');
+
+        const profileImg = $('#click_profile_img');
+        profileImg.attr('src', profileFunction.generateInitialsAvatar(fullName, 160));
+        profileImg.attr('data-generated-initials', '1');
+    },
+
+    generateInitialsAvatar: function (name, size = 64) {
+        const initials = (name || 'User').split(' ')
+            .map(n => n.charAt(0).toUpperCase())
+            .slice(0, 2)
+            .join('');
+
+        const colors = [
+            ['#667eea', '#764ba2'],
+            ['#f093fb', '#f5576c'],
+            ['#10b981', '#06b6d4'],
+            ['#f59e0b', '#ef4444']
+        ];
+
+        const pick = colors[(initials.charCodeAt(0) + (initials.charCodeAt(1) || 0)) % colors.length];
+        const r = size / 2;
+        const stroke = Math.max(2, Math.round(size * 0.06));
+        const innerR = r - stroke / 1.5;
+        const fontSize = Math.round(size * 0.38);
+
+        const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='${size}' height='${size}' viewBox='0 0 ${size} ${size}'>
+            <defs>
+                <linearGradient id='g' x1='0' x2='1' y1='0' y2='1'>
+                    <stop offset='0' stop-color='${pick[0]}' />
+                    <stop offset='1' stop-color='${pick[1]}' />
+                </linearGradient>
+            </defs>
+            <circle cx='${r}' cy='${r}' r='${innerR}' fill='url(#g)' stroke='rgba(0,0,0,0.28)' stroke-width='${stroke}' />
+            <text x='50%' y='50%' dy='.36em' text-anchor='middle' font-family='Inter, Arial, sans-serif' font-size='${fontSize}' font-weight='700' fill='rgba(255,255,255,0.95)'>${initials}</text>
+        </svg>`;
+
+        return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
     }
 };
 

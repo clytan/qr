@@ -87,6 +87,28 @@ let currentCommunityId = null;
 let lastMessageTime = null;
 let isSendingMessage = false;
 
+// Normalize image path returned from backend:
+// - If path is absolute (starts with http(s)://) or starts with '/', or already relative ('../'), return as-is.
+// - Otherwise prefix with '../' to point to the correct directory relative to the JS file.
+function resolveImagePath(p) {
+    if (!p) return null;
+    try {
+        p = p.toString();
+        if (/^https?:\/\//i.test(p)) return p;
+        // If backend returned an absolute project path like '/user/src/backend/...',
+        // normalize it to a relative path from this UI file: '../backend/...'
+        if (p.startsWith('/user/src/')) {
+            return '..' + p.replace(/^\/user\/src/, '');
+        }
+        if (p.startsWith('/')) return p;
+        if (p.startsWith('../') || p.startsWith('./')) return p;
+        // otherwise assume it's a relative path from project root under user/src
+        return '../' + p;
+    } catch (e) {
+        return p;
+    }
+}
+
 // Lightbox functions for image expansion
 function openLightbox(imageUrl) {
     const lightbox = document.getElementById('imageLightbox');
@@ -230,28 +252,6 @@ function renderMessage(msg) {
         // Regular text message - escape HTML to prevent XSS
         return message.replace(/</g, '&lt;').replace(/>/g, '&gt;');
     };
-
-    // Normalize image path returned from backend:
-    // - If path is absolute (starts with http(s)://) or starts with '/', or already relative ('../'), return as-is.
-    // - Otherwise prefix with '../' to point to the correct directory relative to the JS file.
-    function resolveImagePath(p) {
-        if (!p) return null;
-        try {
-            p = p.toString();
-            if (/^https?:\/\//i.test(p)) return p;
-            // If backend returned an absolute project path like '/user/src/backend/...',
-            // normalize it to a relative path from this UI file: '../backend/...'
-            if (p.startsWith('/user/src/')) {
-                return '..' + p.replace(/^\/user\/src/, '');
-            }
-            if (p.startsWith('/')) return p;
-            if (p.startsWith('../') || p.startsWith('./')) return p;
-            // otherwise assume it's a relative path from project root under user/src
-            return '../' + p;
-        } catch (e) {
-            return p;
-        }
-    }
 
     const avatarSrc = msg.user_image_path ? resolveImagePath(msg.user_image_path) : generateInitialsAvatar(msg.user_name, 56);
     return `

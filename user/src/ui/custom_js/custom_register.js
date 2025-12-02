@@ -358,14 +358,31 @@ var eventHandler = {
                         contentType: 'application/json',
                         dataType: 'json',
                         success: function (response) {
+                            console.log('Order.php response:', response);
                             if (response.status && response.session) {
-                                // Redirect to payment intent page
-                                window.location.href = '../backend/payment/intent.php?session=' + response.session;
+                                console.log('✓ Payment order created successfully');
+                                console.log('  Session:', response.session.substring(0, 50) + '...');
+                                console.log('  Order ID:', response.order_id);
+
+                                // IMPORTANT: Redirect IMMEDIATELY, don't wait
+                                const session = encodeURIComponent(response.session);
+                                const orderId = encodeURIComponent(response.order_id);
+                                const timestamp = Date.now();
+                                const redirectUrl = '../backend/payment/intent.php?session=' + session + '&orderId=' + orderId + '&t=' + timestamp;
+
+                                console.log('Redirecting to:', redirectUrl);
+                                window.location.href = redirectUrl;
+
+                                // Prevent any other code from executing
+                                return false;
                             } else {
+                                console.error('❌ Payment order failed:', response);
                                 alert(response.error || 'Failed to initiate payment.');
                             }
                         },
                         error: function (xhr, status, error) {
+                            console.error('❌ AJAX error:', status, error);
+                            console.error('Response text:', xhr.responseText);
                             alert('An error occurred while initiating payment: ' + error);
                         }
                     });
@@ -385,7 +402,7 @@ var registerFunction = {
     referenceTimeout: null,
 
     calculateAmount: function (userType, userTag) {
-        // Registration amount based on membership tier
+        // Production amounts
         let amount = 999; // Default Normal tier
 
         // Adjust amount based on membership tier
@@ -677,11 +694,11 @@ var registerFunction = {
     },
 
     updateSubmitState: () => {
-    const $submit = $('#register_user_form');
-    const isComplete = registerFunction.isFormComplete();
-    // Also require terms checkbox to be checked
-    const termsChecked = $('#terms-checkbox').is(':checked');
-    $submit.prop('disabled', !(isComplete && termsChecked));
+        const $submit = $('#register_user_form');
+        const isComplete = registerFunction.isFormComplete();
+        // Also require terms checkbox to be checked
+        const termsChecked = $('#terms-checkbox').is(':checked');
+        $submit.prop('disabled', !(isComplete && termsChecked));
     },
 
     checkPasswordMatch: function () {
