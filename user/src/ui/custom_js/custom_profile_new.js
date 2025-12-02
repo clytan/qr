@@ -61,8 +61,8 @@ const profileFunction = {
                     // Not logged in - show login prompt button
                     console.log('User not logged in, showing login button');
                     $('#follow-btn-container').html(`
-                        <button class="btn btn-primary" id="login-to-follow-btn">
-                            <i class="fas fa-sign-in-alt"></i> Login to Follow
+                        <button class="btn btn-primary" id="login-to-follow-btn" title="Login to Follow">
+                            <i class="fas fa-sign-in-alt"></i>
                         </button>
                     `).removeClass('hidden');
 
@@ -74,8 +74,8 @@ const profileFunction = {
                 console.log('Error checking login status, assuming not logged in');
                 // Assume not logged in on error
                 $('#follow-btn-container').html(`
-                    <button class="btn btn-primary" id="login-to-follow-btn">
-                        <i class="fas fa-sign-in-alt"></i> Login to Follow
+                    <button class="btn btn-primary" id="login-to-follow-btn" title="Login to Follow">
+                        <i class="fas fa-sign-in-alt"></i>
                     </button>
                 `).removeClass('hidden');
                 profileFunction.getFollowersCount(viewingQr, null);
@@ -897,6 +897,8 @@ const profileFunction = {
             'snapchat_username'
         ];
 
+        let hasAnyLinks = false;
+
         // Hide fields that don't have values or aren't in the links data
         allSocialFields.forEach(fieldId => {
             const hasValue = links[fieldId] && links[fieldId].value && links[fieldId].value.trim() !== '';
@@ -906,8 +908,14 @@ const profileFunction = {
             } else {
                 // Mark fields with values for different styling
                 $(`#${fieldId}`).attr('data-has-link', 'true');
+                hasAnyLinks = true;
             }
         });
+
+        // Hide the entire Social Media Links section if no links are present
+        if (!hasAnyLinks) {
+            $('#social-media-section').hide();
+        }
     },
 
 

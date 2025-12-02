@@ -22,6 +22,10 @@ function sendWelcomeEmail($toEmail, $toName = '') {
     $mail->Username = getenv('SMTP_USER') ?: 'support@codersdek.com';
     $mail->Password = getenv('SMTP_PASS') ?: 'Cdek@2020*';
     $mail->IsHTML(true);
+    
+    // Set UTF-8 charset to properly handle Unicode characters and emoji
+    $mail->CharSet = 'UTF-8';
+    $mail->Encoding = 'base64';
 
     $content = getWelcomeEmailContent($toName);
 

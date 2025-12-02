@@ -1034,10 +1034,13 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
             transition: all 0.3s ease;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             border: none;
+            font-size: 0 !important;
+            overflow: hidden;
         }
         
         #follow-btn-container .btn i {
             margin: 0 !important;
+            font-size: 18px !important;
         }
         
         #follow-btn-container .btn:hover {
@@ -1666,7 +1669,7 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                         </div>
 
                         <!-- Social Media Links -->
-                        <div class="form-section social-media-section">
+                        <div class="form-section social-media-section" id="social-media-section">
                             <div class="section-header">
                                 <i class="fas fa-share-alt"></i>
                                 <h3>Social Media Links</h3>
