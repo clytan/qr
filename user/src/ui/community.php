@@ -121,7 +121,7 @@ $user_id = $_SESSION['user_id'];
                         </div>
                     </div>
                     <!-- Members Sidebar -->
-                    <div class="discord-members-section">
+                    <div class="discord-members-section" style="display: none;">
                         <div class="members-header">Community Members</div>
                         <div class="members-list" id="membersList">
                             <!-- Members will be loaded here -->

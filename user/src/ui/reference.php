@@ -50,7 +50,7 @@ if (!$is_logged_in) {
                     <div style="margin-top:10px;"class="referral-card wow fadeInUp" data-wow-delay="0.4s">
                         <div class="referral-card-content">
                             <div class="referral-code-section">
-                                <span class="referral-code-label">Your Referral Code</span>
+                                <span class="referral-code-label text-white">Your Referral Code</span>
                                 <div class="referral-code-box">
                                     <span class="referral-code-text" id="referral-code">Loading...</span>
                                     <button class="copy-btn" id="copy-code-btn" title="Copy Code">
