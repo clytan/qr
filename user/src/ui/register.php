@@ -15,14 +15,17 @@
     <link rel="stylesheet" href="../assets/css/register-form.css">
 
     <style>
-        body, #wrapper, #content, .no-bottom.no-top {
+        body,
+        #wrapper,
+        #content,
+        .no-bottom.no-top {
             background: #1A1A1B !important;
         }
-        
+
         html {
             background: #1A1A1B !important;
         }
-        
+
         .centered-logo {
             width: 240px !important;
             height: auto !important;
@@ -41,7 +44,7 @@
             text-align: center;
             margin: 10px 0 20px;
         }
-        
+
         /* Gradient button */
         .btn-main {
             background: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%) !important;
@@ -50,7 +53,7 @@
             font-weight: 600 !important;
             transition: transform 0.2s, box-shadow 0.2s !important;
         }
-        
+
         .btn-main:hover {
             transform: translateY(-2px) !important;
             box-shadow: 0 6px 20px rgba(230, 119, 83, 0.4) !important;
@@ -177,7 +180,7 @@
             color: #64748b;
             font-weight: 500;
         }
-        
+
         /* Make all labels white */
         label {
             color: #e2e8f0 !important;
@@ -196,20 +199,20 @@
             transition: all 0.3s ease;
             background: white;
         }
-        
+
         .selection-card .card-text {
             color: #2c3e50;
             font-weight: 600;
             font-size: 14px;
             margin-top: 8px;
         }
-        
+
         .selection-card .card-icon {
             display: flex;
             align-items: center;
             justify-content: center;
         }
-        
+
         .selection-card .card-icon span {
             transition: all 0.3s ease;
         }
@@ -247,24 +250,36 @@
             background: #eff6ff;
         }
 
+        .tier-card[data-tier="silver"] .card-text {
+            color: #817c7c;
+            font-weight: 800;
+            font-size: 18px;
+        }
+
+        .tier-card[data-tier="gold"] .card-text {
+            color: #FFD700;
+            font-weight: 800;
+            font-size: 18px;
+        }
+
         .tier-card[data-tier="silver"]:has(input:checked) {
-            border-color: #94a3b8 !important;
-            background: #f1f5f9;
+            border-color: #C0C0C0 !important;
+            background: #f8f8f8;
         }
 
         .tier-card[data-tier="gold"]:has(input:checked) {
-            border-color: #eab308 !important;
-            background: #fefce8;
+            border-color: #FFD700 !important;
+            background: #fffacd;
         }
 
         .tier-card input:checked~.card-price {
             color: #16a34a;
             font-weight: 800;
         }
-        
+
         .tier-card input:checked~.card-text {
-            color: #1e293b;
-            font-weight: 700;
+            font-weight: 800;
+            font-size: 18px;
         }
 
         /* ==================== MOBILE RESPONSIVE STYLES ==================== */
@@ -277,15 +292,15 @@
                 backdrop-filter: blur(10px);
                 border: 1px solid rgba(255, 255, 255, 0.1);
             }
-            
+
             .box-rounded h3 {
                 color: #e2e8f0 !important;
             }
-            
+
             .box-rounded p {
                 color: #94a3b8 !important;
             }
-            
+
             .box-rounded p a {
                 background: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%);
                 -webkit-background-clip: text;
@@ -632,7 +647,8 @@
                                                     <label class="selection-card tier-card" data-tier="gold">
                                                         <input type="radio" name="user_tag" value="gold" id="tier_gold">
                                                         <div class="card-icon">
-                                                            <span style="font-size:24px;">✨</span>
+                                                            <span
+                                                                style="font-size:28px; filter:drop-shadow(0 0 1px rgba(0,0,0,7.3));">👑</span>
                                                         </div>
                                                         <span class="card-text">Gold</span>
                                                     </label>
@@ -640,10 +656,12 @@
                                                         <input type="radio" name="user_tag" value="silver"
                                                             id="tier_silver">
                                                         <div class="card-icon">
-                                                            <span style="font-size:24px;">🥈</span>
+                                                            <span
+                                                                style="font-size:28px; filter: grayscale(1) brightness(1.5) drop-shadow(0 0 1px rgba(0,0,0,7.3));">👑</span>
                                                         </div>
-                                                        <span class="card-text">Silver</span>
+                                                        <span class="card-text" style="">Silver</span>
                                                     </label>
+
                                                     <!-- Normal tier removed: only Gold and Silver shown -->
                                                 </div>
 
@@ -672,23 +690,22 @@
                                             <!-- Promo Code Section -->
                                             <div class="field-set" style="margin-bottom:20px;">
                                                 <label for="promo_code"
-                                                    style="font-weight:600;color:#e2e8f0;font-size:15px;">🎁 Promo Code (Optional)</label>
-                                                <input type="text" name="promo_code" id="promo_code"
-                                                    class="form-input" 
-                                                    placeholder="Enter promo code"
-                                                    style="text-transform: uppercase;">
+                                                    style="font-weight:600;color:#e2e8f0;font-size:15px;">🎁 Promo Code
+                                                    (Optional)</label>
+                                                <input type="text" name="promo_code" id="promo_code" class="form-input"
+                                                    placeholder="Enter promo code" style="text-transform: uppercase;">
                                                 <span id="promo-status"
                                                     style="margin-top:10px; display:block; font-size:14px; font-weight:600;"></span>
                                             </div>
 
-                                            <!-- Reference Code Section (Always Visible, 10 digits) -->
+                                            <!-- Reference Code Section (Always Visible, 10 characters alphanumeric) -->
                                             <div class="field-set" style="margin-bottom:20px;">
                                                 <label for="reference_code"
                                                     style="font-weight:600;color:#e2e8f0;font-size:15px;">🎯 Reference
                                                     Code (if any)</label>
                                                 <input type="text" name="reference_code" id="reference_code"
-                                                    class="reference-input" maxlength="10" pattern="[0-9]{10}"
-                                                    placeholder="🔗 Enter 10-digit reference code">
+                                                    class="reference-input" maxlength="10" pattern="[A-Za-z0-9]{10}"
+                                                    placeholder="🔗 Enter 10-character reference code">
                                                 <span id="reference-status"
                                                     style="margin-left:0px; margin-top:10px; display:block; font-size:14px; font-weight:600;"></span>
                                             </div>

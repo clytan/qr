@@ -12,9 +12,11 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
     <link rel="icon" href="../assets/logo2.png" type="image/gif" sizes="16x16">
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <meta content="Zokli - Join 10 million Zoks in the hyper-connected knowledge nexus. A digital community for learning, creating, and collective action."
+    <meta
+        content="Zokli - Join 10 million Zoks in the hyper-connected knowledge nexus. A digital community for learning, creating, and collective action."
         name="description" />
-    <meta content="Zokli, digital community, social media, Zoks, knowledge sharing, networking, skill development" name="keywords" />
+    <meta content="Zokli, digital community, social media, Zoks, knowledge sharing, networking, skill development"
+        name="keywords" />
     <meta content="Zokli" name="author" />
     <!-- CSS Files -->
     <?php include('../components/csslinks.php') ?>
@@ -540,7 +542,8 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                                 <img src="../assets/images/carousel/crs-1.jpg" alt="Knowledge Sharing">
                                 <div class="carousel-overlay">
                                     <h3><i class="fas fa-book-reader"></i> Knowledge Nexus</h3>
-                                    <p>Access curated learning paths, expert workshops, and peer-to-peer tutoring from 10 million minds</p>
+                                    <p>Access curated learning paths, expert workshops, and peer-to-peer tutoring from
+                                        10 million minds</p>
                                 </div>
                             </div>
 
@@ -548,7 +551,8 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                                 <img src="../assets/images/carousel/crs-2.jpg" alt="Community Connection">
                                 <div class="carousel-overlay">
                                     <h3><i class="fas fa-users"></i> A Continent of Connection</h3>
-                                    <p>Join Zoks from diverse ages, geographies, interests, and backgrounds in one vibrant community
+                                    <p>Join Zoks from diverse ages, geographies, interests, and backgrounds in one
+                                        vibrant community
                                     </p>
                                 </div>
                             </div>
@@ -557,7 +561,8 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                                 <img src="../assets/images/carousel/crs-3.jpg" alt="Rewards System">
                                 <div class="carousel-overlay">
                                     <h3><i class="fas fa-coins"></i> Economic Empowerment</h3>
-                                    <p>Get rewarded for your contributions in our transparent, reward-based ecosystem</p>
+                                    <p>Get rewarded for your contributions in our transparent, reward-based ecosystem
+                                    </p>
                                 </div>
                             </div>
 
@@ -565,7 +570,8 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                                 <img src="../assets/images/carousel/crs-4.jpg" alt="Creative Collaboration">
                                 <div class="carousel-overlay">
                                     <h3><i class="fas fa-palette"></i> Creator's Marketplace</h3>
-                                    <p>Collaborate on art, music, writing, and innovation with talented Zoks nationwide</p>
+                                    <p>Collaborate on art, music, writing, and innovation with talented Zoks nationwide
+                                    </p>
                                 </div>
                             </div>
 
@@ -573,7 +579,8 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                                 <img src="../assets/images/carousel/crs-5.jpg" alt="Collective Intelligence">
                                 <div class="carousel-overlay">
                                     <h3><i class="fas fa-brain"></i> Collective Intelligence</h3>
-                                    <p>Solve complex challenges together by mobilizing 10 million minds for real-world impact
+                                    <p>Solve complex challenges together by mobilizing 10 million minds for real-world
+                                        impact
                                     </p>
                                 </div>
                             </div>
@@ -615,10 +622,10 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                     <div class="hero-buttons">
                         <?php if (!$is_logged_in): ?>
                         <a href="register.php" class="btn-hero btn-primary">
-                            <i class="fas fa-rocket"></i> Become a Zok
+                            <i class="fas fa-rocket"></i> Register Now
                         </a>
                         <a href="login.php" class="btn-hero btn-outline">
-                            <i class="fas fa-sign-in-alt"></i> Zok Sign In
+                            <i class="fas fa-sign-in-alt"></i> Sign In
                         </a>
                         <?php else: ?>
                         <a href="profile.php" class="btn-hero btn-primary">
@@ -652,7 +659,8 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                             </div>
                             <h3 class="feature-title">Knowledge Sharing</h3>
                             <p class="feature-description">
-                                Access curated learning paths, expert-led workshops, and peer-to-peer tutoring on any subject. Get help from seasoned professionals and native speakers.
+                                Access curated learning paths, expert-led workshops, and peer-to-peer tutoring on any
+                                subject. Get help from seasoned professionals and native speakers.
                             </p>
                         </div>
 
@@ -662,7 +670,8 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                             </div>
                             <h3 class="feature-title">Creative Collaboration</h3>
                             <p class="feature-description">
-                                Artists collaborate on digital canvases, musicians jam across regions, writers co-author novels, and innovators pitch concepts to potential partners.
+                                Artists collaborate on digital canvases, musicians jam across regions, writers co-author
+                                novels, and innovators pitch concepts to potential partners.
                             </p>
                         </div>
 
@@ -672,7 +681,8 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                             </div>
                             <h3 class="feature-title">Collective Intelligence</h3>
                             <p class="feature-description">
-                                When challenges arise, 10 million minds mobilize together, brainstorming solutions, crowdsourcing data, and driving real-world impact.
+                                When challenges arise, 10 million minds mobilize together, brainstorming solutions,
+                                crowdsourcing data, and driving real-world impact.
                             </p>
                         </div>
 
@@ -682,7 +692,8 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                             </div>
                             <h3 class="feature-title">Economic Empowerment</h3>
                             <p class="feature-description">
-                                A transparent, reward-based economy where members are rewarded for contributions, fostering sustainable talent recognition and compensation.
+                                A transparent, reward-based economy where members are rewarded for contributions,
+                                fostering sustainable talent recognition and compensation.
                             </p>
                         </div>
 
@@ -692,7 +703,8 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                             </div>
                             <h3 class="feature-title">Decentralized Governance</h3>
                             <p class="feature-description">
-                                Participate in transparent, democratic processes to shape the community's future, allocate resources, and influence policy.
+                                Participate in transparent, democratic processes to shape the community's future,
+                                allocate resources, and influence policy.
                             </p>
                         </div>
 
@@ -702,7 +714,8 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                             </div>
                             <h3 class="feature-title">Culture of Generosity</h3>
                             <p class="feature-description">
-                                Thrive in a community built on sharing expertise, offering support, and celebrating each other's successes. A digital sanctuary fostering belonging.
+                                Thrive in a community built on sharing expertise, offering support, and celebrating each
+                                other's successes. A digital sanctuary fostering belonging.
                             </p>
                         </div>
                     </div>
@@ -710,7 +723,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
             </section>
 
             <!-- Vision Section -->
-            <section class="features-parallax" style="margin-top: -110px; background: var(--darker);">
+            <section class="features-parallax" style="margin-top: -110px; background: transparent;">
                 <div class="container">
                     <div class="section-header">
                         <h2 class="section-title">Our Vision</h2>
@@ -726,7 +739,9 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                             </div>
                             <h3 class="feature-title">For Learners</h3>
                             <p class="feature-description">
-                                Access curated learning paths, expert-led workshops, and peer-to-peer tutoring on any subject imaginable. Get help from seasoned developers, master new languages with native speakers, and grow your skills continuously.
+                                Access curated learning paths, expert-led workshops, and peer-to-peer tutoring on any
+                                subject imaginable. Get help from seasoned developers, master new languages with native
+                                speakers, and grow your skills continuously.
                             </p>
                         </div>
 
@@ -736,7 +751,9 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                             </div>
                             <h3 class="feature-title">For Creators</h3>
                             <p class="feature-description">
-                                A curated marketplace for ideas and talent. Artists collaborate on digital canvases, musicians jam across regions, writers co-author novels, and innovators pitch groundbreaking concepts to potential investors and partners.
+                                A curated marketplace for ideas and talent. Artists collaborate on digital canvases,
+                                musicians jam across regions, writers co-author novels, and innovators pitch
+                                groundbreaking concepts to potential investors and partners.
                             </p>
                         </div>
 
@@ -746,7 +763,9 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                             </div>
                             <h3 class="feature-title">For Problem Solvers</h3>
                             <p class="feature-description">
-                                A powerful collective intelligence engine. When significant challenges arise, 10 million minds mobilize, brainstorming solutions, crowdsourcing data, and driving real-world impact on social issues and community needs.
+                                A powerful collective intelligence engine. When significant challenges arise, 10 million
+                                minds mobilize, brainstorming solutions, crowdsourcing data, and driving real-world
+                                impact on social issues and community needs.
                             </p>
                         </div>
 
@@ -756,7 +775,9 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                             </div>
                             <h3 class="feature-title">Personalized Discovery</h3>
                             <p class="feature-description">
-                                Sophisticated algorithms curate content, connections, and opportunities tailored to each individual's evolving needs and interests, ensuring every member feels seen, valued, and consistently engaged.
+                                Sophisticated algorithms curate content, connections, and opportunities tailored to each
+                                individual's evolving needs and interests, ensuring every member feels seen, valued, and
+                                consistently engaged.
                             </p>
                         </div>
 
@@ -766,7 +787,9 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                             </div>
                             <h3 class="feature-title">The Spirit of Generosity</h3>
                             <p class="feature-description">
-                                A culture where sharing expertise, offering support, and celebrating each other's successes are the norm. A digital sanctuary that fosters belonging and amplifies individual potential through collective goodwill.
+                                A culture where sharing expertise, offering support, and celebrating each other's
+                                successes are the norm. A digital sanctuary that fosters belonging and amplifies
+                                individual potential through collective goodwill.
                             </p>
                         </div>
 
@@ -776,14 +799,21 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                             </div>
                             <h3 class="feature-title">Power of Collective Action</h3>
                             <p class="feature-description">
-                                By pooling resources, knowledge, and intent, this community becomes a formidable force for positive change, driving innovation, promoting social justice, and fostering a more equitable and sustainable world.
+                                By pooling resources, knowledge, and intent, this community becomes a formidable force
+                                for positive change, driving innovation, promoting social justice, and fostering a more
+                                equitable and sustainable world.
                             </p>
                         </div>
                     </div>
 
                     <div class="section-header" style="margin-top: 60px;">
-                        <h3 class="section-subtitle" style="font-size: 1.3rem; color: var(--text-color); max-width: 900px; margin: 0 auto; line-height: 1.8;">
-                            Built on principles of <strong style="color: #e67753;">open access</strong>, <strong style="color: #e67753;">intellectual curiosity</strong>, <strong style="color: #e67753;">mutual respect</strong>, and a shared commitment to <strong style="color: #e67753;">positive contribution</strong>. A testament to the power of collective human ingenuity when amplified by technology.
+                        <h3 class="section-subtitle"
+                            style="font-size: 1.3rem; color: var(--text-color); max-width: 900px; margin: 0 auto; line-height: 1.8;">
+                            Built on principles of <strong style="color: #e67753;">open access</strong>, <strong
+                                style="color: #e67753;">intellectual curiosity</strong>, <strong
+                                style="color: #e67753;">mutual respect</strong>, and a shared commitment to <strong
+                                style="color: #e67753;">positive contribution</strong>. A testament to the power of
+                            collective human ingenuity when amplified by technology.
                         </h3>
                     </div>
                 </div>
@@ -795,7 +825,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                     <div class="stats-grid">
                         <div class="stat-item">
                             <span class="stat-number">10M</span>
-                            <span class="stat-label">Target Members (Zoks)</span>
+                            <span class="stat-label">Target Members</span>
                         </div>
                         <div class="stat-item">
                             <span class="stat-number counter" data-count="50000">0</span>
@@ -818,7 +848,8 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                 <div class="cta-content">
                     <h2 class="cta-title">Become a Proud Zok Today!</h2>
                     <p class="cta-text">
-                        Join the hyper-connected knowledge nexus where 10 million members from across the nation converge to learn, create, and drive positive change.
+                        Join the hyper-connected knowledge nexus where 10 million members from across the nation
+                        converge to learn, create, and drive positive change.
                         Be part of Community Zokli and amplify your potential.
                     </p>
                     <?php if (!$is_logged_in): ?>

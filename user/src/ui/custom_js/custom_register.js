@@ -15,17 +15,17 @@ var eventHandler = {
         eventHandler.studentLeaderEvents();
         eventHandler.promoCodeEvents();
     },
-    
+
     promoCodeEvents: () => {
         let promoTimeout = null;
-        
-        $('#promo_code').on('input', function() {
+
+        $('#promo_code').on('input', function () {
             const promoCode = $(this).val().trim().toUpperCase();
             const statusEl = $('#promo-status');
-            
+
             // Clear previous timeout
             clearTimeout(promoTimeout);
-            
+
             // Reset if empty
             if (!promoCode) {
                 if (appliedPromoCode) {
@@ -38,15 +38,15 @@ var eventHandler = {
                 }
                 return;
             }
-            
+
             // Show checking status
             statusEl.html('<span style="color: #94a3b8;">⏳ Checking...</span>');
-            
+
             // Debounce the API call
-            promoTimeout = setTimeout(function() {
+            promoTimeout = setTimeout(function () {
                 // Get current amount
                 let amount = parseInt($('#pay-amount').text());
-                
+
                 $.ajax({
                     url: '../backend/payment/validate_promo.php',
                     type: 'POST',
@@ -55,18 +55,18 @@ var eventHandler = {
                         code: promoCode,
                         amount: amount
                     }),
-                    success: function(response) {
+                    success: function (response) {
                         if (response.success) {
                             appliedPromoCode = response.promo_code;
                             promoDiscount = response.discount_amount;
                             originalAmount = response.original_amount;
-                            
+
                             $('#pay-amount').text(response.final_amount.toFixed(0));
-                            
-                            let discountText = response.discount_type === 'percentage' 
-                                ? response.discount_value + '% off' 
+
+                            let discountText = response.discount_type === 'percentage'
+                                ? response.discount_value + '% off'
                                 : '₹' + response.discount_value + ' off';
-                                
+
                             statusEl.html(`<span style="color: #10b981;">✓ ${discountText} applied! You save ₹${promoDiscount.toFixed(2)}</span>`);
                         } else {
                             appliedPromoCode = null;
@@ -76,7 +76,7 @@ var eventHandler = {
                             eventHandler.updatePayAmount();
                         }
                     },
-                    error: function() {
+                    error: function () {
                         appliedPromoCode = null;
                         promoDiscount = 0;
                         originalAmount = 0;
@@ -87,14 +87,14 @@ var eventHandler = {
             }, 800); // Wait 800ms after user stops typing
         });
     },
-    
+
     updatePayAmount: () => {
         let checkedTier = $('input[name="user_tag"]:checked').val();
         let amount = 999;
         if (checkedTier === 'gold') amount = 9999;
         else if (checkedTier === 'silver') amount = 5555;
         if ($('#student_leader').val() === 'yes') amount = 999;
-        
+
         // Reset promo if amount changes
         if (appliedPromoCode && originalAmount !== amount) {
             appliedPromoCode = null;
@@ -104,7 +104,7 @@ var eventHandler = {
             $('#apply-promo-btn').prop('disabled', false).text('Apply').css('background', '');
             $('#promo-status').html('');
         }
-        
+
         $('#pay-amount').text(amount);
     },
 
@@ -242,7 +242,7 @@ var eventHandler = {
     },
 
     referenceEvents: () => {
-        // Reference code is always visible, validate for 10 digits if filled
+        // Reference code is always visible, validate for 10 alphanumeric characters if filled
         $('#reference_code').on('input', function () {
             var code = $(this).val().trim();
             if (code === '') {
@@ -251,8 +251,8 @@ var eventHandler = {
                 registerFunction.updateSubmitState();
                 return;
             }
-            if (!/^[0-9]{10}$/.test(code)) {
-                $('#reference-status').text('Reference code must be 10 digits').css('color', 'red');
+            if (!/^[A-Za-z0-9]{10}$/.test(code)) {
+                $('#reference-status').text('Reference code must be 10 characters (letters and numbers)').css('color', 'red');
                 registerFunction.setReferenceValid(false);
                 registerFunction.referredByUserId = null;
                 registerFunction.updateSubmitState();
