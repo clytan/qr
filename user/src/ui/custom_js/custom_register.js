@@ -760,7 +760,7 @@ var registerFunction = {
         var phoneValid = phonePattern.test(phone);
         // Reference code validation
         var referenceCode = $.trim($('#reference_code').val());
-        var referenceValid = referenceCode === '' || (/^[0-9]{10}$/.test(referenceCode) && registerFunction.referenceValid);
+var referenceValid = referenceCode === '' || (/^[A-Za-z0-9]{10}$/.test(referenceCode) && registerFunction.referenceValid);
         // Policy checkbox
         var termsChecked = $('#terms-checkbox').is(':checked');
         var isValid = (
