@@ -66,6 +66,43 @@ try {
         }
     }
 
+    // ============================================
+    // SECURITY: Hardcoded tier prices - NEVER trust frontend amounts
+    // ============================================
+    $TIER_PRICES = [
+        'normal' => 999,
+        'silver' => 5555,
+        'gold' => 9999,
+        'student_leader' => 999
+    ];
+
+    // Get user_tag from frontend (gold/silver/normal)
+    $userTag = isset($data['user_tag']) ? strtolower(trim($data['user_tag'])) : 'normal';
+    
+    // Check if student leader (overrides tier selection)
+    $isStudentLeader = isset($data['student_leader']) && $data['student_leader'] === 'yes';
+    
+    // Determine the correct tier for pricing
+    if ($isStudentLeader) {
+        $pricingTier = 'student_leader';
+    } else if (in_array($userTag, ['gold', 'silver', 'normal'])) {
+        $pricingTier = $userTag;
+    } else {
+        $pricingTier = 'normal'; // Default fallback
+    }
+    
+    // Get the HARDCODED price for this tier (NEVER use frontend amount directly)
+    $originalAmount = $TIER_PRICES[$pricingTier];
+    
+    // Validate that frontend sent the correct amount (detect tampering)
+    $frontendAmount = floatval($data['amount']);
+    if ($frontendAmount != $originalAmount) {
+        error_log("⚠️ SECURITY WARNING: Frontend amount ($frontendAmount) doesn't match tier price ($originalAmount) for tier: $pricingTier");
+        // We'll use our hardcoded amount anyway, but log the discrepancy
+    }
+    
+    error_log("✓ Tier: $pricingTier, Hardcoded Price: ₹$originalAmount");
+
     // Your Cashfree credentials - replace with actual credentials
     $clientId = "1106277eab36909b950443d4c757726011"; // Replace with your client ID
     $clientSecret = "cfsk_ma_prod_36fd9bb92f7bbb654f807b60d6b7c67c_244c3bc6"; // Replace with your client secret
@@ -75,7 +112,6 @@ try {
 
     // Handle promo code if provided
     $promoCode = isset($data['promo_code']) ? strtoupper(trim($data['promo_code'])) : null;
-    $originalAmount = $data['amount'];
     $discountAmount = 0;
     $finalAmount = $originalAmount;
 

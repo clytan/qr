@@ -1558,3 +1558,7 @@
 [02-Dec-2025 20:28:33 UTC] Attempting to include: ./dbconfig/connection.php
 [02-Dec-2025 20:28:46 UTC] Current Directory: C:\project\user\src\backend
 [02-Dec-2025 20:28:46 UTC] Attempting to include: ./dbconfig/connection.php
+[08-Dec-2025 18:01:55 Europe/Berlin] Current Directory: C:\xampp\htdocs\qr\user\src\backend
+[08-Dec-2025 18:01:55 Europe/Berlin] Attempting to include: ./dbconfig/connection.php
+[08-Dec-2025 18:02:00 Europe/Berlin] Current Directory: C:\xampp\htdocs\qr\user\src\backend
+[08-Dec-2025 18:02:00 Europe/Berlin] Attempting to include: ./dbconfig/connection.php

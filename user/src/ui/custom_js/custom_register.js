@@ -44,8 +44,13 @@ var eventHandler = {
 
             // Debounce the API call
             promoTimeout = setTimeout(function () {
-                // Get current amount
-                let amount = parseInt($('#pay-amount').text());
+                // IMPORTANT: Always calculate original tier amount from tier selection,
+                // not from the displayed #pay-amount (which could already be discounted)
+                let checkedTier = $('input[name="user_tag"]:checked').val();
+                let amount = 999; // Default
+                if (checkedTier === 'gold') amount = 9999;
+                else if (checkedTier === 'silver') amount = 5555;
+                if ($('#student_leader').val() === 'yes') amount = 999;
 
                 $.ajax({
                     url: '../backend/payment/validate_promo.php',
@@ -269,10 +274,13 @@ var eventHandler = {
         $('#email').on('input', function () {
             var email = $(this).val().trim();
             if (email !== '') {
-                $('#verify-email-section').show();
-                $('#email-verified-status').text('');
-                $('#verify-email-link').show();
-                registerFunction.setEmailVerified(false);
+                $('#verify-email-section').css('display', 'flex');
+                // Only reset verification if the email actually changed from the verified one
+                if (email !== registerFunction.lastVerifiedEmail) {
+                    $('#email-verified-status').text('');
+                    $('#verify-email-link').show();
+                    registerFunction.setEmailVerified(false);
+                }
             } else {
                 $('#verify-email-section').hide();
                 registerFunction.setEmailVerified(false);
@@ -414,14 +422,17 @@ var eventHandler = {
                 password: $('#password').val().trim(),
                 user_type: finalUserType,
                 user_slab: $('#user_slab').val(),
+                user_tag: finalUserTag, // Send tier for backend validation
+                student_leader: $('#student_leader').val(), // Send student leader status
                 college_name: $('#college_name').val().trim(),
                 reference_code: $('#reference_code').val().trim(),
                 referred_by_user_id: registerFunction.referredByUserId || null,
                 promo_code: appliedPromoCode || null
             };
             // Calculate amount based on user type and membership tier
+            // ALWAYS send the original tier amount - backend will validate and use hardcoded prices
             const amount = registerFunction.calculateAmount(finalUserType, finalUserTag);
-            formData.amount = appliedPromoCode ? parseInt($('#pay-amount').text()) : amount;
+            formData.amount = amount; // Backend will verify this matches the tier
             console.log('Form submission - User Type:', finalUserType, 'Membership Tier:', finalUserTag, 'Amount:', formData.amount);
             if (appliedPromoCode) {
                 console.log('Promo code applied:', appliedPromoCode, 'Discount:', promoDiscount);
@@ -486,6 +497,7 @@ var eventHandler = {
 
 var registerFunction = {
     emailVerified: false,
+    lastVerifiedEmail: '', // Track which email was verified to avoid resetting unnecessarily
     referenceValid: true,
     referredByUserId: null,
     referenceTimeout: null,
@@ -506,9 +518,10 @@ var registerFunction = {
         return amount;
     },
 
-    setEmailVerified: function (val) {
+    setEmailVerified: function (val, email) {
         registerFunction.emailVerified = val;
         if (val) {
+            registerFunction.lastVerifiedEmail = email || $('#email').val().trim();
             $('#email-verified-status').text('Verified').css('color', 'green');
             $('#verify-email-link').hide();
         } else {
@@ -676,7 +689,8 @@ var registerFunction = {
                     setTimeout(function () {
                         $('#email-otp-modal').hide();
                     }, 1500);
-                    registerFunction.setEmailVerified(true);
+                    // Pass the email that was verified
+                    registerFunction.setEmailVerified(true, $('#email').val().trim());
                 } else {
                     $('#otp-status-msg').css('color', 'red').text(response.message ||
                         'Invalid OTP.');
@@ -699,7 +713,7 @@ var registerFunction = {
             dataType: 'json',
             success: function (response) {
                 if (response.status && response.data.verified == 1) {
-                    registerFunction.setEmailVerified(true);
+                    registerFunction.setEmailVerified(true, email);
                     if (cb) cb(true);
                 } else {
                     registerFunction.setEmailVerified(false);
@@ -760,7 +774,7 @@ var registerFunction = {
         var phoneValid = phonePattern.test(phone);
         // Reference code validation
         var referenceCode = $.trim($('#reference_code').val());
-var referenceValid = referenceCode === '' || (/^[A-Za-z0-9]{10}$/.test(referenceCode) && registerFunction.referenceValid);
+        var referenceValid = referenceCode === '' || (/^[A-Za-z0-9]{10}$/.test(referenceCode) && registerFunction.referenceValid);
         // Policy checkbox
         var termsChecked = $('#terms-checkbox').is(':checked');
         var isValid = (
@@ -809,8 +823,23 @@ $(document).ready(function () {
     eventHandler.init();
     registerFunction.init();
 
+    // Check if email already has value (e.g., returning from payment gateway or browser back)
     var email = $('#email').val().trim();
     if (email !== '') {
+        // Show the verify email section
+        $('#verify-email-section').css('display', 'flex');
+
+        // Check if this email was previously verified
         registerFunction.checkEmailVerified(email);
     }
+
+    // Also re-check on page visibility change (user returning from payment app)
+    document.addEventListener('visibilitychange', function () {
+        if (!document.hidden) {
+            var currentEmail = $('#email').val().trim();
+            if (currentEmail !== '' && !registerFunction.emailVerified) {
+                registerFunction.checkEmailVerified(currentEmail);
+            }
+        }
+    });
 });
