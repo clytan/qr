@@ -85,12 +85,16 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
 
     header a.btn-notification,
     header a.btn-wallet,
+    header a.btn-rewards,
     header .btn-notification,
     header .btn-wallet,
+    header .btn-rewards,
     a.btn-notification,
     a.btn-wallet,
+    a.btn-rewards,
     .btn-notification,
-    .btn-wallet {
+    .btn-wallet,
+    .btn-rewards {
         display: flex !important;
         align-items: center;
         justify-content: center;
@@ -111,12 +115,16 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
 
     header a.btn-notification i,
     header a.btn-wallet i,
+    header a.btn-rewards i,
     header .btn-notification i,
     header .btn-wallet i,
+    header .btn-rewards i,
     a.btn-notification i,
     a.btn-wallet i,
+    a.btn-rewards i,
     .btn-notification i,
-    .btn-wallet i {
+    .btn-wallet i,
+    .btn-rewards i {
         font-size: 17px !important;
         display: inline-block !important;
         color: #ffffff !important;
@@ -124,12 +132,16 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
 
     header a.btn-notification:hover,
     header a.btn-wallet:hover,
+    header a.btn-rewards:hover,
     header .btn-notification:hover,
     header .btn-wallet:hover,
+    header .btn-rewards:hover,
     a.btn-notification:hover,
     a.btn-wallet:hover,
+    a.btn-rewards:hover,
     .btn-notification:hover,
-    .btn-wallet:hover {
+    .btn-wallet:hover,
+    .btn-rewards:hover {
         background: rgba(255, 255, 255, 0.15) !important;
         border-color: rgba(255, 255, 255, 1) !important;
         transform: translateY(-2px) !important;

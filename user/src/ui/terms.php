@@ -57,9 +57,9 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                 <div class="container">
                     <div class="policy-card">
                         <h1 class="policy-title">Terms & Agreement</h1>
-                        <p class="policy-sub">Last updated: October 2025</p>
+                        <p class="policy-sub">Last updated: December 2025</p>
 
-                        <p>Welcome to Zokli <strong>(Blr Leaf Technologies Pvt Ltd.)</strong>. These Terms & Agreement
+                        <p>Welcome to Zokli <strong>(Blrleaf Technology OPC Private Limited)</strong>. These Terms & Agreement
                             ("Terms") govern your access to and use of our website and services. By accessing or using
                             Zokli, you agree to be bound by these Terms.</p>
 

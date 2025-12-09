@@ -48,9 +48,9 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                 <div class="container">
                     <div class="policy-card">
                         <h1 class="policy-title">Privacy Policy</h1>
-                        <p class="policy-sub">Last updated: October 2025</p>
+                        <p class="policy-sub">Last updated: December 2025</p>
 
-                        <p>Welcome to Zokli <strong>(Blr Leaf Technologies Pvt Ltd.)</strong>. Your privacy matters to us. This Privacy Policy explains how Zokli ("we", "our", or "us") collects, uses, discloses, and protects information when you visit or use our website and services.</p>
+                        <p>Welcome to Zokli <strong>(Blrleaf Technology OPC Private Limited)</strong>. Your privacy matters to us. This Privacy Policy explains how Zokli ("we", "our", or "us") collects, uses, discloses, and protects information when you visit or use our website and services.</p>
 
                         <h3>1. Information We Collect</h3>
                         <p>We may collect information you provide directly (for example, when you register, update your profile, or contact support) such as name, email address, username, profile data, and any other information you choose to provide. We also collect data automatically when you use our services, including device information, IP address, browser type, pages visited, and usage statistics.</p>

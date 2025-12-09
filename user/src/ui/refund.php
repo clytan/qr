@@ -57,9 +57,9 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                 <div class="container">
                     <div class="policy-card">
                         <h1 class="policy-title">Refund Policy</h1>
-                        <p class="policy-sub">Last updated: October 2025</p>
+                        <p class="policy-sub">Last updated: December 2025</p>
 
-                        <p>At Zokli <strong>(Blr Leaf Technologies Pvt Ltd.)</strong>, we aim to provide clear, fair
+                        <p>At Zokli <strong>(Blrleaf Technology OPC Private Limited)</strong>, we aim to provide clear, fair
                             policies for subscriptions, purchases, and payments. This Refund Policy explains when
                             refunds are available, how to request one, and how we process refunds.</p>
 
@@ -87,7 +87,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                         </ol>
 
                         <h3>5. Processing Refunds</h3>
-                        <p>Approved refunds will be issued to the original payment method. It may take up to 10 business
+                        <p>Approved refunds will be issued to the original payment method. It may take up to 7 business
                             days for refunded amounts to appear depending on your bank or payment provider.</p>
 
                         <h3>6. Chargebacks</h3>

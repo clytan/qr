@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function(){
             </div>
             <span>Profile</span>
         </a>
-        <a href="#" class="nav-item coming-soon" data-name="Rewards" data-page="rewards">
+        <a href="/user/src/ui/rewards.php" class="nav-item" data-page="rewards">
             <div class="nav-icon-wrapper">
                 <i class="fas fa-gift"></i>
             </div>

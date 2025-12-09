@@ -27,7 +27,7 @@ function assignUserToCommunity($conn, $user_id)
         // Community 1: Users 1-100
         // Community 2: Users 101-200
         // Community 3: Users 201-300, etc.
-        $communityNumber = ceil($totalUsers / 100);
+        $communityNumber = ceil($totalUsers / 1000000);
         if ($communityNumber < 1)
             $communityNumber = 1;
 
@@ -94,7 +94,7 @@ function assignUserToCommunity($conn, $user_id)
 
         // Update community member count and check if full
         $new_member_count = $current_members + 1;
-        $is_full = ($new_member_count >= 100) ? 1 : 0;
+        $is_full = ($new_member_count >= 1000000) ? 1 : 0;
 
         $sqlUpdateCommunity = "UPDATE community SET current_members = ?, is_full = ?, updated_on = NOW(3) WHERE id = ?";
         $stmtUpdateCommunity = $conn->prepare($sqlUpdateCommunity);
