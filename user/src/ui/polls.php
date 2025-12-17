@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<?php
+include '../backend/dbconfig/connection.php';
+session_start();
+$is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
+$user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
+$user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
+?>
+
+<head>
+    <title>Zokli - Community Polls</title>
+    <link rel="icon" href="../assets/logo2.png" type="image/gif" sizes="16x16">
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="Zokli Community Polls - Create and vote on polls" name="description" />
+    
+    <?php include('../components/csslinks.php') ?>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+    :root {
+        --primary: #667eea;
+        --primary-dark: #5568d3;
+        --secondary: #764ba2;
+        --accent: #f093fb;
+        --dark: #0f172a;
+        --darker: #0a0e27;
+        --light: #f8fafc;
+        --gradient-1: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --gradient-2: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%);
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+    }
+
+    body, html {
+        min-height: 100vh;
+        background: var(--darker) !important;
+    }
+
+    #wrapper {
+        background: linear-gradient(135deg, rgba(10, 14, 39, 0.98) 0%, rgba(26, 31, 58, 0.95) 100%);
+    }
+
+    #content {
+        padding-top: 80px !important;
+        padding-bottom: 100px;
+    }
+
+    @media (max-width: 768px) {
+        #content {
+           padding-top: 60px !important;
+        }
+    }
+
+    /* Page Header */
+    .polls-hero {
+        text-align: center;
+        padding: 30px 0 20px;
+        margin-top:10%;
+    }
+
+    .polls-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: var(--gradient-2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+    }
+
+    .polls-subtitle {
+        color: #94a3b8;
+        font-size: 1rem;
+    }
+
+    /* Tabs */
+    .polls-tabs {
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+        margin: 20px 0 30px;
+        flex-wrap: wrap;
+    }
+
+    .poll-tab {
+        padding: 10px 24px;
+        border-radius: 50px;
+        border: 2px solid rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.05);
+        color: #94a3b8;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .poll-tab:hover {
+        border-color: var(--primary);
+        color: #fff;
+    }
+
+    .poll-tab.active {
+        background: var(--gradient-1);
+        border-color: transparent;
+        color: #fff;
+    }
+
+    /* Create Poll Button */
+    .create-poll-btn {
+        position: fixed;
+        bottom: 120px;
+        right: 20px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: var(--gradient-2);
+        color: white;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        box-shadow: 0 8px 25px rgba(233, 67, 122, 0.4);
+        z-index: 100;
+        transition: all 0.3s ease;
+    }
+
+    .create-poll-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 12px 35px rgba(233, 67, 122, 0.5);
+    }
+
+    /* Polls Container */
+    .polls-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 15px;
+    }
+
+    /* Poll Card */
+    .poll-card {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 24px;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .poll-card:hover {
+        border-color: rgba(102, 126, 234, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .poll-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 15px;
+    }
+
+    .poll-creator {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.85rem;
+        color: #94a3b8;
+    }
+
+    .poll-creator-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--gradient-1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 0.8rem;
+    }
+
+    .poll-status {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .poll-status.active {
+        background: rgba(16, 185, 129, 0.2);
+        color: #10b981;
+    }
+
+    .poll-status.closed {
+        background: rgba(148, 163, 184, 0.2);
+        color: #94a3b8;
+    }
+
+    .poll-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #fff;
+        margin-bottom: 8px;
+    }
+
+    .poll-description {
+        color: #94a3b8;
+        font-size: 0.9rem;
+        margin-bottom: 20px;
+    }
+
+    /* Poll Options */
+    .poll-options {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .poll-option {
+        position: relative;
+        padding: 14px 18px;
+        border-radius: 10px;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.03);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        overflow: hidden;
+    }
+
+    .poll-option:hover:not(.disabled) {
+        border-color: var(--primary);
+        background: rgba(102, 126, 234, 0.1);
+    }
+
+    .poll-option.selected {
+        border-color: var(--primary);
+        background: rgba(102, 126, 234, 0.15);
+    }
+
+    .poll-option.voted {
+        cursor: default;
+    }
+
+    .poll-option-content {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+    }
+
+    .poll-option-text {
+        color: #e2e8f0;
+        font-weight: 500;
+    }
+
+    .poll-option-stats {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #94a3b8;
+        font-size: 0.85rem;
+    }
+
+    .poll-option-bar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.1) 100%);
+        border-radius: 8px;
+        transition: width 0.5s ease;
+        z-index: 1;
+    }
+
+    .poll-option.user-voted .poll-option-bar {
+        background: linear-gradient(90deg, rgba(102, 126, 234, 0.4) 0%, rgba(118, 75, 162, 0.3) 100%);
+    }
+
+    /* Poll Footer */
+    .poll-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    .poll-votes {
+        color: #64748b;
+        font-size: 0.85rem;
+    }
+
+    .poll-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .poll-action-btn {
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .poll-action-btn.edit {
+        background: rgba(102, 126, 234, 0.2);
+        color: var(--primary);
+    }
+
+    .poll-action-btn.delete {
+        background: rgba(239, 68, 68, 0.2);
+        color: var(--danger);
+    }
+
+    .poll-action-btn:hover {
+        opacity: 0.8;
+    }
+
+    /* Modal */
+    .poll-modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 2000;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .poll-modal.show {
+        display: flex;
+    }
+
+    .poll-modal-content {
+        background: #1a1f3e;
+        border-radius: 20px;
+        width: 100%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .poll-modal-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .poll-modal-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #fff;
+    }
+
+    .poll-modal-close {
+        background: none;
+        border: none;
+        color: #94a3b8;
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: 0;
+        line-height: 1;
+    }
+
+    .poll-modal-body {
+        padding: 24px;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-label {
+        display: block;
+        color: #e2e8f0;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .form-input, .form-textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 10px;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-input:focus, .form-textarea:focus {
+        outline: none;
+        border-color: var(--primary);
+        background: rgba(102, 126, 234, 0.1);
+    }
+
+    .form-textarea {
+        resize: vertical;
+        min-height: 80px;
+    }
+
+    .options-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .option-input-wrapper {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .option-input {
+        flex: 1;
+    }
+
+    .remove-option-btn {
+        padding: 8px 12px;
+        background: rgba(239, 68, 68, 0.2);
+        color: var(--danger);
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+
+    .add-option-btn {
+        padding: 10px;
+        background: rgba(102, 126, 234, 0.2);
+        color: var(--primary);
+        border: 2px dashed rgba(102, 126, 234, 0.4);
+        border-radius: 10px;
+        cursor: pointer;
+        text-align: center;
+        margin-top: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .add-option-btn:hover {
+        background: rgba(102, 126, 234, 0.3);
+        border-color: var(--primary);
+    }
+
+    .submit-poll-btn {
+        width: 100%;
+        padding: 14px 20px;
+        background: var(--gradient-2);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .submit-poll-btn:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+    }
+
+    .submit-poll-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        transform: none;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #64748b;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        margin-bottom: 20px;
+        opacity: 0.5;
+    }
+
+    .empty-state h3 {
+        color: #94a3b8;
+        margin-bottom: 10px;
+    }
+
+    /* Login Prompt */
+    .login-prompt {
+        text-align: center;
+        padding: 100px 20px;
+        min-height: 60vh;
+    }
+
+    .login-prompt h2 {
+        color: #fff;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .login-prompt p {
+        color: #94a3b8;
+        margin-bottom: 2rem;
+    }
+
+    .btn-login {
+        padding: 15px 40px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 50px;
+        background: var(--gradient-2);
+        color: white;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.3s ease;
+    }
+
+    .btn-login:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 40px rgba(233, 67, 122, 0.4);
+        color: white;
+    }
+
+    /* Loading */
+    .loading-spinner {
+        text-align: center;
+        padding: 40px;
+        color: #94a3b8;
+    }
+
+    .loading-spinner i {
+        font-size: 2rem;
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    /* Toast */
+    .toast {
+        position: fixed;
+        bottom: 120px;
+        left: 50%;
+        transform: translateX(-50%);
+        padding: 12px 24px;
+        border-radius: 10px;
+        color: white;
+        font-weight: 500;
+        z-index: 3000;
+        display: none;
+        animation: slideUp 0.3s ease;
+    }
+
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--danger); }
+
+    .toast.show { display: block; }
+
+    @keyframes slideUp {
+        from { transform: translate(-50%, 20px); opacity: 0; }
+        to { transform: translate(-50%, 0); opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+        .polls-title { font-size: 1.8rem; }
+        .poll-card { padding: 16px; }
+        .poll-title { font-size: 1.1rem; }
+        .create-poll-btn { bottom: 120px; right: 15px; width: 55px; height: 55px; }
+    }
+    </style>
+</head>
+
+<body class="dark-scheme de-grey">
+    <div id="wrapper">
+        <?php include('../components/header.php') ?>
+
+        <div class="no-bottom no-top" id="content">
+            <?php if (!$is_logged_in): ?>
+            <section class="login-prompt">
+                <i class="fas fa-poll" style="font-size: 4rem; color: var(--primary); margin-bottom: 1rem;"></i>
+                <h2>Login Required</h2>
+                <p>Please login to view and participate in community polls!</p>
+                <a href="login.php?return=<?php echo urlencode($_SERVER['REQUEST_URI']); ?>" class="btn-login">
+                    <i class="fas fa-sign-in-alt"></i> Login Now
+                </a>
+            </section>
+            <?php else: ?>
+            
+            <section class="polls-hero">
+                <h1 class="polls-title">Community Polls</h1>
+                <p class="polls-subtitle">Vote on polls and share your opinion with the community!</p>
+            </section>
+
+            <div class="polls-tabs">
+                <button class="poll-tab active" data-filter="all">All Polls</button>
+                <button class="poll-tab" data-filter="my">My Polls</button>
+            </div>
+
+            <div class="polls-container" id="pollsContainer">
+                <div class="loading-spinner">
+                    <i class="fas fa-spinner"></i>
+                    <p>Loading polls...</p>
+                </div>
+            </div>
+
+            <button class="create-poll-btn" id="createPollBtn" title="Create Poll">
+                <i class="fas fa-plus"></i>
+            </button>
+
+            <?php endif; ?>
+        </div>
+
+        <?php include('../components/footer.php') ?>
+    </div>
+
+    <!-- Create Poll Modal -->
+    <div class="poll-modal" id="createPollModal">
+        <div class="poll-modal-content">
+            <div class="poll-modal-header">
+                <h3 class="poll-modal-title">Create New Poll</h3>
+                <button class="poll-modal-close" id="closeModal">&times;</button>
+            </div>
+            <div class="poll-modal-body">
+                <form id="createPollForm">
+                    <div class="form-group">
+                        <label class="form-label">Question *</label>
+                        <input type="text" class="form-input" id="pollTitle" placeholder="What do you want to ask?" required maxlength="255">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Description (optional)</label>
+                        <textarea class="form-textarea" id="pollDescription" placeholder="Add more context..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Options *</label>
+                        <div class="options-container" id="optionsContainer">
+                            <div class="option-input-wrapper">
+                                <input type="text" class="form-input option-input" placeholder="Option 1" required maxlength="255">
+                            </div>
+                            <div class="option-input-wrapper">
+                                <input type="text" class="form-input option-input" placeholder="Option 2" required maxlength="255">
+                            </div>
+                        </div>
+                        <button type="button" class="add-option-btn" id="addOptionBtn">
+                            <i class="fas fa-plus"></i> Add Option
+                        </button>
+                    </div>
+                    
+                    <button type="submit" class="submit-poll-btn" id="submitPollBtn">
+                        <i class="fas fa-paper-plane"></i> Create Poll
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <?php include('../components/jslinks.php') ?>
+    
+    <?php if ($is_logged_in): ?>
+    <script>
+    const PollsApp = {
+        currentFilter: 'all',
+        polls: [],
+        
+        init() {
+            this.bindEvents();
+            this.loadPolls();
+        },
+        
+        bindEvents() {
+            // Tab switching
+            document.querySelectorAll('.poll-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.poll-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                    this.currentFilter = tab.dataset.filter;
+                    this.loadPolls();
+                });
+            });
+            
+            // Create poll button
+            document.getElementById('createPollBtn').addEventListener('click', () => {
+                document.getElementById('createPollModal').classList.add('show');
+            });
+            
+            // Close modal
+            document.getElementById('closeModal').addEventListener('click', () => {
+                document.getElementById('createPollModal').classList.remove('show');
+            });
+            
+            // Close modal on backdrop click
+            document.getElementById('createPollModal').addEventListener('click', (e) => {
+                if (e.target === document.getElementById('createPollModal')) {
+                    document.getElementById('createPollModal').classList.remove('show');
+                }
+            });
+            
+            // Add option
+            document.getElementById('addOptionBtn').addEventListener('click', () => {
+                this.addOptionInput();
+            });
+            
+            // Submit poll form
+            document.getElementById('createPollForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.createPoll();
+            });
+        },
+        
+        async loadPolls() {
+            const container = document.getElementById('pollsContainer');
+            container.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner"></i><p>Loading polls...</p></div>';
+            
+            try {
+                const response = await fetch(`../backend/polls/get_polls.php?filter=${this.currentFilter}`);
+                const data = await response.json();
+                
+                if (data.status && data.polls.length > 0) {
+                    container.innerHTML = data.polls.map(poll => this.renderPollCard(poll)).join('');
+                    this.bindPollEvents();
+                } else {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-poll"></i>
+                            <h3>No polls found</h3>
+                            <p>Be the first to create a poll!</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading polls:', error);
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><h3>Error loading polls</h3></div>';
+            }
+        },
+        
+        renderPollCard(poll) {
+            const totalVotes = poll.total_votes || 0;
+            const creatorInitial = poll.creator_name ? poll.creator_name.charAt(0).toUpperCase() : '?';
+            
+            let optionsHtml = poll.options.map(opt => {
+                const percentage = totalVotes > 0 ? Math.round((opt.votes / totalVotes) * 100) : 0;
+                const isUserVoted = poll.user_voted_option === opt.id;
+                const votedClass = poll.user_voted ? 'voted' : '';
+                const userVotedClass = isUserVoted ? 'user-voted selected' : '';
+                
+                return `
+                    <div class="poll-option ${votedClass} ${userVotedClass}" 
+                         data-poll-id="${poll.id}" 
+                         data-option-id="${opt.id}"
+                         ${poll.user_voted || poll.status === 'closed' ? 'disabled' : ''}>
+                        <div class="poll-option-bar" style="width: ${poll.user_voted || poll.status === 'closed' ? percentage : 0}%"></div>
+                        <div class="poll-option-content">
+                            <span class="poll-option-text">${this.escapeHtml(opt.text)}</span>
+                            <span class="poll-option-stats">
+                                ${poll.user_voted || poll.status === 'closed' ? `<span>${percentage}%</span>` : ''}
+                                ${isUserVoted ? '<i class="fas fa-check-circle" style="color: var(--primary)"></i>' : ''}
+                            </span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            let actionsHtml = '';
+            if (poll.is_owner) {
+                actionsHtml = `
+                    <div class="poll-actions">
+                        <button class="poll-action-btn delete" data-poll-id="${poll.id}">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+            }
+            
+            return `
+                <div class="poll-card" data-poll-id="${poll.id}">
+                    <div class="poll-header">
+                        <div class="poll-creator">
+                            <div class="poll-creator-avatar">${creatorInitial}</div>
+                            <span>${this.escapeHtml(poll.creator_name)}</span>
+                            ${poll.is_admin_poll ? '<span style="color: var(--primary);"><i class="fas fa-shield-alt"></i> Admin</span>' : ''}
+                        </div>
+                        <span class="poll-status ${poll.status}">${poll.status === 'active' ? 'Active' : 'Closed'}</span>
+                    </div>
+                    
+                    <h3 class="poll-title">${this.escapeHtml(poll.title)}</h3>
+                    ${poll.description ? `<p class="poll-description">${this.escapeHtml(poll.description)}</p>` : ''}
+                    
+                    <div class="poll-options">
+                        ${optionsHtml}
+                    </div>
+                    
+                    <div class="poll-footer">
+                        <span class="poll-votes">
+                            <i class="fas fa-vote-yea"></i> ${totalVotes} vote${totalVotes !== 1 ? 's' : ''}
+                        </span>
+                        ${actionsHtml}
+                    </div>
+                </div>
+            `;
+        },
+        
+        bindPollEvents() {
+            // Vote on poll
+            document.querySelectorAll('.poll-option:not(.voted):not([disabled])').forEach(option => {
+                option.addEventListener('click', async () => {
+                    const pollId = option.dataset.pollId;
+                    const optionId = option.dataset.optionId;
+                    await this.vote(pollId, optionId);
+                });
+            });
+            
+            // Delete poll
+            document.querySelectorAll('.poll-action-btn.delete').forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    if (confirm('Are you sure you want to delete this poll?')) {
+                        await this.deletePoll(btn.dataset.pollId);
+                    }
+                });
+            });
+        },
+        
+        async vote(pollId, optionId) {
+            try {
+                const response = await fetch('../backend/polls/vote_poll.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ poll_id: pollId, option_id: optionId })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status) {
+                    this.showToast('Vote recorded!', 'success');
+                    this.loadPolls();
+                } else {
+                    this.showToast(data.message || 'Failed to vote', 'error');
+                }
+            } catch (error) {
+                console.error('Vote error:', error);
+                this.showToast('Error recording vote', 'error');
+            }
+        },
+        
+        async deletePoll(pollId) {
+            try {
+                const response = await fetch('../backend/polls/delete_poll.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ poll_id: pollId })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status) {
+                    this.showToast('Poll deleted!', 'success');
+                    this.loadPolls();
+                } else {
+                    this.showToast(data.message || 'Failed to delete', 'error');
+                }
+            } catch (error) {
+                console.error('Delete error:', error);
+                this.showToast('Error deleting poll', 'error');
+            }
+        },
+        
+        async createPoll() {
+            const title = document.getElementById('pollTitle').value.trim();
+            const description = document.getElementById('pollDescription').value.trim();
+            const optionInputs = document.querySelectorAll('.option-input');
+            const options = Array.from(optionInputs).map(input => input.value.trim()).filter(v => v);
+            
+            if (!title) {
+                this.showToast('Please enter a question', 'error');
+                return;
+            }
+            
+            if (options.length < 2) {
+                this.showToast('Please add at least 2 options', 'error');
+                return;
+            }
+            
+            const submitBtn = document.getElementById('submitPollBtn');
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Creating...';
+            
+            try {
+                const response = await fetch('../backend/polls/create_poll.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, description, options, poll_type: 'single' })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status) {
+                    this.showToast('Poll created!', 'success');
+                    document.getElementById('createPollModal').classList.remove('show');
+                    document.getElementById('createPollForm').reset();
+                    this.resetOptionsContainer();
+                    this.loadPolls();
+                } else {
+                    this.showToast(data.message || 'Failed to create poll', 'error');
+                }
+            } catch (error) {
+                console.error('Create poll error:', error);
+                this.showToast('Error creating poll', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> Create Poll';
+            }
+        },
+        
+        addOptionInput() {
+            const container = document.getElementById('optionsContainer');
+            const count = container.querySelectorAll('.option-input-wrapper').length;
+            
+            if (count >= 10) {
+                this.showToast('Maximum 10 options allowed', 'error');
+                return;
+            }
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'option-input-wrapper';
+            wrapper.innerHTML = `
+                <input type="text" class="form-input option-input" placeholder="Option ${count + 1}" required maxlength="255">
+                <button type="button" class="remove-option-btn"><i class="fas fa-times"></i></button>
+            `;
+            
+            wrapper.querySelector('.remove-option-btn').addEventListener('click', () => {
+                wrapper.remove();
+            });
+            
+            container.appendChild(wrapper);
+        },
+        
+        resetOptionsContainer() {
+            const container = document.getElementById('optionsContainer');
+            container.innerHTML = `
+                <div class="option-input-wrapper">
+                    <input type="text" class="form-input option-input" placeholder="Option 1" required maxlength="255">
+                </div>
+                <div class="option-input-wrapper">
+                    <input type="text" class="form-input option-input" placeholder="Option 2" required maxlength="255">
+                </div>
+            `;
+        },
+        
+        showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        },
+        
+        escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+    };
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        PollsApp.init();
+    });
+    </script>
+    <?php endif; ?>
+</body>
+</html>

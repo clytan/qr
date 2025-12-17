@@ -171,10 +171,10 @@ document.addEventListener('DOMContentLoaded', function(){
                 <span>More</span>
             </a>
             <div class="more-popover" role="menu" aria-hidden="true">
-                <a href="#" class="more-item coming-soon" data-name="Biz">Biz</a>
-                <a href="#" class="more-item coming-soon" data-name="Poll">Poll</a>
+                <a href="/user/src/ui/biz.php" class="more-item">Biz</a>
+                <a href="/user/src/ui/polls.php" class="more-item">Poll</a>
                 <a href="#" class="more-item coming-soon" data-name="Game">Game</a>
-                <a href="#" class="more-item coming-soon" data-name="Influencer Program">Influencer Program</a>
+                <a href="/user/src/ui/influencer.php" class="more-item">Influencer Program</a>
             </div>
         </div>
     </div>
@@ -193,10 +193,10 @@ document.addEventListener('DOMContentLoaded', function(){
                 <div class="more-desktop-wrapper">
                     <a href="#" class="desktop-more-toggle">More</a>
                     <div class="more-desktop" aria-hidden="true">
-                        <a href="#" class="coming-soon" data-name="Biz">Biz</a>
-                        <a href="#" class="coming-soon" data-name="Poll">Poll</a>
+                        <a href="/user/src/ui/biz.php">Biz</a>
+                        <a href="/user/src/ui/polls.php">Poll</a>
                         <a href="#" class="coming-soon" data-name="Game">Game</a>
-                        <a href="#" class="coming-soon" data-name="Influencer Program">Influencer Program</a>
+                        <a href="/user/src/ui/influencer.php">Influencer Program</a>
                     </div>
                 </div>
             </div>

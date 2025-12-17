@@ -1,6 +1,22 @@
 <?php
-function getWelcomeEmailContent($name = '') {
+function getWelcomeEmailContent($name = '', $hasAttachments = false) {
     $displayName = $name ? htmlspecialchars($name) : 'Member';
+    
+    // Attachment notice section
+    $attachmentSection = '';
+    if ($hasAttachments) {
+        $attachmentSection = 
+            '<div style="background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:25px;border-radius:8px;margin:25px 0;box-shadow:0 6px 20px rgba(102,126,234,0.3)">' .
+            '<h3 style="margin:0 0 15px 0;text-align:center;font-size:20px">📎 Important Attachments</h3>' .
+            '<p style="margin:10px 0;font-size:15px;text-align:center">We have attached the following files to this email:</p>' .
+            '<ul style="margin:15px 0;padding-left:0;list-style:none">' .
+            '<li style="margin:12px 0;padding-left:30px;position:relative;font-size:15px;color:#fff">📱 <strong>Your Personal QR Code</strong> - Share this with friends to connect instantly!</li>' .
+            '<li style="margin:12px 0;padding-left:30px;position:relative;font-size:15px;color:#fff">📄 <strong>Registration Invoice</strong> - Your payment receipt for record keeping.</li>' .
+            '</ul>' .
+            '<p style="margin:10px 0;font-size:14px;text-align:center;opacity:0.9">Save your QR code and share it on your social media profiles!</p>' .
+            '</div>';
+    }
+    
     $content = '<!doctype html>' .
         '<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">' .
         '<title>Welcome to Zokli</title>' .
@@ -47,6 +63,10 @@ function getWelcomeEmailContent($name = '') {
         '<div class="container">' .
         '<p class="greeting">Hello <strong>' . $displayName . '</strong>,</p>' .
         '<p class="intro-text">A warm welcome to our digital community - <strong>Zokli</strong>. We are building world\'s largest ever digital social media community. A ten million strong, diverse digital youths across India.</p>' .
+        
+        // Add attachment section if applicable
+        $attachmentSection .
+        
         '<div class="highlight">' .
         '<p>"ZOKLI" : Connect-Create-Communicate</p>' .
         '</div>' .

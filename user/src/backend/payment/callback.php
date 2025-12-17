@@ -235,12 +235,13 @@ function processRegistration($data, $payment_id, $bank_reference, $order_id)
             error_log("Failed to auto-assign community for user $user_id: " . $communityResult['error']);
         }
 
-        // Send welcome email (best effort)
+        // Send welcome email with QR code and invoice attachments (best effort)
         try {
-            sendWelcomeEmail($email, $full_name ?? '');
+            sendWelcomeEmail($email, $full_name ?? '', $user_id, $user_qr_id);
         } catch (Exception $e) {
             error_log('Failed to send welcome email: ' . $e->getMessage());
         }
+
 
         return ['status' => true, 'message' => 'Registration successful'];
 

@@ -258,9 +258,9 @@ try {
         error_log("⚠ WARNING: Failed to assign user $user_id to community: " . ($communityResult['error'] ?? 'Unknown error'));
     }
 
-    // Send welcome email
+    // Send welcome email with QR code and invoice attachments
     try {
-        sendWelcomeEmail($email, $full_name ?? '');
+        sendWelcomeEmail($email, $full_name ?? '', $user_id, $user_qr_id);
     } catch (Exception $e) {
         error_log('Email sending failed: ' . $e->getMessage());
     }
