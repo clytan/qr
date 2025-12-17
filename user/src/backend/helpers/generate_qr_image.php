@@ -2,10 +2,9 @@
 /**
  * QR Code Image Generator Helper
  * 
- * Generates a QR code image for a user's profile URL
+ * Generates a QR code image for a user's profile URL using Google Charts API
+ * This is more reliable than custom PHP QR generation
  */
-
-require_once __DIR__ . '/../../libs/phpqrcode/phpqrcode.php';
 
 /**
  * Generate a QR code image for a user
@@ -16,8 +15,8 @@ require_once __DIR__ . '/../../libs/phpqrcode/phpqrcode.php';
  */
 function generateUserQRImage($userQrId, $outputPath = null) {
     try {
-        // Generate the profile URL
-        $profileUrl = "https://zokli.io/profile.php?qr=" . urlencode($userQrId);
+        // Generate the profile URL - must match the actual profile page path
+        $profileUrl = "https://zokli.in/user/src/ui/profile.php?qr=" . urlencode($userQrId);
         
         // Determine output path
         if ($outputPath === null) {
@@ -28,15 +27,41 @@ function generateUserQRImage($userQrId, $outputPath = null) {
             $outputPath = $tempDir . '/qr_' . $userQrId . '_' . time() . '.png';
         }
         
-        // Generate QR code with high quality settings
-        // Size 8 = 8 pixels per module, Margin 2 = 2 module margin
-        QRcode::png($profileUrl, $outputPath, QR_ECLEVEL_H, 8, 2);
+        // Use Google Charts API to generate QR code (reliable and standard-compliant)
+        $googleChartUrl = "https://chart.googleapis.com/chart?chs=300x300&cht=qr&chl=" . urlencode($profileUrl) . "&choe=UTF-8&chld=H|2";
         
-        if (file_exists($outputPath)) {
+        // Download the QR code image
+        $context = stream_context_create([
+            'http' => [
+                'timeout' => 10,
+                'user_agent' => 'Mozilla/5.0'
+            ],
+            'ssl' => [
+                'verify_peer' => false,
+                'verify_peer_name' => false
+            ]
+        ]);
+        
+        $imageData = @file_get_contents($googleChartUrl, false, $context);
+        
+        if ($imageData === false) {
+            error_log("Failed to fetch QR from Google Charts API, trying alternative method");
+            // Fallback: Use QR Server API (another reliable service)
+            $qrServerUrl = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=" . urlencode($profileUrl) . "&ecc=H&margin=10";
+            $imageData = @file_get_contents($qrServerUrl, false, $context);
+        }
+        
+        if ($imageData === false) {
+            error_log("QR code generation failed: Could not fetch from API");
+            return false;
+        }
+        
+        // Save to file
+        if (file_put_contents($outputPath, $imageData) !== false) {
             error_log("QR code generated successfully: " . $outputPath);
             return $outputPath;
         } else {
-            error_log("QR code generation failed: file not created");
+            error_log("QR code generation failed: Could not write file");
             return false;
         }
     } catch (Exception $e) {
@@ -46,7 +71,7 @@ function generateUserQRImage($userQrId, $outputPath = null) {
 }
 
 /**
- * Generate QR code with custom colors
+ * Generate QR code with custom colors (not supported by API, returns standard)
  * 
  * @param string $userQrId The user's QR ID
  * @param string $darkColor Hex color for dark modules (e.g., #000000)
@@ -54,8 +79,7 @@ function generateUserQRImage($userQrId, $outputPath = null) {
  * @return string|false Path to the generated image file, or false on failure
  */
 function generateColoredQRImage($userQrId, $darkColor = '#000000', $lightColor = '#FFFFFF') {
-    // For now, generate standard black/white QR
-    // Color customization can be added later if needed
+    // API doesn't support custom colors, generate standard QR
     return generateUserQRImage($userQrId);
 }
 
