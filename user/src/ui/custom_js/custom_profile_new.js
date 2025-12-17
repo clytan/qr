@@ -554,17 +554,42 @@ const profileFunction = {
 
         // Get QR image and frame image
         const qrImg = document.getElementById('click_banner_img');
+        const frameOverlay = document.querySelector('.qr-frame-overlay');
         const frameImg = new Image();
-        frameImg.src = '../assets/images/frame.png';
+        let useFrame = false;
+
+        // Check if frame exists and is visible (not 'none')
+        // Using getComputedStyle to ensure we catch hidden state even if not inline style
+        if (frameOverlay && frameOverlay.src) {
+            const style = window.getComputedStyle(frameOverlay);
+            if (style.display !== 'none' && frameOverlay.src.indexOf('frame.png') === -1) { // Assuming 'frame.png' is just a placeholder name or check if real frame
+                // Better check: if the src is not empty and display is not none
+                // In profile.php, if no frame is selected, display is set to none
+            }
+
+            if (style.display !== 'none') {
+                frameImg.src = frameOverlay.src;
+                frameImg.crossOrigin = "Anonymous"; // Handle potential CORS issues with frame images
+                useFrame = true;
+            }
+        }
 
         // Wait for both images to load
         if (qrImg && qrImg.src && qrImg.complete) {
-            frameImg.onload = function () {
-                profileFunction.drawQROnCanvas(ctx, qrImg, frameImg, canvas);
-            };
-            // If frame already loaded
-            if (frameImg.complete) {
-                profileFunction.drawQROnCanvas(ctx, qrImg, frameImg, canvas);
+            if (useFrame) {
+                frameImg.onload = function () {
+                    profileFunction.drawQROnCanvas(ctx, qrImg, frameImg, canvas);
+                };
+                frameImg.onerror = function () {
+                    // Fallback if frame fails to load
+                    profileFunction.drawQROnCanvas(ctx, qrImg, null, canvas);
+                };
+                // If frame already loaded
+                if (frameImg.complete) {
+                    profileFunction.drawQROnCanvas(ctx, qrImg, frameImg, canvas);
+                }
+            } else {
+                profileFunction.drawQROnCanvas(ctx, qrImg, null, canvas);
             }
         } else {
             showToast('QR code not loaded yet. Please try again.', 'error');
@@ -589,13 +614,23 @@ const profileFunction = {
         const qrY = whiteBoxY + 160;
 
         // Draw QR code first
-        ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+        try {
+            ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
+        } catch (e) {
+            console.error('Error drawing QR code:', e);
+        }
 
         // Draw frame overlay to match QR size
-        const frameSize = 850;
-        const frameX = (canvas.width - frameSize) / 2;
-        const frameY = whiteBoxY + 10;
-        ctx.drawImage(frameImg, frameX, frameY, frameSize, frameSize);
+        if (frameImg) {
+            const frameSize = 850;
+            const frameX = (canvas.width - frameSize) / 2;
+            const frameY = whiteBoxY + 10;
+            try {
+                ctx.drawImage(frameImg, frameX, frameY, frameSize, frameSize);
+            } catch (e) {
+                console.error('Error drawing frame:', e);
+            }
+        }
 
         // Bottom text
         ctx.fillStyle = '#718096';
@@ -803,6 +838,13 @@ const profileFunction = {
                     $('#landmark').val(user.user_landmark || '');
                     $('#pincode').val(user.user_pincode || '');
                     $('#user-name').text(fullName);
+
+                    // Set QR ID
+                    if (user.user_qr_id) {
+                        $('#user-qr-id').text('@' + user.user_qr_id);
+                    } else {
+                        $('#user-qr-id').hide();
+                    }
 
                     // Set public toggle for address
                     if (!window.PUBLIC_PROFILE) {

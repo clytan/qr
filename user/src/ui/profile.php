@@ -1547,6 +1547,7 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                         </script>
 
                         <h2 id="user-name">Loading</h2>
+                        <p id="user-qr-id" style="text-align: center; color: var(--text-secondary); margin-top: -20px; margin-bottom: 20px; font-weight: 500; letter-spacing: 0.5px; width: 100%;">@Loading</p>
 
                         <div class="stats-grid" style="margin-top: -5%;">
                             <div class="stat-item" id="followers-count">
