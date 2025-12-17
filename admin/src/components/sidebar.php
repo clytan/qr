@@ -18,6 +18,7 @@ $menuItems = [
     ['url' => 'communities.php', 'name' => 'Communities', 'icon' => 'fas fa-comments'],
     ['url' => 'collaborations.php', 'name' => 'Influencer Collabs', 'icon' => 'fas fa-handshake'],
     ['url' => 'partner_programmes.php', 'name' => 'Partner Programmes', 'icon' => 'fas fa-briefcase'],
+    ['url' => 'supercharge.php', 'name' => 'Super Charge', 'icon' => 'fas fa-bolt'],
     ['url' => 'users.php', 'name' => 'Users', 'icon' => 'fas fa-users'],
     ['url' => 'notifications.php', 'name' => 'Notifications', 'icon' => 'fas fa-bell'],
     ['url' => 'reports.php', 'name' => 'Reports', 'icon' => 'fas fa-chart-bar'],
@@ -32,6 +33,7 @@ $isSuperAdmin = (isset($_SESSION['admin_role_id']) && $_SESSION['admin_role_id']
 
 <style>
 /* ==================== SIDEBAR STYLES ==================== */
+/* ==================== SIDEBAR STYLES ==================== */
 .admin-sidebar {
     position: fixed;
     left: 0;
@@ -39,9 +41,9 @@ $isSuperAdmin = (isset($_SESSION['admin_role_id']) && $_SESSION['admin_role_id']
     width: 260px;
     height: 100vh;
     background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%);
-    padding: 20px 0;
+    display: flex;
+    flex-direction: column;
     z-index: 1000;
-    overflow-y: auto;
     box-shadow: 4px 0 15px rgba(0, 0, 0, 0.3);
     transition: transform 0.3s ease;
 }
@@ -49,7 +51,8 @@ $isSuperAdmin = (isset($_SESSION['admin_role_id']) && $_SESSION['admin_role_id']
 .sidebar-header {
     padding: 20px 25px 30px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 20px;
+    margin-bottom: 0; /* Changed from 20px */
+    flex-shrink: 0;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -94,8 +97,23 @@ $isSuperAdmin = (isset($_SESSION['admin_role_id']) && $_SESSION['admin_role_id']
 
 .sidebar-menu {
     list-style: none;
-    padding: 0;
+    padding: 20px 0;
     margin: 0;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0; /* Important for flex child scrolling */
+}
+
+/* Custom Scrollbar for menu */
+.sidebar-menu::-webkit-scrollbar {
+    width: 4px;
+}
+.sidebar-menu::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+}
+.sidebar-menu::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
 }
 
 .sidebar-menu-item {
@@ -135,13 +153,14 @@ $isSuperAdmin = (isset($_SESSION['admin_role_id']) && $_SESSION['admin_role_id']
 
 /* User info at bottom */
 .sidebar-user {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    position: relative; /* Changed from absolute */
+    bottom: auto; /* Reset */
+    left: auto; /* Reset */
+    right: auto; /* Reset */
     padding: 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(0, 0, 0, 0.2);
+    flex-shrink: 0; /* Don't shrink */
 }
 
 .sidebar-user-info {
