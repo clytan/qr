@@ -1575,6 +1575,11 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                                     <i class="fas fa-share-alt"></i> Share Profile
                                 </button>
                             </div>
+                            <?php if (!$viewing_qr): ?>
+                            <button class="btn btn-outline-primary mt-3" id="choose-frame-btn" style="width: 100%;">
+                                <i class="fas fa-image"></i> Choose Frame
+                            </button>
+                            <?php endif; ?>
 
                             <div id="qr-color-controls" class="hidden">
                                 <div class="color-picker-container">
@@ -2418,6 +2423,255 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
             }
             document.body.removeChild(textArea);
         }
+    </script>
+
+    <!-- Frame Selector Modal -->
+    <div class="modal fade" id="frameModal" tabindex="-1" aria-labelledby="frameModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content" style="background: var(--card-bg); border: 1px solid var(--border-color);">
+                <div class="modal-header" style="border-bottom: 1px solid var(--border-color);">
+                    <h5 class="modal-title" id="frameModalLabel" style="color: var(--text-color);">
+                        <i class="fas fa-image"></i> Choose QR Frame
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="frame-grid" class="frame-grid">
+                        <div class="text-center py-4">
+                            <i class="fas fa-spinner fa-spin fa-2x" style="color: var(--primary-color);"></i>
+                            <p class="mt-2" style="color: var(--text-secondary);">Loading frames...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Frame Selector Modal Styles */
+        .frame-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            padding: 0.5rem;
+        }
+        
+        .frame-item {
+            aspect-ratio: 1;
+            border: 3px solid transparent;
+            border-radius: 12px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.2s ease;
+            background: rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .frame-item:hover {
+            border-color: var(--primary-color);
+            transform: scale(1.05);
+            box-shadow: 0 5px 20px rgba(230, 119, 83, 0.3);
+        }
+        
+        .frame-item.selected {
+            border-color: var(--success);
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+        }
+        
+        .frame-item.selected::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: var(--success);
+            color: white;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .frame-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+        
+        .frame-item .no-frame-icon {
+            font-size: 2rem;
+            color: var(--text-secondary);
+        }
+        
+        .frame-item .frame-label {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            font-size: 0.75rem;
+            padding: 4px;
+            text-align: center;
+        }
+
+        .btn-outline-primary {
+            background: transparent;
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+    </style>
+
+    <script>
+        // Frame Selector Logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const chooseFrameBtn = document.getElementById('choose-frame-btn');
+            const frameGrid = document.getElementById('frame-grid');
+            const frameOverlay = document.querySelector('.qr-frame-overlay');
+            let currentFrame = 'default';
+            let frameModal;
+
+            // Initialize modal
+            if (typeof bootstrap !== 'undefined') {
+                frameModal = new bootstrap.Modal(document.getElementById('frameModal'));
+            }
+
+            // Load user's current frame
+            function loadCurrentFrame() {
+                const userId = document.getElementById('user_id').value;
+                if (!userId) return;
+
+                $.ajax({
+                    url: '../backend/profile_new/get_frame.php',
+                    type: 'POST',
+                    data: { user_id: userId },
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status && response.frameUrl) {
+                            currentFrame = response.frame;
+                            if (frameOverlay) {
+                                if (response.frameUrl === null) {
+                                    frameOverlay.style.display = 'none';
+                                } else {
+                                    frameOverlay.src = response.frameUrl;
+                                    frameOverlay.style.display = 'block';
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Load available frames
+            function loadFrames() {
+                $.ajax({
+                    url: '../backend/profile_new/get_frames.php',
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status && response.data) {
+                            renderFrameGrid(response.data);
+                        } else {
+                            frameGrid.innerHTML = '<p class="text-center" style="color: var(--danger);">Failed to load frames</p>';
+                        }
+                    },
+                    error: function() {
+                        frameGrid.innerHTML = '<p class="text-center" style="color: var(--danger);">Error loading frames</p>';
+                    }
+                });
+            }
+
+            // Render frame grid
+            function renderFrameGrid(frames) {
+                frameGrid.innerHTML = '';
+                
+                frames.forEach(function(frame) {
+                    const div = document.createElement('div');
+                    div.className = 'frame-item' + (frame.id === currentFrame ? ' selected' : '');
+                    div.dataset.frameId = frame.id;
+                    div.dataset.frameUrl = frame.url || '';
+
+                    if (frame.id === 'none') {
+                        div.innerHTML = '<i class="fas fa-ban no-frame-icon"></i><span class="frame-label">No Frame</span>';
+                    } else if (frame.thumbnail) {
+                        div.innerHTML = '<img src="' + frame.thumbnail + '" alt="' + frame.name + '"><span class="frame-label">' + frame.name + '</span>';
+                    } else {
+                        div.innerHTML = '<i class="fas fa-image no-frame-icon"></i><span class="frame-label">' + frame.name + '</span>';
+                    }
+
+                    div.addEventListener('click', function() {
+                        selectFrame(frame.id, frame.url);
+                    });
+
+                    frameGrid.appendChild(div);
+                });
+            }
+
+            // Select frame
+            function selectFrame(frameId, frameUrl) {
+                // Update UI immediately
+                document.querySelectorAll('.frame-item').forEach(el => el.classList.remove('selected'));
+                document.querySelector('[data-frame-id="' + frameId + '"]')?.classList.add('selected');
+
+                // Update frame overlay
+                if (frameOverlay) {
+                    if (frameId === 'none' || !frameUrl) {
+                        frameOverlay.style.display = 'none';
+                    } else {
+                        frameOverlay.src = frameUrl;
+                        frameOverlay.style.display = 'block';
+                    }
+                }
+
+                // Save to server
+                $.ajax({
+                    url: '../backend/profile_new/save_frame.php',
+                    type: 'POST',
+                    data: JSON.stringify({ frame: frameId }),
+                    contentType: 'application/json',
+                    dataType: 'json',
+                    success: function(response) {
+                        if (response.status) {
+                            currentFrame = frameId;
+                            if (frameModal) frameModal.hide();
+                            showToast('Frame updated successfully!', 'success');
+                        } else {
+                            showToast('Failed to save frame: ' + response.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        showToast('Error saving frame', 'error');
+                    }
+                });
+            }
+
+            // Open modal
+            if (chooseFrameBtn) {
+                chooseFrameBtn.addEventListener('click', function() {
+                    loadFrames();
+                    if (frameModal) {
+                        frameModal.show();
+                    } else {
+                        $('#frameModal').modal('show');
+                    }
+                });
+            }
+
+            // Load current frame on page load
+            loadCurrentFrame();
+        });
     </script>
 </body>
 

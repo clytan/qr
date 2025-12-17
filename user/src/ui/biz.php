@@ -10,7 +10,18 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 $user_name = $_SESSION['user_name'] ?? 'Partner';
-$user_email = $_SESSION['user_email'] ?? '';
+
+// Get user details from database for accurate info
+$stmtUser = $conn->prepare("SELECT user_email, user_user_type FROM user_user WHERE id = ?");
+$stmtUser->bind_param('i', $user_id);
+$stmtUser->execute();
+$userResult = $stmtUser->get_result();
+$userData = $userResult->fetch_assoc();
+$stmtUser->close();
+
+$user_email = $userData['user_email'] ?? '';
+$user_type = intval($userData['user_user_type'] ?? 1);
+$is_biz_user = ($user_type === 3); // Biz users can create collaborations
 
 // Handle AJAX requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
@@ -113,8 +124,103 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 echo json_encode(['status' => false, 'message' => $e->getMessage()]);
             }
             exit();
+            
+        case 'create_programme':
+            // Only Biz users can create partner programmes
+            if ($user_type != 3) {
+                echo json_encode(['status' => false, 'message' => 'Only Business users can create partner programmes']);
+                exit();
+            }
+            
+            try {
+                $programme_header = trim($_POST['programme_header'] ?? '');
+                $company_name = trim($_POST['company_name'] ?? '');
+                $product_link = trim($_POST['product_link'] ?? '');
+                $description = trim($_POST['description'] ?? '');
+                $commission_details = trim($_POST['commission_details'] ?? '');
+                $company_email = $user_email; // Use logged-in user's email
+                
+                if (empty($programme_header) || empty($commission_details) || empty($description)) {
+                    echo json_encode(['status' => false, 'message' => 'Programme header, description and commission details are required']);
+                    exit();
+                }
+                
+                $sql = "INSERT INTO partner_programmes (
+                    programme_header, company_name, product_link, description,
+                    commission_details, company_email, status, created_by, created_on
+                ) VALUES (?, ?, ?, ?, ?, ?, 'active', ?, NOW())";
+                
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param(
+                    'ssssssi',
+                    $programme_header, $company_name, $product_link, $description,
+                    $commission_details, $company_email, $user_id
+                );
+                
+                if ($stmt->execute()) {
+                    echo json_encode(['status' => true, 'message' => 'Partner programme created successfully!']);
+                } else {
+                    echo json_encode(['status' => false, 'message' => 'Failed to create programme']);
+                }
+            } catch (Exception $e) {
+                echo json_encode(['status' => false, 'message' => $e->getMessage()]);
+            }
+            exit();
+            
+        case 'get_my_programmes':
+            try {
+                $sql = "SELECT p.*, COUNT(r.id) as referral_count
+                        FROM partner_programmes p
+                        LEFT JOIN partner_referrals r ON p.id = r.programme_id AND r.is_deleted = 0
+                        WHERE p.created_by = ? AND p.is_deleted = 0
+                        GROUP BY p.id
+                        ORDER BY p.created_on DESC";
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param('i', $user_id);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                
+                $programmes = [];
+                while ($row = $result->fetch_assoc()) {
+                    $programmes[] = $row;
+                }
+                
+                echo json_encode(['status' => true, 'data' => $programmes]);
+            } catch (Exception $e) {
+                echo json_encode(['status' => false, 'message' => $e->getMessage()]);
+            }
+            exit();
+            
+        case 'delete_programme':
+            try {
+                $programme_id = intval($_POST['programme_id'] ?? 0);
+                
+                $stmt = $conn->prepare("SELECT created_by FROM partner_programmes WHERE id = ? AND is_deleted = 0");
+                $stmt->bind_param('i', $programme_id);
+                $stmt->execute();
+                $result = $stmt->get_result();
+                $programme = $result->fetch_assoc();
+                
+                if (!$programme || $programme['created_by'] != $user_id) {
+                    echo json_encode(['status' => false, 'message' => 'You can only delete your own programmes']);
+                    exit();
+                }
+                
+                $stmt = $conn->prepare("UPDATE partner_programmes SET is_deleted = 1 WHERE id = ?");
+                $stmt->bind_param('i', $programme_id);
+                
+                if ($stmt->execute()) {
+                    echo json_encode(['status' => true, 'message' => 'Programme deleted successfully']);
+                } else {
+                    echo json_encode(['status' => false, 'message' => 'Failed to delete']);
+                }
+            } catch (Exception $e) {
+                echo json_encode(['status' => false, 'message' => $e->getMessage()]);
+            }
+            exit();
     }
 }
+
 
 // Email function
 function sendReferralEmails($programme, $client_name, $client_phone, $client_email, $product_name, $user_name, $user_email) {
@@ -571,6 +677,204 @@ function sendReferralEmails($programme, $client_name, $client_phone, $client_ema
             .tabs-container { flex-direction: column; }
             .programmes-grid { grid-template-columns: 1fr; }
         }
+        
+        /* Create Collaboration Button */
+        .create-collab-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .create-collab-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(34, 197, 94, 0.4);
+        }
+        
+        /* Create Modal Styles */
+        .create-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .create-modal.show { display: flex; }
+        
+        .create-modal .modal {
+            background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 16px;
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid rgba(233, 67, 122, 0.3);
+            display: block !important;
+            position: relative;
+            z-index: 10001;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-header {
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 {
+            margin: 0;
+            font-size: 1.3rem;
+            background: linear-gradient(135deg, #E9437A, #E2AD2A);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .modal-close-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .modal-body { padding: 15px 20px; }
+        .collab-form-group { margin-bottom: 12px; }
+        
+        .collab-form-group label {
+            display: block;
+            font-size: 0.85rem;
+            color: #94a3b8;
+            margin-bottom: 5px;
+        }
+        
+        .collab-form-input, .collab-form-select, .collab-form-textarea {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: #e2e8f0;
+            font-size: 13px;
+        }
+        
+        .collab-form-input:focus, .collab-form-select:focus { outline: none; border-color: #E9437A; }
+        .collab-form-textarea { min-height: 70px; resize: vertical; }
+
+        
+        .photo-uploads-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+        
+        .photo-upload-box {
+            aspect-ratio: 1;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .photo-upload-box:hover { border-color: #E9437A; }
+        .photo-upload-box input { display: none; }
+        .photo-upload-box i { font-size: 24px; color: #475569; }
+        .photo-upload-box span { font-size: 11px; color: #475569; margin-top: 5px; }
+        .photo-upload-box img { position: absolute; width: 100%; height: 100%; object-fit: cover; }
+        
+        .modal-footer-btns {
+            padding: 20px 25px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn-modal-cancel {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 10px;
+            color: #94a3b8;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        
+        .btn-modal-submit {
+            flex: 2;
+            padding: 12px;
+            background: linear-gradient(135deg, #E9437A, #E2AD2A);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        /* Collab Card */
+        .collab-card {
+            background: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+        }
+        
+        .collab-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+        
+        .collab-title { font-size: 18px; font-weight: 700; color: #f1f5f9; }
+        
+        .collab-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .collab-status.pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+        .collab-status.active { background: rgba(34, 197, 94, 0.2); color: #4ade80; }
+        
+        .collab-desc { font-size: 14px; color: #94a3b8; margin-bottom: 15px; }
+        
+        .collab-delete-btn {
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        
+        .collab-delete-btn:hover { background: #ef4444; color: white; }
     </style>
 </head>
 <body class="dark-scheme de-grey">
@@ -591,18 +895,31 @@ function sendReferralEmails($programme, $client_name, $client_phone, $client_ema
                         Partner with top companies and earn commissions by referring clients. 
                         Simple, transparent, and rewarding!
                     </p>
+                    <!-- Debug: User Type = <?php echo $user_type; ?>, Is Biz = <?php echo $is_biz_user ? 'true' : 'false'; ?> -->
+                    <?php if ($is_biz_user): ?>
+                    <button class="create-collab-btn" onclick="openCreateModal()">
+                        <i class="fas fa-plus"></i> Create Partner Programme
+                    </button>
+                    <?php endif; ?>
                 </div>
                 
                 <!-- Tabs -->
                 <div class="tabs-container">
                     <button class="tab-btn active" onclick="showTab('programmes')">
                         <i class="fas fa-briefcase"></i>
-                        Available Programmes
+                        Programmes
                     </button>
                     <button class="tab-btn" onclick="showTab('my_referrals')">
                         <i class="fas fa-list"></i>
                         My Referrals
                     </button>
+                    <?php if ($is_biz_user): ?>
+                    <button class="tab-btn" onclick="showTab('my_collabs')">
+                        <i class="fas fa-layer-group"></i>
+                        My Programmes
+                    </button>
+
+                    <?php endif; ?>
                 </div>
                 
                 <!-- Tab: Programmes -->
@@ -639,6 +956,19 @@ function sendReferralEmails($programme, $client_name, $client_phone, $client_ema
                         </div>
                     </div>
                 </div>
+                
+                <!-- Tab: My Created Collabs (Biz users only) -->
+                <?php if ($is_biz_user): ?>
+                <div class="tab-content" id="tab-my_collabs">
+                    <div class="programmes-grid" id="my-collabs-grid">
+                        <div class="empty-state">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Loading your collaborations...</p>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
+
             </div>
         </div>
         
@@ -682,28 +1012,87 @@ function sendReferralEmails($programme, $client_name, $client_phone, $client_ema
         </div>
     </div>
     
+    <!-- Create Partner Programme Modal (Biz users only) -->
+    <?php if ($is_biz_user): ?>
+    <div class="create-modal" id="createProgrammeModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="fas fa-plus-circle"></i> Create Partner Programme</h3>
+                <button class="modal-close-btn" onclick="closeCreateModal()">&times;</button>
+            </div>
+            <form id="createProgrammeForm">
+                <div class="modal-body">
+                    <div class="collab-form-group">
+                        <label class="form-label">Programme Header *</label>
+                        <input type="text" class="collab-form-input" name="programme_header" required placeholder="e.g., Sell Life Insurance">
+                    </div>
+                    
+                    <div class="collab-form-group">
+                        <label class="form-label">Company Name</label>
+                        <input type="text" class="collab-form-input" name="company_name" placeholder="e.g., ABC Insurance Ltd.">
+                    </div>
+                    
+                    <div class="collab-form-group">
+                        <label class="form-label">Product/Company Link</label>
+                        <input type="url" class="collab-form-input" name="product_link" placeholder="https://company.com">
+                    </div>
+                    
+                    <div class="collab-form-group">
+                        <label class="form-label">Description *</label>
+                        <textarea class="collab-form-textarea" name="description" required placeholder="Describe the partner programme..."></textarea>
+                    </div>
+                    
+                    <div class="collab-form-group">
+                        <label class="form-label">Commission Details *</label>
+                        <textarea class="collab-form-textarea" name="commission_details" required placeholder="e.g., 10% commission on first year premium, Paid within 30 days..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer-btns">
+                    <button type="button" class="btn-modal-cancel" onclick="closeCreateModal()">Cancel</button>
+                    <button type="submit" class="btn-modal-submit"><i class="fas fa-paper-plane"></i> Create Programme</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <?php endif; ?>
+
+
+    
     <div class="toast" id="toast"></div>
     
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         let currentTab = 'programmes';
         let currentProgramme = null;
+        const isBizUser = <?php echo $is_biz_user ? 'true' : 'false'; ?>;
         
         $(document).ready(function() {
             loadProgrammes();
+            <?php if ($is_biz_user): ?>
+            loadMyProgrammes();
+            <?php endif; ?>
         });
         
         function showTab(tab) {
             currentTab = tab;
             
             $('.tab-btn').removeClass('active');
-            $(`.tab-btn:contains('${tab === 'programmes' ? 'Available' : 'My'}')`).addClass('active');
+            $(`.tab-btn`).each(function() {
+                const text = $(this).text().trim().toLowerCase();
+                if ((tab === 'programmes' && text.includes('programmes')) ||
+                    (tab === 'my_referrals' && text.includes('referrals')) ||
+                    (tab === 'my_collabs' && text.includes('collabs'))) {
+                    $(this).addClass('active');
+                }
+            });
             
             $('.tab-content').removeClass('active');
             $(`#tab-${tab}`).addClass('active');
             
             if (tab === 'my_referrals') {
                 loadMyReferrals();
+            } else if (tab === 'my_collabs') {
+                loadMyProgrammes();
             }
         }
         
@@ -799,16 +1188,14 @@ function sendReferralEmails($programme, $client_name, $client_phone, $client_ema
         }
         
         function openReferModal(programmeId, programmeName) {
-            console.log('Opening modal for programme:', programmeId, programmeName);
-            currentProgramme = programmeId;
+            currentProgramme = { id: programmeId, name: programmeName };
             $('#programme-id').val(programmeId);
+            $('#referForm')[0].reset();
             $('#referModal').addClass('show');
-            console.log('Modal should be visible now');
         }
         
         function closeModal() {
             $('#referModal').removeClass('show');
-            $('#referForm')[0].reset();
         }
         
         $('#referForm').on('submit', function(e) {
@@ -865,6 +1252,99 @@ function sendReferralEmails($programme, $client_name, $client_phone, $client_ema
             const date = new Date(dateString);
             return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
         }
+        
+        // ===== BIZ USER FUNCTIONS =====
+        <?php if ($is_biz_user): ?>
+        
+        function openCreateModal() {
+            $('#createProgrammeForm')[0].reset();
+            $('#createProgrammeModal').addClass('show');
+        }
+        
+        function closeCreateModal() {
+            $('#createProgrammeModal').removeClass('show');
+        }
+        
+        function loadMyProgrammes() {
+            $.post('', { action: 'get_my_programmes' }, function(response) {
+                if (response.status && response.data.length > 0) {
+                    renderMyProgrammes(response.data);
+                } else {
+                    $('#my-collabs-grid').html(`
+                        <div class="empty-state">
+                            <i class="fas fa-briefcase"></i>
+                            <h3>No Created Programmes</h3>
+                            <p>Click "Create Partner Programme" to get started!</p>
+                        </div>
+                    `);
+                }
+            }, 'json');
+        }
+        
+        function renderMyProgrammes(programmes) {
+            let html = '';
+            
+            programmes.forEach(p => {
+                html += `
+                    <div class="collab-card">
+                        <div class="collab-card-header">
+                            <div class="collab-title">${escapeHtml(p.programme_header)}</div>
+                            <span class="collab-status ${p.status}">${p.status}</span>
+                        </div>
+                        ${p.company_name ? `<div style="color: #E9437A; font-size: 12px; margin-bottom: 8px;"><i class="fas fa-building"></i> ${escapeHtml(p.company_name)}</div>` : ''}
+                        <div class="collab-desc">${escapeHtml(p.description || '')}</div>
+                        <div style="font-size: 12px; color: #E2AD2A; margin: 10px 0;">
+                            <i class="fas fa-users"></i> ${p.referral_count || 0} referrals
+                        </div>
+                        <button class="collab-delete-btn" onclick="deleteProgramme(${p.id})">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+            });
+            
+            $('#my-collabs-grid').html(html);
+        }
+        
+        function deleteProgramme(id) {
+            if (!confirm('Are you sure you want to delete this programme?')) return;
+            
+            $.post('', { action: 'delete_programme', programme_id: id }, function(response) {
+                if (response.status) {
+                    showToast(response.message, 'success');
+                    loadMyProgrammes();
+                } else {
+                    showToast(response.message, 'error');
+                }
+            }, 'json');
+        }
+        
+        // Submit create programme form
+        $('#createProgrammeForm').on('submit', function(e) {
+            e.preventDefault();
+            
+            $.post('', $(this).serialize() + '&action=create_programme', function(response) {
+                if (response.status) {
+                    showToast(response.message, 'success');
+                    closeCreateModal();
+                    loadMyProgrammes();
+                    loadProgrammes(); // Reload the main list too
+                } else {
+                    showToast(response.message, 'error');
+                }
+            }, 'json').fail(function() {
+                showToast('Failed to create programme', 'error');
+            });
+        });
+        
+        // Close modal on overlay click
+        $('#createProgrammeModal').on('click', function(e) {
+            if (e.target === this) closeCreateModal();
+        });
+        
+        <?php endif; ?>
+
     </script>
+
 </body>
 </html>
