@@ -128,7 +128,7 @@ try {
                   (user_id, amount, payment_method, upi_id, bank_name, account_number, ifsc_code, account_holder_name, status, created_on) 
                   VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())";
     $stmtInsert = $conn->prepare($sqlInsert);
-    $stmtInsert->bind_param('idsssss', 
+    $stmtInsert->bind_param('idssssss', 
         $user_id, 
         $amount, 
         $payment_method, 

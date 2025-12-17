@@ -18,6 +18,7 @@ $menuItems = [
     ['url' => 'communities.php', 'name' => 'Communities', 'icon' => 'fas fa-comments'],
     ['url' => 'collaborations.php', 'name' => 'Influencer Collabs', 'icon' => 'fas fa-handshake'],
     ['url' => 'partner_programmes.php', 'name' => 'Partner Programmes', 'icon' => 'fas fa-briefcase'],
+    ['url' => 'withdrawals.php', 'name' => 'Wallet Requests', 'icon' => 'fas fa-money-bill-wave'],
     ['url' => 'supercharge.php', 'name' => 'Super Charge', 'icon' => 'fas fa-bolt'],
     ['url' => 'users.php', 'name' => 'Users', 'icon' => 'fas fa-users'],
     ['url' => 'notifications.php', 'name' => 'Notifications', 'icon' => 'fas fa-bell'],

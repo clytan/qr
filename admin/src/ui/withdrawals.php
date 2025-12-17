@@ -145,6 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Wallet Withdrawals - Admin</title>
     <link rel="icon" href="../../assets/logo2.png" type="image/png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
@@ -168,11 +169,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             color: var(--text-primary);
             min-height: 100vh;
         }
+
+        /* Layout Override for sidebar */
+        .admin-main { margin-left: 260px; transition: margin-left 0.3s ease; }
+        .dashboard-content { padding: 30px; }
+        @media (max-width: 768px) { .admin-main { margin-left: 0; padding-top: 60px; } }
         
         .container {
             max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
+            /* padding: 20px; Removed padding as it's handled by dashboard-content */
         }
         
         .header {
@@ -476,70 +482,79 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1><i class="fas fa-money-bill-wave"></i> Wallet Withdrawals</h1>
-            <a href="dashboard.php" class="back-btn">
-                <i class="fas fa-arrow-left"></i> Back to Dashboard
-            </a>
-        </div>
-        
-        <!-- Stats -->
-        <div class="stats-grid">
-            <div class="stat-card pending">
-                <div class="stat-value" id="stat-pending">0</div>
-                <div class="stat-label">Pending Requests</div>
+<body id="page-top">
+    <?php include('../components/sidebar.php'); ?>
+
+    <main class="admin-main">
+        <div class="dashboard-content">
+
+            <div class="container">
+                <div class="header">
+                    <h1><i class="fas fa-money-bill-wave"></i> Wallet Withdrawals</h1>
+                </div>
+                
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card pending">
+                        <div class="stat-value" id="stat-pending">0</div>
+                        <div class="stat-label">Pending Requests</div>
+                    </div>
+                    <div class="stat-card approved">
+                        <div class="stat-value" id="stat-approved">0</div>
+                        <div class="stat-label">Approved</div>
+                    </div>
+                    <div class="stat-card completed">
+                        <div class="stat-value" id="stat-completed">0</div>
+                        <div class="stat-label">Completed</div>
+                    </div>
+                    <div class="stat-card rejected">
+                        <div class="stat-value" id="stat-rejected">0</div>
+                        <div class="stat-label">Rejected</div>
+                    </div>
+                </div>
+                
+                <!-- Filters -->
+                <div class="filters">
+                    <button class="filter-btn active" data-status="all">All</button>
+                    <button class="filter-btn" data-status="pending">Pending</button>
+                    <button class="filter-btn" data-status="approved">Approved</button>
+                    <button class="filter-btn" data-status="completed">Completed</button>
+                    <button class="filter-btn" data-status="rejected">Rejected</button>
+                </div>
+                
+                <!-- Table -->
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Amount</th>
+                                <th>Payment Method</th>
+                                <th>Payment Details</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="withdrawals-table">
+                            <tr>
+                                <td colspan="8" class="empty-state">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <p>Loading...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div class="stat-card approved">
-                <div class="stat-value" id="stat-approved">0</div>
-                <div class="stat-label">Approved</div>
-            </div>
-            <div class="stat-card completed">
-                <div class="stat-value" id="stat-completed">0</div>
-                <div class="stat-label">Completed</div>
-            </div>
-            <div class="stat-card rejected">
-                <div class="stat-value" id="stat-rejected">0</div>
-                <div class="stat-label">Rejected</div>
-            </div>
         </div>
-        
-        <!-- Filters -->
-        <div class="filters">
-            <button class="filter-btn active" data-status="all">All</button>
-            <button class="filter-btn" data-status="pending">Pending</button>
-            <button class="filter-btn" data-status="approved">Approved</button>
-            <button class="filter-btn" data-status="completed">Completed</button>
-            <button class="filter-btn" data-status="rejected">Rejected</button>
-        </div>
-        
-        <!-- Table -->
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>User</th>
-                        <th>Amount</th>
-                        <th>Payment Method</th>
-                        <th>Payment Details</th>
-                        <th>Status</th>
-                        <th>Date</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="withdrawals-table">
-                    <tr>
-                        <td colspan="8" class="empty-state">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <p>Loading...</p>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+    </main>
+
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
     
     <!-- Process Modal -->
     <div class="modal-overlay" id="processModal">
@@ -577,6 +592,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         let currentFilter = 'all';
+        let withdrawalsMap = {}; // Global map to store withdrawal data
         
         $(document).ready(function() {
             loadWithdrawals();
@@ -606,6 +622,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         function renderWithdrawals(withdrawals) {
+            withdrawalsMap = {}; // Reset map
+            
             if (withdrawals.length === 0) {
                 $('#withdrawals-table').html(`
                     <tr>
@@ -620,6 +638,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             let html = '';
             withdrawals.forEach(w => {
+                withdrawalsMap[w.id] = w; // Store in map
+                
                 const date = new Date(w.created_on).toLocaleString('en-IN');
                 const paymentDetails = w.payment_method === 'upi' 
                     ? w.upi_id 
@@ -628,19 +648,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 let actions = '';
                 if (w.status === 'pending') {
                     actions = `
-                        <button class="action-btn btn-approve" onclick="showProcessModal(${w.id}, 'approve', '${escapeHtml(JSON.stringify(w))}')">
+                        <button class="action-btn btn-approve" onclick="showProcessModal(${w.id}, 'approve')">
                             <i class="fas fa-check"></i> Approve
                         </button>
-                        <button class="action-btn btn-reject" onclick="showProcessModal(${w.id}, 'reject', '${escapeHtml(JSON.stringify(w))}')">
+                        <button class="action-btn btn-reject" onclick="showProcessModal(${w.id}, 'reject')">
                             <i class="fas fa-times"></i> Reject
                         </button>
                     `;
                 } else if (w.status === 'approved') {
                     actions = `
-                        <button class="action-btn btn-complete" onclick="showProcessModal(${w.id}, 'complete', '${escapeHtml(JSON.stringify(w))}')">
+                        <button class="action-btn btn-complete" onclick="showProcessModal(${w.id}, 'complete')">
                             <i class="fas fa-check-double"></i> Complete
                         </button>
-                        <button class="action-btn btn-reject" onclick="showProcessModal(${w.id}, 'reject', '${escapeHtml(JSON.stringify(w))}')">
+                        <button class="action-btn btn-reject" onclick="showProcessModal(${w.id}, 'reject')">
                             <i class="fas fa-times"></i> Reject
                         </button>
                     `;
@@ -667,12 +687,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $('#withdrawals-table').html(html);
         }
         
-        function escapeHtml(str) {
-            return str.replace(/'/g, "\\'").replace(/"/g, '\\"');
-        }
-        
-        function showProcessModal(id, action, dataStr) {
-            const data = JSON.parse(dataStr.replace(/\\'/g, "'").replace(/\\"/g, '"'));
+        function showProcessModal(id, action) {
+            const data = withdrawalsMap[id]; // Retrieve from map
+            if (!data) return;
             
             $('#modal-withdrawal-id').val(id);
             $('#modal-action').val(action);

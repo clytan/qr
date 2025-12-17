@@ -375,7 +375,7 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
             <section aria-label="section" style="padding-top: 100px;">
                 <div class="wallet-container">
                     <h2 class="text-center text-white mb-4" style="font-weight: 700;">
-                        <i class="fas fa-wallet"></i> My Wallet
+                        <!-- <i class="fas fa-wallet"></i> My Wallet -->
                     </h2>
 
                     <!-- Balance Card -->

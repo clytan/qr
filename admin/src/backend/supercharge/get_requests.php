@@ -37,7 +37,17 @@ try {
         $requests[] = $row;
     }
 
-    echo json_encode(['status' => true, 'data' => $requests]);
+    // Get stats
+    $sqlStats = "SELECT 
+                    COUNT(*) as total,
+                    SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) as pending,
+                    SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved,
+                    SUM(CASE WHEN status = 'rejected' THEN 1 ELSE 0 END) as rejected
+                 FROM supercharge_requests";
+    $statsResult = $conn->query($sqlStats);
+    $stats = $statsResult->fetch_assoc();
+
+    echo json_encode(['status' => true, 'data' => $requests, 'stats' => $stats]);
 
 } catch (Exception $e) {
     echo json_encode(['status' => false, 'message' => 'Database error: ' . $e->getMessage()]);

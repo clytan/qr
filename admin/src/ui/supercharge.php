@@ -7,154 +7,308 @@ if (!isset($_SESSION['admin_id'])) {
 ?>
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
     <title>Super Charge Requests - Admin</title>
-    <title>Super Charge Requests - Admin</title>
-    <!-- Custom fonts for this template-->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg-primary: #0f172a;
+            --bg-secondary: #1e293b;
+            --bg-tertiary: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --accent: #e67753;
+            --accent-gradient: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%);
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
         }
-
-        body, html {
-            background: #0f172a;
+        
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
             min-height: 100vh;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            color: #e2e8f0;
-        }
-
-        /* Dashboard Content */
-        .dashboard-content {
-            padding: 30px;
-        }
-
-        /* Card Styles */
-        .card {
-            background: rgba(30, 41, 59, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .card-header {
-            padding: 20px 25px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .text-primary { color: #E9437A !important; }
-        .text-gray-800 { color: #f1f5f9 !important; }
-
-        .card-body {
-            padding: 25px;
-        }
-
-        /* Table Styles */
-        .table {
-            width: 100%;
-            margin-bottom: 1rem;
-            color: #e2e8f0;
-            border-collapse: collapse;
-        }
-
-        .table th, .table td {
-            padding: 1rem;
-            vertical-align: top;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
-        }
-
-        .table thead th {
-            vertical-align: bottom;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.08);
-            border-top: none;
-            color: #94a3b8;
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-        }
-
-        .badge {
-            display: inline-block;
-            padding: 0.35em 0.65em;
-            font-size: 0.75em;
-            font-weight: 700;
-            line-height: 1;
-            text-align: center;
-            white-space: nowrap;
-            vertical-align: baseline;
-            border-radius: 0.25rem;
-        }
-        .badge-pending { background-color: #f6c23e; color: #fff; }
-        .badge-approved { background-color: #1cc88a; color: #fff; }
-        .badge-rejected { background-color: #e74a3b; color: #fff; }
-
-        /* Buttons */
-        .btn {
-            display: inline-block;
-            font-weight: 400;
-            text-align: center;
-            vertical-align: middle;
-            user-select: none;
-            border: 1px solid transparent;
-            padding: 0.375rem 0.75rem;
-            font-size: 1rem;
-            line-height: 1.5;
-            border-radius: 0.35rem;
-            transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
-            cursor: pointer;
-        }
-        .btn-sm {
-            padding: 0.25rem 0.5rem;
-            font-size: 0.875rem;
-            line-height: 1.5;
-            border-radius: 0.2rem;
-        }
-        .btn-success { background-color: #1cc88a; border-color: #1cc88a; color: white; }
-        .btn-danger { background-color: #e74a3b; border-color: #e74a3b; color: white; }
-        .btn-outline-primary { color: #4e73df; border-color: #4e73df; background: transparent; }
-        .btn-outline-primary:hover, .btn-outline-primary.active { color: #fff; background-color: #4e73df; }
-        
-        /* Modal */
-        .modal { display: none; position: fixed; z-index: 1050; left: 0; top: 0; width: 100%; height: 100%; overflow: hidden; outline: 0; background: rgba(0,0,0,0.5); }
-        .modal.show { display: block; overflow-y: auto; }
-        .modal-dialog { position: relative; width: auto; margin: 0.5rem; pointer-events: none; max-width: 500px; margin: 1.75rem auto; }
-        .modal-content { position: relative; display: flex; flex-direction: column; width: 100%; pointer-events: auto; background-color: #1a1c23; background-clip: padding-box; border: 1px solid rgba(255,255,255,0.1); border-radius: 0.3rem; outline: 0; color: #e2e8f0; }
-        .modal-header { display: flex; align-items: flex-start; justify-content: space-between; padding: 1rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .modal-body { position: relative; flex: 1 1 auto; padding: 1rem; }
-        .modal-footer { display: flex; align-items: center; justify-content: flex-end; padding: 1rem; border-top: 1px solid rgba(255,255,255,0.1); }
-        .close { float: right; font-size: 1.5rem; font-weight: 700; line-height: 1; color: #fff; text-shadow: 0 1px 0 #fff; opacity: .5; background: none; border: none; cursor: pointer; }
-        
-        .form-control {
-            display: block;
-            width: 100%;
-            padding: 0.375rem 0.75rem;
-            font-size: 1rem;
-            line-height: 1.5;
-            color: #e2e8f0;
-            background-color: #2d3748;
-            background-clip: padding-box;
-            border: 1px solid #4a5568;
-            border-radius: 0.25rem;
-            transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
         }
 
         /* Layout Override for sidebar */
         .admin-main { margin-left: 260px; transition: margin-left 0.3s ease; }
+        .dashboard-content { padding: 30px; }
         @media (max-width: 768px) { .admin-main { margin-left: 0; padding-top: 60px; } }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+        
+        .header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+        
+        .header h1 i {
+            margin-right: 10px;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--bg-tertiary);
+        }
+        
+        .stat-card.pending { border-left: 4px solid var(--warning); }
+        .stat-card.approved { border-left: 4px solid var(--success); }
+        .stat-card.rejected { border-left: 4px solid var(--danger); }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+        
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            padding: 10px 20px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--bg-tertiary);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--accent);
+            border-color: var(--accent);
+        }
+        
+        /* Table */
+        .table-container {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--bg-tertiary);
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--bg-tertiary);
+        }
+        
+        th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+        }
+        
+        tr:hover {
+            background: rgba(255,255,255,0.02);
+        }
+        
+        /* Status badges */
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .status-pending { background: rgba(245, 158, 11, 0.15); color: var(--warning); }
+        .status-approved { background: rgba(16, 185, 129, 0.15); color: var(--success); }
+        .status-rejected { background: rgba(239, 68, 68, 0.15); color: var(--danger); }
+        
+        /* Action buttons */
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin: 2px;
+            transition: all 0.2s;
+        }
+        
+        .btn-approve {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid var(--success);
+        }
+        
+        .btn-approve:hover {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-reject {
+            background: rgba(239, 68, 68, 0.15);
+            color: var(--danger);
+            border: 1px solid var(--danger);
+        }
+        
+        .btn-reject:hover {
+            background: var(--danger);
+            color: white;
+        }
+        
+        /* Link style */
+        .req-link {
+            color: var(--info);
+            text-decoration: none;
+        }
+        .req-link:hover { text-decoration: underline; }
+
+        /* Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .modal-overlay.active { display: flex; }
+        
+        .modal-content {
+            background: var(--bg-secondary);
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            border: 1px solid var(--bg-tertiary);
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--bg-tertiary);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 { margin: 0; }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .modal-body { padding: 20px; }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 10px 14px;
+            background: var(--bg-primary);
+            border: 1px solid var(--bg-tertiary);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent-gradient);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .btn-primary:hover { opacity: 0.9; }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+        
+        @media (max-width: 768px) {
+            .table-container { overflow-x: auto; }
+            table { min-width: 800px; }
+        }
     </style>
 </head>
 
@@ -163,94 +317,102 @@ if (!isset($_SESSION['admin_id'])) {
     
     <main class="admin-main">
         <div class="dashboard-content">
+            <div class="container">
+                <div class="header">
+                    <h1><i class="fas fa-bolt"></i> Super Charge Requests</h1>
+                </div>
 
-                <div class="container-fluid">
-                    <h1 class="h3 mb-2 text-gray-800" style="font-size: 1.75rem; margin-bottom: 0.5rem;">Super Charge Requests</h1>
-                    <p class="mb-4" style="color: #94a3b8;">Manage promotion requests from Gold users.</p>
-
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                            <h6 class="m-0 font-weight-bold text-primary">Requests List</h6>
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-sm btn-outline-primary active" onclick="filterRequests('all')">All</button>
-                                <button type="button" class="btn btn-sm btn-outline-warning" style="color: #f6c23e; border-color: #f6c23e;" onclick="filterRequests('pending')">Pending</button>
-                                <button type="button" class="btn btn-sm btn-outline-success" style="color: #1cc88a; border-color: #1cc88a;" onclick="filterRequests('approved')">Approved</button>
-                                <button type="button" class="btn btn-sm btn-outline-danger" style="color: #e74a3b; border-color: #e74a3b;" onclick="filterRequests('rejected')">Rejected</button>
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="requestsTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>User</th>
-                                            <th>Link</th>
-                                            <th>Status</th>
-                                            <th>Date</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="requestsList">
-                                        <!-- Data populated by JS -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card pending">
+                        <div class="stat-value" id="stat-pending">0</div>
+                        <div class="stat-label">Pending Requests</div>
+                    </div>
+                    <div class="stat-card approved">
+                        <div class="stat-value" id="stat-approved">0</div>
+                        <div class="stat-label">Approved</div>
+                    </div>
+                    <div class="stat-card rejected">
+                        <div class="stat-value" id="stat-rejected">0</div>
+                        <div class="stat-label">Rejected</div>
                     </div>
                 </div>
+
+                <!-- Filters -->
+                <div class="filters">
+                    <button class="filter-btn active" data-status="all">All</button>
+                    <button class="filter-btn" data-status="pending">Pending</button>
+                    <button class="filter-btn" data-status="approved">Approved</button>
+                    <button class="filter-btn" data-status="rejected">Rejected</button>
+                </div>
+
+                <!-- Table -->
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>User</th>
+                                <th>Link</th>
+                                <th>Status</th>
+                                <th>Date</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="requestsList">
+                            <tr>
+                                <td colspan="6" class="empty-state">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    <p>Loading...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </main>
+
+    <!-- Reject Modal -->
+    <div class="modal-overlay" id="rejectModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Reject Request</h3>
+                <button class="modal-close" onclick="closeRejectModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="rejectRequestId">
+                <div class="form-group">
+                    <label>Reason for Rejection</label>
+                    <textarea class="form-control" id="rejectReason" rows="3" placeholder="Enter reason..."></textarea>
+                </div>
+                <button class="btn-primary" style="background: var(--danger);" onclick="submitReject()">Reject Request</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
     </a>
 
-    <!-- Reject Modal -->
-    <div class="modal fade" id="rejectModal" tabindex="-1" role="dialog" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Reject Request</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <form id="rejectForm">
-                        <input type="hidden" id="rejectRequestId">
-                        <div class="form-group">
-                            <label>Reason for Rejection</label>
-                            <textarea class="form-control" id="rejectReason" rows="3" required></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <button class="btn btn-danger" type="button" onclick="submitReject()">Reject</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- jQuery and Bootstrap -->
+    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
         let currentFilter = 'all';
+        let requestsMap = {};
 
         $(document).ready(function() {
             loadRequests();
-        });
 
-        function filterRequests(status) {
-            currentFilter = status;
-            $('.btn-group .btn').removeClass('active');
-            $(`.btn-group .btn-outline-${status === 'all' ? 'primary' : (status === 'pending' ? 'warning' : (status === 'approved' ? 'success' : 'danger'))}`).addClass('active');
-            loadRequests();
-        }
+            $('.filter-btn').click(function() {
+                $('.filter-btn').removeClass('active');
+                $(this).addClass('active');
+                currentFilter = $(this).data('status');
+                loadRequests();
+            });
+        });
 
         function loadRequests() {
             $.ajax({
@@ -260,55 +422,73 @@ if (!isset($_SESSION['admin_id'])) {
                 success: function(response) {
                     if (response.status) {
                         displayRequests(response.data);
+                        updateStats(response.stats);
                     } else {
                         alert('Error loading data');
                     }
                 },
                 error: function() {
-                    alert('Error connecting to server');
+                    console.error('Error connecting to server');
                 }
             });
+        }
+
+        function updateStats(stats) {
+            if (!stats) return;
+            $('#stat-pending').text(stats.pending || 0);
+            $('#stat-approved').text(stats.approved || 0);
+            $('#stat-rejected').text(stats.rejected || 0);
         }
 
         function displayRequests(data) {
             const tbody = $('#requestsList');
             tbody.empty();
+            requestsMap = {};
 
             if (data.length === 0) {
-                tbody.html('<tr><td colspan="6" class="text-center">No requests found</td></tr>');
+                tbody.html(`
+                    <tr>
+                        <td colspan="6" class="empty-state">
+                            <i class="fas fa-inbox"></i>
+                            <p>No requests found</p>
+                        </td>
+                    </tr>
+                `);
                 return;
             }
 
             data.forEach(req => {
-                let statusBadge = `<span class="badge badge-${req.status}">${req.status.toUpperCase()}</span>`;
+                requestsMap[req.id] = req;
                 
                 let actions = '';
                 if (req.status === 'pending') {
                     actions = `
-                        <button class="btn btn-sm btn-success" onclick="processRequest(${req.id}, 'approve')">
-                            <i class="fas fa-check"></i>
+                        <button class="action-btn btn-approve" onclick="processRequest(${req.id}, 'approve')">
+                            <i class="fas fa-check"></i> Approve
                         </button>
-                        <button class="btn btn-sm btn-danger" onclick="openRejectModal(${req.id})">
-                            <i class="fas fa-times"></i>
+                        <button class="action-btn btn-reject" onclick="openRejectModal(${req.id})">
+                            <i class="fas fa-times"></i> Reject
                         </button>
                     `;
                 } else if (req.status === 'rejected' && req.admin_notes) {
-                    actions = `<small class="text-muted">Reason: ${req.admin_notes}</small>`;
+                    actions = `<small style="color: var(--text-secondary);">Reason: ${req.admin_notes}</small>`;
                 }
 
                 tbody.append(`
                     <tr>
-                        <td>${req.id}</td>
+                        <td>#${req.id}</td>
                         <td>
-                            <div><strong>${req.user_full_name}</strong></div>
-                            <small class="text-muted">${req.user_email}</small><br>
-                            <small class="text-muted">@${req.user_qr_id}</small>
+                            <strong>${req.user_full_name}</strong><br>
+                            <small style="color: var(--text-secondary);">${req.user_email}</small><br>
+                            <small style="color: var(--accent);">@${req.user_qr_id}</small>
                         </td>
                         <td>
-                            <a href="${req.supercharge_link}" target="_blank">${req.supercharge_link}</a>
+                            <a href="${req.supercharge_link}" target="_blank" class="req-link">
+                                ${req.supercharge_link} <i class="fas fa-external-link-alt" style="font-size: 0.8em;"></i>
+                            </a>
                         </td>
-                        <td>${statusBadge}</td>
-                        <td>${new Date(req.created_at).toLocaleDateString()}</td>
+                        <td><span class="status-badge status-${req.status}">${req.status}</span></td>
+                        <td><small>${new Date(req.created_at).toLocaleDateString()}</small></td>
                         <td>${actions}</td>
                     </tr>
                 `);
@@ -330,7 +510,7 @@ if (!isset($_SESSION['admin_id'])) {
                 success: function(response) {
                     if (response.status) {
                         loadRequests();
-                        if (action === 'reject') $('#rejectModal').modal('hide');
+                        if (action === 'reject') closeRejectModal();
                     } else {
                         alert(response.message);
                     }
@@ -341,7 +521,11 @@ if (!isset($_SESSION['admin_id'])) {
         function openRejectModal(id) {
             $('#rejectRequestId').val(id);
             $('#rejectReason').val('');
-            $('#rejectModal').modal('show');
+            $('#rejectModal').addClass('active');
+        }
+
+        function closeRejectModal() {
+            $('#rejectModal').removeClass('active');
         }
 
         function submitReject() {
@@ -353,6 +537,11 @@ if (!isset($_SESSION['admin_id'])) {
             }
             processRequest(id, 'reject', reason);
         }
+
+        // Close modal on outside click
+        $('#rejectModal').click(function(e) {
+            if (e.target === this) closeRejectModal();
+        });
     </script>
 </body>
 </html>
