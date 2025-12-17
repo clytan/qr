@@ -96,7 +96,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                             and suspend the account.</p>
 
                         <h3>7. Contact</h3>
-                        <p>For refund requests and questions, contact: Zokli.india@gmail.com</p>
+                        <p>For refund requests and questions, contact: Zokli.india@gmail.com or call us at +91 9980769600</p>
                     </div>
                 </div>
             </section>

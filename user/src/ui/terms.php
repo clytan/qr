@@ -102,7 +102,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                             Terms.</p>
 
                         <h3>9. Contact</h3>
-                        <p>Questions about these Terms can be sent to: Zokli.india@gmail.com</p>
+                        <p>Questions about these Terms can be sent to: Zokli.india@gmail.com or call us at +91 9980769600</p>
                     </div>
                 </div>
             </section>

@@ -63,7 +63,7 @@ function sendWelcomeEmail($toEmail, $toName = '', $userId = null, $userQrId = nu
         try {
             $invoicePath = generateInvoicePDF($userId);
             if ($invoicePath && file_exists($invoicePath)) {
-                $mail->AddAttachment($invoicePath, 'Zokli_Registration_Invoice.html', 'base64', 'text/html');
+                $mail->AddAttachment($invoicePath, 'Zokli_Registration_Invoice.pdf', 'base64', 'application/pdf');
                 $filesToCleanup[] = $invoicePath;
                 error_log("Invoice attached to welcome email: " . $invoicePath);
             }

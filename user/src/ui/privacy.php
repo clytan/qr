@@ -87,7 +87,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                         <p>We may update this Policy from time to time. We will post the updated policy with a revised "Last updated" date.</p>
 
                         <h3>9. Contact Us</h3>
-                        <p>If you have questions about this Privacy Policy, please contact us at: Zokli.india@gmail.com</p>
+                        <p>If you have questions about this Privacy Policy, please contact us at: Zokli.india@gmail.com or call us at +91 9980769600</p>
                     </div>
                 </div>
             </section>
