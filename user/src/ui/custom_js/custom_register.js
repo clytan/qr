@@ -511,11 +511,11 @@ var registerFunction = {
 
         // Adjust amount based on membership tier
         if (userTag === 'gold') {
-            amount = 1; // Original: 9999
+            amount = 9999; // Original: 9999
         } else if (userTag === 'silver') {
-            amount = 1; // Original: 5555
+            amount = 5555; // Original: 5555
         } else {
-            amount = 1; // Original: 999
+            amount = 999; // Original: 999
         }
 
         return amount;
