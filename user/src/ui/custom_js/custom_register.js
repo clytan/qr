@@ -48,11 +48,10 @@ var eventHandler = {
                 // not from the displayed #pay-amount (which could already be discounted)
                 let checkedTier = $('input[name="user_tag"]:checked').val();
                 // TESTING: All prices set to 1 (Original: Normal=999, Silver=5555, Gold=9999)
-                let amount = 1; // Default
-                if (checkedTier === 'gold') amount = 1; // Original: 9999
-                else if (checkedTier === 'silver') amount = 1; // Original: 5555
-                if ($('#student_leader').val() === 'yes') amount = 1; // Original: 999
-
+                let amount = 999; // Default
+                if (checkedTier === 'gold') amount = 9999; // Original: 9999
+                else if (checkedTier === 'silver') amount = 5555; // Original: 5555
+                if ($('#student_leader').val() === 'yes') amount = 999; // Original: 999
                 $.ajax({
                     url: '../backend/payment/validate_promo.php',
                     type: 'POST',
