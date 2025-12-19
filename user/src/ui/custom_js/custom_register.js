@@ -507,7 +507,7 @@ var registerFunction = {
     calculateAmount: function (userType, userTag) {
         // TESTING: All prices set to 1
         // Original prices: Normal=999, Silver=5555, Gold=9999
-        let amount = 1; // Default Normal tier (Original: 999)
+        let amount = 999; // Default Normal tier (Original: 999)
 
         // Adjust amount based on membership tier
         if (userTag === 'gold') {
