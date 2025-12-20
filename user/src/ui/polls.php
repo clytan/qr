@@ -891,6 +891,48 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
             };
         },
         
+            };
+        },
+
+        async verifyPayment(orderId) {
+            if (!orderId) return;
+            
+            const btn = document.querySelector(`button[data-order="${orderId}"]`);
+            if(btn) {
+                btn.disabled = true;
+                btn.textContent = 'Checking...';
+            }
+
+            this.showToast('Checking payment status...', 'info');
+
+            try {
+                const response = await fetch('../backend/polls/verify_poll_payment.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ order_id: orderId })
+                });
+                const data = await response.json();
+                
+                if (data.status) {
+                    this.showToast('Payment confirmed! Poll activated.', 'success');
+                    this.loadPolls();
+                } else {
+                    this.showToast(data.error || 'Payment not completed or failed', 'error');
+                    if(btn) {
+                        btn.disabled = false;
+                        btn.textContent = 'Check Payment';
+                    }
+                }
+            } catch (error) {
+                console.error('Verification error:', error);
+                this.showToast('Network error verifying payment', 'error');
+                if(btn) {
+                    btn.disabled = false;
+                    btn.textContent = 'Check Payment';
+                }
+            }
+        },
+
         async loadPolls() {
             const container = document.getElementById('pollsContainer');
             container.innerHTML = '<div class="loading-spinner"><i class="fas fa-spinner"></i><p>Loading polls...</p></div>';
@@ -963,8 +1005,17 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                             <span>${this.escapeHtml(poll.creator_name)}</span>
                             ${poll.is_admin_poll ? '<span style="color: var(--primary);"><i class="fas fa-shield-alt"></i> Admin</span>' : ''}
                         </div>
-                        <span class="poll-status ${poll.status}">${poll.status === 'active' ? 'Active' : 'Closed'}</span>
+                        <span class="poll-status ${poll.status}">
+                            ${poll.status === 'active' ? 'Active' : (poll.status === 'pending_payment' ? 'Pending Payment' : 'Closed')}
+                        </span>
                     </div>
+                     ${poll.status === 'pending_payment' && poll.is_owner ? 
+                        `<div style="margin-bottom: 15px;">
+                            <button onclick="PollsApp.verifyPayment('${poll.payment_id}')" data-order="${poll.payment_id}" class="poll-action-btn edit" style="width:100%">
+                                <i class="fas fa-sync"></i> Check Payment Status
+                            </button>
+                         </div>` 
+                    : ''}
                     
                     <h3 class="poll-title">${this.escapeHtml(poll.title)}</h3>
                     ${poll.description ? `<p class="poll-description">${this.escapeHtml(poll.description)}</p>` : ''}
