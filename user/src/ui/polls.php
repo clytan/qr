@@ -192,6 +192,11 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         color: #10b981;
     }
 
+    .poll-status.pending_payment {
+        background: rgba(245, 158, 11, 0.2);
+        color: #f59e0b;
+    }
+
     .poll-status.closed {
         background: rgba(148, 163, 184, 0.2);
         color: #94a3b8;

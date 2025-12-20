@@ -57,7 +57,8 @@ try {
     }
 
     // Amount is fixed ₹99
-    $amount = 99.00;
+    // Amount is fixed ₹99
+    $amount = 1.00; // TESTING: Set to 1
     $customerName = $_SESSION['user_name'] ?? 'User';
     $customerEmail = $_SESSION['user_email'] ?? 'user@example.com';
     $customerPhone = $_SESSION['user_phone'] ?? '9999999999';
