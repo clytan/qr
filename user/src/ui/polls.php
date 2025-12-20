@@ -202,6 +202,21 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         color: #94a3b8;
     }
 
+    .poll-timer {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        background: rgba(102, 126, 234, 0.2);
+        color: #667eea;
+        margin-left: auto;
+    }
+
+    .poll-timer.expired {
+        background: rgba(239, 68, 68, 0.2);
+        color: #ef4444;
+    }
+
     .poll-title {
         font-size: 1.25rem;
         font-weight: 700;
@@ -1058,6 +1073,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                         <span class="poll-votes">
                             <i class="fas fa-vote-yea"></i> ${totalVotes} vote${totalVotes !== 1 ? 's' : ''}
                         </span>
+                        ${poll.is_owner && poll.status === 'active' ? this.getExpiryTimerHtml(poll.created_on) : ''}
                         ${actionsHtml}
                     </div>
                 </div>
@@ -1187,6 +1203,28 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
             });
             
             container.appendChild(wrapper);
+        },
+
+        getExpiryTimerHtml(createdOn) {
+            const createdDate = new Date(createdOn);
+            const expiryDate = new Date(createdDate.getTime() + (7 * 24 * 60 * 60 * 1000)); // 7 days
+            const now = new Date();
+            const diff = expiryDate - now;
+            
+            if (diff <= 0) {
+                return '<span class="poll-timer expired"><i class="fas fa-clock"></i> Expired</span>';
+            }
+            
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+            
+            let timeStr = '';
+            if (days > 0) timeStr += `${days}d `;
+            if (hours > 0) timeStr += `${hours}h `;
+            if (days === 0) timeStr += `${mins}m`;
+            
+            return `<span class="poll-timer"><i class="fas fa-hourglass-half"></i> ${timeStr.trim()} left</span>`;
         },
         
         resetOptionsContainer() {
