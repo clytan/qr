@@ -3,24 +3,30 @@
  * Generate vCard (.vcf) file for user profile
  * Downloads contact information to phone
  */
-header('Content-Type: text/vcard; charset=utf-8');
+
+// Prevent any output before headers
+ob_start();
 
 require_once('../dbconfig/connection.php');
 
 $qr_id = $_GET['qr'] ?? $_GET['QR'] ?? null;
 
 if (!$qr_id) {
-    header('Content-Type: application/json');
-    echo json_encode(['error' => 'QR ID required']);
+    header('Content-Type: text/plain');
+    echo 'Error: QR ID required';
     exit();
 }
 
-// Get user data
-$sql = "SELECT u.user_full_name, u.user_email, u.user_phone, u.user_address, u.user_tag, u.user_qr_id,
-               u.profile_image
-        FROM user_user u 
-        WHERE u.user_qr_id = ? AND u.is_deleted = 0";
-$stmt = $conn->prepare($sql);
+// Get user data - removed profile_image as it may not exist
+$sql = "SELECT user_full_name, user_email, user_phone, user_address, user_tag, user_qr_id
+        FROM user_user 
+        WHERE user_qr_id = ? AND is_deleted = 0";
+$stmt = @$conn->prepare($sql);
+if (!$stmt) {
+    header('Content-Type: text/plain');
+    echo 'Database error';
+    exit();
+}
 $stmt->bind_param('s', $qr_id);
 $stmt->execute();
 $result = $stmt->get_result();
@@ -28,26 +34,28 @@ $user = $result->fetch_assoc();
 $stmt->close();
 
 if (!$user) {
-    header('Content-Type: application/json');
-    echo json_encode(['error' => 'User not found']);
+    header('Content-Type: text/plain');
+    echo 'Error: User not found';
     exit();
 }
 
-// Get social links
+// Get social links (optional - may not exist on all setups)
+$links = [];
 $sql_links = "SELECT plt.link as link_value, lkt.name as link_type_name 
               FROM user_profile_links plt 
               JOIN user_profile_links_type lkt ON plt.link_type = lkt.id 
               WHERE plt.user_id = (SELECT id FROM user_user WHERE user_qr_id = ?) 
               AND plt.is_deleted = 0 AND plt.is_public = 1";
-$stmt_links = $conn->prepare($sql_links);
-$stmt_links->bind_param('s', $qr_id);
-$stmt_links->execute();
-$links_result = $stmt_links->get_result();
-$links = [];
-while ($row = $links_result->fetch_assoc()) {
-    $links[$row['link_type_name']] = $row['link_value'];
+$stmt_links = @$conn->prepare($sql_links);
+if ($stmt_links) {
+    $stmt_links->bind_param('s', $qr_id);
+    $stmt_links->execute();
+    $links_result = $stmt_links->get_result();
+    while ($row = $links_result->fetch_assoc()) {
+        $links[$row['link_type_name']] = $row['link_value'];
+    }
+    $stmt_links->close();
 }
-$stmt_links->close();
 
 // Generate vCard
 $name = $user['user_full_name'] ?? 'Contact';
@@ -101,10 +109,13 @@ $vcard .= "NOTE:" . $socialNote . "\r\n";
 
 $vcard .= "END:VCARD\r\n";
 
-// Set download headers
+// Clear any output buffer and set download headers
+ob_end_clean();
+header('Content-Type: text/vcard; charset=utf-8');
 $filename = preg_replace('/[^a-zA-Z0-9]/', '_', $name) . '_Zokli.vcf';
 header('Content-Disposition: attachment; filename="' . $filename . '"');
 header('Content-Length: ' . strlen($vcard));
 
 echo $vcard;
+exit();
 ?>
