@@ -101,9 +101,51 @@ while ($row = $links_result->fetch_assoc()) {
 }
 $links_stmt->close();
 
+// Calculate subscription status
+$subscription = null;
+if (!empty($user_data['created_on'])) {
+    $created = new DateTime($user_data['created_on']);
+    $expiry = clone $created;
+    $expiry->add(new DateInterval('P1Y')); // Add 1 year
+    
+    $now = new DateTime();
+    $diff = $now->diff($expiry);
+    $days_remaining = $diff->invert ? -$diff->days : $diff->days;
+    
+    // Grace period: 2 days after expiry
+    $is_expired = $days_remaining < -2;
+    $is_in_grace = $days_remaining >= -2 && $days_remaining < 0;
+    
+    // TEST MODE: Add ?test_renewal=1 to profile.php URL to force show renew button
+    $test_mode = isset($_POST['test_renewal']) && $_POST['test_renewal'] == '1';
+    $needs_renewal = $test_mode || $days_remaining <= 30; // Show renewal button if 30 days or less
+    
+    // Renewal prices based on tier
+    $tier_prices = [
+        'gold' => 9999,
+        'silver' => 5555,
+        'normal' => 999,
+        'student' => 999
+    ];
+    $user_tier = strtolower($user_data['user_tag'] ?? 'normal');
+    $renewal_price = $tier_prices[$user_tier] ?? 999;
+    
+    $subscription = [
+        'tier' => $user_data['user_tag'] ?? 'normal',
+        'registered_on' => $user_data['created_on'],
+        'expires_on' => $expiry->format('Y-m-d H:i:s'),
+        'days_remaining' => $days_remaining,
+        'is_expired' => $is_expired,
+        'is_in_grace' => $is_in_grace,
+        'needs_renewal' => $needs_renewal,
+        'renewal_price' => $renewal_price
+    ];
+}
+
 $response = [
     'user' => $user_data,
     'links' => $links,
+    'subscription' => $subscription,
     'is_public_view' => $is_public_view,
     'debug' => [
         'user_id' => $user_id,

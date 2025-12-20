@@ -18,8 +18,8 @@ try {
     $stats['users'] = $result ? $result->fetch_assoc()['count'] : 0;
     
     // Total communities
-    $result = $conn->query("SELECT COUNT(*) as count FROM community WHERE is_active = 1");
-    $stats['communities'] = $result ? $result->fetch_assoc()['count'] : 0;
+    $communityResult = @$conn->query("SELECT COUNT(*) as count FROM community");
+    $stats['communities'] = $communityResult ? $communityResult->fetch_assoc()['count'] : 0;
     
     // Admin users
     $result = $conn->query("SELECT COUNT(*) as count FROM admin_user WHERE is_deleted = 0");
@@ -32,6 +32,7 @@ try {
     echo json_encode(['status' => true, 'data' => $stats]);
     
 } catch (Exception $e) {
-    echo json_encode(['status' => false, 'message' => 'Error fetching stats']);
+    error_log("Dashboard stats error: " . $e->getMessage());
+    echo json_encode(['status' => false, 'message' => 'Error fetching stats: ' . $e->getMessage()]);
 }
 ?>

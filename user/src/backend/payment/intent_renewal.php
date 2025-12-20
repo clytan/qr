@@ -1,0 +1,246 @@
+<?php
+/**
+ * Intent page for subscription renewal payments
+ * Similar to intent.php but redirects to return_renewal.php after payment
+ */
+header('Content-Type: text/html; charset=utf-8');
+
+$orderId = isset($_GET['orderId']) ? htmlspecialchars($_GET['orderId']) : '';
+$sessionId = isset($_GET['session']) ? htmlspecialchars($_GET['session']) : '';
+
+if (!$orderId || !$sessionId) {
+    die('Invalid payment session or order ID.');
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>Renew Subscription</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100">
+    <div class="min-h-screen w-screen flex flex-col items-center justify-center">
+        <div class="p-6 text-center max-w-md">
+            <div class="flex flex-col items-center">
+                <div class="logo m-auto mb-5 bg-white w-24 h-24 p-3 border rounded-full overflow-hidden flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="w-16 h-16">
+                        <path fill="#10B981"
+                            d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm-1.24 14.774l-3.34-3.34a.5.5 0 0 1 0-.708l.708-.707a.5.5 0 0 1 .707 0l2.279 2.279 5.526-5.526a.5.5 0 0 1 .707 0l.707.707a.5.5 0 0 1 0 .707l-6.587 6.588a.5.5 0 0 1-.707 0z" />
+                    </svg>
+                </div>
+                <h2 class="font-bold text-xl text-center mb-3">Renew Your Subscription</h2>
+                <p class="text-sm text-center text-gray-600 px-4 mb-6">
+                    Complete the payment to extend your subscription by one year.
+                </p>
+            </div>
+        </div>
+
+        <div id="intent" class="w-full max-w-md px-6"></div>
+        <div id="status" class="mx-6 text-center text-sm text-gray-600 mt-4 mb-4 max-w-md">
+            <p id="status-text">Initializing payment...</p>
+        </div>
+        <div id="Cerror" class="mx-6 text-white p-3 bg-red-500 rounded-md mt-4 hidden text-center max-w-md"></div>
+
+        <button id="payNowBtn"
+            class="mx-6 bg-green-600 text-white px-6 py-3 rounded-md mt-4 hover:bg-green-700 max-w-md font-bold text-lg">
+            🔄 Pay & Renew Now
+        </button>
+
+        <button id="checkPaymentBtn"
+            class="hidden mx-6 bg-blue-600 text-white px-6 py-2 rounded-md mt-4 hover:bg-blue-700 max-w-md">
+            ✓ Check Payment Status
+        </button>
+        <button id="backBtn"
+            class="hidden mx-6 bg-gray-400 text-white px-6 py-2 rounded-md mt-2 hover:bg-gray-500 max-w-md">
+            ← Back to Profile
+        </button>
+    </div>
+
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
+    <script>
+        const orderId = '<?php echo $orderId; ?>';
+        const sessionId = '<?php echo $sessionId; ?>';
+        let pollInterval = null;
+        let renewalCompleted = false;
+
+        console.log('intent_renewal.php loaded - orderId:', orderId);
+
+        const cashfree = Cashfree({
+            mode: "production",
+        });
+
+        const upiApp = cashfree.create("upiApp", {
+            values: {
+                upiApp: "web",
+                buttonIcon: false,
+            },
+        });
+
+        function updateStatus(msg) {
+            document.getElementById("status-text").textContent = msg;
+            console.log(msg);
+        }
+
+        function showError(err) {
+            document.getElementById("Cerror").style.display = "block";
+            document.getElementById("Cerror").innerHTML = err;
+            document.getElementById("checkPaymentBtn").classList.remove("hidden");
+            document.getElementById("backBtn").classList.remove("hidden");
+        }
+
+        upiApp.on("loaderror", function (data) {
+            console.error("Load error:", data);
+            showError("Payment load error: " + (data.error?.message || "Unknown"));
+        });
+
+        upiApp.mount("#intent");
+
+        upiApp.on("ready", function () {
+            console.log("Payment ready");
+            updateStatus("Payment form ready. Click 'Pay & Renew Now' to continue...");
+        });
+
+        function startPayment() {
+            console.log("Starting payment...");
+            updateStatus("Opening payment app...");
+
+            cashfree.pay({
+                paymentMethod: upiApp,
+                paymentSessionId: sessionId,
+            })
+            .then(function (result) {
+                console.log("Payment initiated:", result);
+                updateStatus("Payment app opened. Please complete payment...");
+                startPollingForPayment();
+            })
+            .catch(function (error) {
+                console.error("Payment error:", error);
+                showError("Error: " + (error.message || "Unknown"));
+            });
+        }
+
+        // Listen for success callback
+        upiApp.on("payment_success", function (data) {
+            console.log("✓ Payment success callback:", data);
+            updateStatus("✓ Payment successful!");
+            completeRenewal();
+        });
+
+        upiApp.on("payment_failed", function (data) {
+            console.error("✗ Payment failed:", data);
+            showError("Payment failed: " + (data.message || "Unknown"));
+            stopPolling();
+        });
+
+        // Polling for payment status
+        function startPollingForPayment() {
+            console.log('Starting payment status polling...');
+            let pollCount = 0;
+            const maxPolls = 300; // 5 minutes
+
+            pollInterval = setInterval(function () {
+                pollCount++;
+
+                fetch('check_payment_status.php?orderId=' + encodeURIComponent(orderId) + '&t=' + Date.now(), {
+                    method: 'GET',
+                    headers: { 'Content-Type': 'application/json' }
+                })
+                .then(r => r.json())
+                .then(data => {
+                    console.log('Poll #' + pollCount + ' - Status:', data.status);
+
+                    if (data.status === 'PAID') {
+                        console.log('✓ Payment confirmed via polling!');
+                        stopPolling();
+                        completeRenewal();
+                    } else if (data.status === 'FAILED') {
+                        console.log('✗ Payment failed');
+                        stopPolling();
+                        showError("Payment was declined. Please try again.");
+                    } else if (pollCount % 30 === 0) {
+                        updateStatus("Checking payment status... (" + Math.floor(pollCount / 60) + "m)");
+                    }
+                })
+                .catch(e => console.log('Poll error:', e));
+
+                if (pollCount >= maxPolls) {
+                    console.log('Max polling reached');
+                    stopPolling();
+                    showError("Payment check timed out. Click button below to verify manually.");
+                }
+            }, 1000);
+        }
+
+        function stopPolling() {
+            if (pollInterval) {
+                clearInterval(pollInterval);
+                pollInterval = null;
+            }
+        }
+
+        function completeRenewal() {
+            if (renewalCompleted) {
+                console.log('Renewal already completed, ignoring duplicate call');
+                return;
+            }
+            renewalCompleted = true;
+
+            stopPolling();
+            updateStatus("✓ Processing renewal...");
+            
+            // Redirect to return_renewal.php to complete the renewal
+            window.location.href = 'return_renewal.php?order_id=' + encodeURIComponent(orderId);
+        }
+
+        // Manual check button
+        document.getElementById("checkPaymentBtn").addEventListener("click", function () {
+            console.log('Manual check clicked');
+            updateStatus("Checking payment status...");
+
+            fetch('check_payment_status.php?orderId=' + encodeURIComponent(orderId) + '&t=' + Date.now(), {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(r => r.json())
+            .then(data => {
+                console.log('Manual check result:', data);
+                if (data.status === 'PAID') {
+                    updateStatus("✓ Payment confirmed!");
+                    completeRenewal();
+                } else {
+                    showError("Status: " + data.status + ". Try again in a moment.");
+                }
+            })
+            .catch(e => {
+                console.error('Check error:', e);
+                showError("Error checking payment.");
+            });
+        });
+
+        // Pay Now button
+        document.getElementById("payNowBtn").addEventListener("click", function () {
+            console.log('Pay Now button clicked');
+            this.disabled = true;
+            this.style.opacity = '0.5';
+            startPayment();
+        });
+
+        // Back button
+        document.getElementById("backBtn").addEventListener("click", function () {
+            window.location.href = '../../ui/profile.php';
+        });
+
+        window.addEventListener('focus', function () {
+            console.log('Page focused - checking payment status');
+            if (pollInterval === null && !renewalCompleted) {
+                startPollingForPayment();
+            }
+        });
+    </script>
+</body>
+
+</html>

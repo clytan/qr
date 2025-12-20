@@ -23,8 +23,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!empty($search)) {
                 $where .= " AND (user_full_name LIKE ? OR user_email LIKE ? OR user_phone LIKE ? OR user_qr_id LIKE ?)";
                 $searchTerm = "%$search%";
-                $params = [$searchTerm, $searchTerm, $searchTerm, $searchTerm];
-                $types = 'ssss';
+                $params = array_merge($params, [$searchTerm, $searchTerm, $searchTerm, $searchTerm]);
+                $types .= 'ssss';
+            }
+            
+            // Tier filter
+            $tier_filter = isset($_POST['tier_filter']) ? trim($_POST['tier_filter']) : '';
+            if (!empty($tier_filter)) {
+                $where .= " AND user_tag = ?";
+                $params[] = $tier_filter;
+                $types .= 's';
             }
             
             // Get total count
@@ -206,6 +214,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo json_encode(['status' => false, 'message' => 'Failed to verify email']);
             }
             exit();
+            
+        case 'export':
+            $search = isset($_POST['search']) ? trim($_POST['search']) : '';
+            $tier_filter = isset($_POST['tier_filter']) ? trim($_POST['tier_filter']) : '';
+            
+            $where = "WHERE is_deleted = 0";
+            $params = [];
+            $types = '';
+            
+            if (!empty($search)) {
+                $where .= " AND (user_full_name LIKE ? OR user_email LIKE ? OR user_phone LIKE ? OR user_qr_id LIKE ?)";
+                $searchTerm = "%$search%";
+                $params = array_merge($params, [$searchTerm, $searchTerm, $searchTerm, $searchTerm]);
+                $types .= 'ssss';
+            }
+            
+            if (!empty($tier_filter)) {
+                $where .= " AND user_tag = ?";
+                $params[] = $tier_filter;
+                $types .= 's';
+            }
+            
+            $sql = "SELECT user_full_name, user_email, user_phone, user_qr_id, user_tag, user_user_type, user_email_verified, created_on FROM user_user $where ORDER BY created_on DESC";
+            
+            if (!empty($params)) {
+                $stmt = $conn->prepare($sql);
+                $stmt->bind_param($types, ...$params);
+                $stmt->execute();
+                $result = $stmt->get_result();
+            } else {
+                $result = $conn->query($sql);
+            }
+            
+            $users = [];
+            while ($row = $result->fetch_assoc()) {
+                $users[] = $row;
+            }
+            
+            echo json_encode(['status' => true, 'data' => $users]);
+            exit();
     }
 }
 ?>
@@ -242,6 +290,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .stat-mini { background: rgba(30, 41, 59, 0.8); padding: 15px 20px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.08); }
         .stat-mini-value { font-size: 22px; font-weight: 700; color: #f1f5f9; }
         .stat-mini-label { font-size: 12px; color: #64748b; margin-top: 3px; }
+        
+        .filter-select { padding: 12px 16px; background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; color: #e2e8f0; font-size: 14px; min-width: 150px; }
+        .filter-select:focus { outline: none; border-color: #e67753; }
+        .btn-export { padding: 12px 20px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; border-radius: 10px; color: white; font-size: 14px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; }
+        .btn-export:hover { opacity: 0.9; }
         
         /* Table */
         .table-container { background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; overflow: hidden; }
@@ -348,12 +401,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 </div>
             </div>
             
-            <!-- Search -->
+            <!-- Search + Filters -->
             <div class="search-bar">
                 <div class="search-wrapper">
                     <i class="fas fa-search"></i>
                     <input type="text" class="search-input" id="searchInput" placeholder="Search by name, email, phone, or QR ID...">
                 </div>
+                <select class="filter-select" id="tierFilter">
+                    <option value="">All Tiers</option>
+                    <option value="gold">Gold</option>
+                    <option value="silver">Silver</option>
+                    <option value="normal">Normal</option>
+                    <option value="student">Student</option>
+                </select>
+                <button class="btn-export" onclick="exportUsers()">
+                    <i class="fas fa-download"></i> Export CSV
+                </button>
             </div>
             
             <!-- Users Table -->
@@ -436,13 +499,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     loadUsers(1);
                 }, 300);
             });
+            
+            // Tier filter change
+            $('#tierFilter').on('change', function() {
+                currentPage = 1;
+                loadUsers(1);
+            });
         });
         
         function loadUsers(page) {
             currentPage = page;
             const search = $('#searchInput').val().trim();
+            const tierFilter = $('#tierFilter').val();
             
-            $.post('', { action: 'get_all', page: page, search: search }, function(response) {
+            $.post('', { action: 'get_all', page: page, search: search, tier_filter: tierFilter }, function(response) {
                 if (response.status && response.data.length > 0) {
                     let html = '';
                     response.data.forEach(user => {
@@ -672,6 +742,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!dateStr) return '-';
             const date = new Date(dateStr);
             return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+        
+        function exportUsers() {
+            const search = $('#searchInput').val().trim();
+            const tierFilter = $('#tierFilter').val();
+            
+            showToast('Preparing export...', 'success');
+            
+            $.post('', { action: 'export', search: search, tier_filter: tierFilter }, function(response) {
+                if (response.status && response.data.length > 0) {
+                    // Convert to CSV
+                    const headers = ['Name', 'Email', 'Phone', 'QR ID', 'Tier', 'Type', 'Verified', 'Joined'];
+                    let csv = headers.join(',') + '\n';
+                    
+                    response.data.forEach(row => {
+                        csv += [
+                            '"' + (row.user_full_name || '').replace(/"/g, '""') + '"',
+                            '"' + (row.user_email || '').replace(/"/g, '""') + '"',
+                            '"' + (row.user_phone || '').replace(/"/g, '""') + '"',
+                            '"' + (row.user_qr_id || '').replace(/"/g, '""') + '"',
+                            '"' + (row.user_tag || '').replace(/"/g, '""') + '"',
+                            '"' + (row.user_user_type || '').replace(/"/g, '""') + '"',
+                            row.user_email_verified ? 'Yes' : 'No',
+                            '"' + (row.created_on || '').replace(/"/g, '""') + '"'
+                        ].join(',') + '\n';
+                    });
+                    
+                    // Download
+                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = 'users_export_' + new Date().toISOString().slice(0,10) + '.csv';
+                    link.click();
+                    
+                    showToast('Export complete! ' + response.data.length + ' users', 'success');
+                } else {
+                    showToast('No data to export', 'error');
+                }
+            }, 'json');
         }
     </script>
 </body>

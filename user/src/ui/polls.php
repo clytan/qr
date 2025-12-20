@@ -209,7 +209,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         font-weight: 600;
         background: rgba(102, 126, 234, 0.2);
         color: #667eea;
-        margin-left: auto;
+        margin-left: 20%;
     }
 
     .poll-timer.expired {

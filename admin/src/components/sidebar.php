@@ -16,14 +16,14 @@ $menuItems = [
     ['url' => 'admin_urls.php', 'name' => 'URL Permissions', 'icon' => 'fas fa-link'],
     ['url' => 'db_explorer.php', 'name' => 'DB Explorer', 'icon' => 'fas fa-database'],
     ['url' => 'communities.php', 'name' => 'Communities', 'icon' => 'fas fa-comments'],
+    ['url' => 'polls.php', 'name' => 'Polls', 'icon' => 'fas fa-poll'],
     ['url' => 'collaborations.php', 'name' => 'Influencer Collabs', 'icon' => 'fas fa-handshake'],
     ['url' => 'partner_programmes.php', 'name' => 'Partner Programmes', 'icon' => 'fas fa-briefcase'],
     ['url' => 'withdrawals.php', 'name' => 'Wallet Requests', 'icon' => 'fas fa-money-bill-wave'],
     ['url' => 'supercharge.php', 'name' => 'Super Charge', 'icon' => 'fas fa-bolt'],
+    ['url' => 'rewards.php', 'name' => 'Rewards', 'icon' => 'fas fa-gift'],
     ['url' => 'users.php', 'name' => 'Users', 'icon' => 'fas fa-users'],
     ['url' => 'notifications.php', 'name' => 'Notifications', 'icon' => 'fas fa-bell'],
-    ['url' => 'reports.php', 'name' => 'Reports', 'icon' => 'fas fa-chart-bar'],
-    ['url' => 'settings.php', 'name' => 'Settings', 'icon' => 'fas fa-cog'],
 ];
 
 $allowedUrls = isset($_SESSION['admin_allowed_urls']) ? $_SESSION['admin_allowed_urls'] : [];

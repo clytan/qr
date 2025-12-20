@@ -266,6 +266,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         .badge { display: inline-flex; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
         .badge.active { background: rgba(34, 197, 94, 0.15); color: #4ade80; }
         .badge.closed { background: rgba(148, 163, 184, 0.15); color: #94a3b8; }
+        .badge.pending_payment { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
         .badge.admin { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
         
         .action-btns { display: flex; gap: 8px; }
@@ -371,6 +372,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <option value="">All Status</option>
                     <option value="active">Active</option>
                     <option value="closed">Closed</option>
+                    <option value="pending_payment">Pending Payment</option>
                 </select>
             </div>
             
@@ -480,9 +482,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (response.status && response.data.length > 0) {
                     let html = '';
                     response.data.forEach(poll => {
-                        const statusBadge = poll.status === 'active' 
-                            ? '<span class="badge active">Active</span>' 
-                            : '<span class="badge closed">Closed</span>';
+                        let statusBadge = '<span class="badge closed">Closed</span>';
+                        if (poll.status === 'active') {
+                            statusBadge = '<span class="badge active">Active</span>';
+                        } else if (poll.status === 'pending_payment') {
+                            statusBadge = '<span class="badge pending_payment">Pending Payment</span>';
+                        }
                         const adminBadge = poll.is_admin_poll == 1 ? ' <span class="badge admin">Admin</span>' : '';
                         
                         html += `
@@ -498,9 +503,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <td>
                                     <div class="action-btns">
                                         <button class="btn-action btn-view" onclick="viewPoll(${poll.id})"><i class="fas fa-eye"></i></button>
-                                        ${poll.status === 'active' 
-                                            ? `<button class="btn-action btn-close" onclick="closePoll(${poll.id})" title="Close Poll"><i class="fas fa-lock"></i></button>` 
-                                            : `<button class="btn-action btn-open" onclick="reopenPoll(${poll.id})" title="Reopen Poll"><i class="fas fa-unlock"></i></button>`}
+                                        ${poll.status === 'pending_payment' 
+                                            ? `<button class="btn-action btn-open" onclick="reopenPoll(${poll.id})" title="Activate Poll"><i class="fas fa-check"></i></button>`
+                                            : poll.status === 'active' 
+                                                ? `<button class="btn-action btn-close" onclick="closePoll(${poll.id})" title="Close Poll"><i class="fas fa-lock"></i></button>` 
+                                                : `<button class="btn-action btn-open" onclick="reopenPoll(${poll.id})" title="Reopen Poll"><i class="fas fa-unlock"></i></button>`}
                                         <button class="btn-action btn-delete" onclick="deletePoll(${poll.id})"><i class="fas fa-trash"></i></button>
                                     </div>
                                 </td>

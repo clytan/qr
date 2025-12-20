@@ -222,6 +222,34 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
             font-size: 1.1rem;
         }
 
+        /* Subscription Status Styles */
+        .subscription-card {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.95) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .subscription-info { padding: 1rem 0; }
+        .sub-row { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .sub-row:last-child { border-bottom: none; }
+        .sub-label { color: var(--text-secondary); font-size: 0.9rem; }
+        .sub-value { color: var(--text-color); font-weight: 600; }
+        .sub-tier { padding: 4px 12px; border-radius: 20px; font-size: 0.85rem; }
+        .sub-tier.tier-gold { background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%); color: #1f2937; }
+        .sub-tier.tier-silver { background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%); color: #1f2937; }
+        .sub-tier.tier-normal { background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%); color: white; }
+        .sub-tier.tier-student { background: linear-gradient(135deg, #34d399 0%, #10b981 100%); color: white; }
+        .subscription-info.status-ok .sub-value:last-child { color: #4ade80; }
+        .subscription-info.status-warning .sub-value:last-child { color: #fbbf24; }
+        .subscription-info.status-grace .sub-value:last-child { color: #f97316; }
+        .subscription-info.status-expired .sub-value:last-child { color: #ef4444; }
+        .sub-action { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        .btn-renew { width: 100%; padding: 0.875rem; font-size: 1rem; }
+        
+        /* Fix modal stacking and disable backdrop */
+        #subscriptionModal { z-index: 9999 !important; }
+        #subscriptionModal .modal-dialog { box-shadow: 0 10px 40px rgba(0,0,0,0.5); z-index: 10000 !important; }
+        #subscriptionModal .modal-content { position: relative; z-index: 10001 !important; }
+        .modal-backdrop { display: none !important; }
+
         .profile-header {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -1590,6 +1618,9 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                             <button class="btn btn-outline-primary mt-3" id="choose-frame-btn" style="width: 100%;">
                                 <i class="fas fa-image"></i> Choose Frame
                             </button>
+                            <button class="btn btn-secondary mt-3" id="subscription-btn" style="width: 100%; display: none;">
+                                <i class="fas fa-credit-card"></i> <span id="subscription-btn-text">Subscription Status</span>
+                            </button>
                             <?php endif; ?>
 
                             <div id="qr-color-controls" class="hidden">
@@ -1606,7 +1637,6 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                                 <button class="btn btn-primary mt-3" id="save-qr-color">
                                     <i class="fas fa-save"></i> Save QR Colors
                                 </button>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1955,6 +1985,29 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                     </form>
                 </div>
                 <div id="toast" class="toast"></div>
+                
+                <!-- Subscription Modal -->
+                <?php if (!$viewing_qr): ?>
+                <div class="modal fade" id="subscriptionModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="false" data-bs-keyboard="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content" style="background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px;">
+                            <div class="modal-header" style="border-bottom: 1px solid rgba(255,255,255,0.1); padding: 1.25rem;">
+                                <h5 class="modal-title" style="color: var(--text-color); font-weight: 600;">
+                                    <i class="fas fa-credit-card" style="color: var(--primary-color); margin-right: 8px;"></i>
+                                    Subscription Status
+                                </h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body" id="subscription-modal-content" style="padding: 1.5rem;">
+                                <div class="text-center py-4">
+                                    <i class="fas fa-spinner fa-spin" style="font-size: 2rem; color: var(--primary-color);"></i>
+                                    <p style="margin-top: 1rem; color: var(--text-secondary);">Loading subscription info...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
             </div>
 
         </div>
@@ -2067,11 +2120,16 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                 return;
             }
 
+            // Check for test mode
+            const urlParams = new URLSearchParams(window.location.search);
+            const testRenewal = urlParams.get('test_renewal');
+            
             $.ajax({
                 url: '../backend/profile_new/get_profile_data.php',
                 type: 'POST',
                 data: {
-                    user_id: userId
+                    user_id: userId,
+                    test_renewal: testRenewal || ''
                 },
                 dataType: 'json',
                 success: function (data) {
@@ -2087,6 +2145,11 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                         } else {
                             console.log('User not eligible for supercharge. Slab ID:', userSlabId, 'Tag:', userTag);
                             document.getElementById('profile-booster-section').style.display = 'none';
+                        }
+                        
+                        // Render subscription status
+                        if (data.subscription) {
+                            renderSubscriptionStatus(data.subscription);
                         }
                     } else {
                         console.log('No user data returned');
@@ -2220,6 +2283,144 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                 error: function (xhr, status, error) {
                     console.error('Error submitting supercharge:', error);
                     alert('Failed to submit supercharge request. Please try again.');
+                }
+            });
+        }
+
+        // Render subscription status
+        let subscriptionData = null;
+        
+        function renderSubscriptionStatus(sub) {
+            subscriptionData = sub;
+            
+            // Show the subscription button
+            const subBtn = document.getElementById('subscription-btn');
+            if (subBtn) {
+                subBtn.style.display = 'block';
+                
+                // Update button text based on status
+                const btnText = document.getElementById('subscription-btn-text');
+                if (btnText) {
+                    if (sub.is_expired) {
+                        btnText.textContent = '⚠️ Subscription Expired';
+                        subBtn.classList.add('btn-danger');
+                        subBtn.classList.remove('btn-secondary');
+                    } else if (sub.needs_renewal) {
+                        btnText.textContent = '⏰ ' + sub.days_remaining + ' days left';
+                        subBtn.classList.add('btn-warning');
+                        subBtn.classList.remove('btn-secondary');
+                    } else {
+                        btnText.textContent = 'Subscription Status';
+                    }
+                }
+                
+                // Bind click to open modal
+                subBtn.onclick = function() {
+                    showSubscriptionModal();
+                };
+            }
+        }
+        
+        function showSubscriptionModal() {
+            const content = document.getElementById('subscription-modal-content');
+            if (!content || !subscriptionData) return;
+            
+            const sub = subscriptionData;
+            const expiryDate = new Date(sub.expires_on);
+            const formattedExpiry = expiryDate.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+            const tier = (sub.tier || 'normal').charAt(0).toUpperCase() + (sub.tier || 'normal').slice(1);
+            
+            let statusClass = 'status-ok';
+            let statusIcon = '✅';
+            let statusText = sub.days_remaining + ' days remaining';
+            
+            if (sub.is_expired) {
+                statusClass = 'status-expired';
+                statusIcon = '❌';
+                statusText = 'Expired';
+            } else if (sub.is_in_grace) {
+                statusClass = 'status-grace';
+                statusIcon = '⚠️';
+                statusText = 'Grace period (' + Math.abs(sub.days_remaining) + ' days overdue)';
+            } else if (sub.days_remaining <= 30) {
+                statusClass = 'status-warning';
+                statusIcon = '⏰';
+                statusText = sub.days_remaining + ' days remaining';
+            }
+            
+            let html = `
+                <div class="subscription-info ${statusClass}">
+                    <div class="sub-row">
+                        <span class="sub-label">Membership:</span>
+                        <span class="sub-value sub-tier tier-${sub.tier}">${tier}</span>
+                    </div>
+                    <div class="sub-row">
+                        <span class="sub-label">Expires:</span>
+                        <span class="sub-value">${formattedExpiry}</span>
+                    </div>
+            `;
+            
+            if (sub.needs_renewal) {
+                html += `
+                    <div class="sub-action">
+                        <button type="button" id="renew-btn" class="btn btn-primary btn-renew">
+                            <i class="fas fa-sync-alt"></i> Renew Now - ₹${sub.renewal_price}
+                        </button>
+                    </div>
+                `;
+            }
+            
+            html += '</div>';
+            content.innerHTML = html;
+            
+            // Bind click event after HTML is inserted
+            const renewBtn = document.getElementById('renew-btn');
+            if (renewBtn) {
+                renewBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    startRenewal();
+                });
+            }
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('subscriptionModal'));
+            modal.show();
+        }
+        
+        // Start renewal payment
+        function startRenewal() {
+            const renewBtn = document.querySelector('.btn-renew');
+            if (renewBtn) {
+                renewBtn.disabled = true;
+                renewBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            }
+            
+            fetch('../backend/payment/renew_order.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status && data.session) {
+                    // Redirect to renewal payment page
+                    const session = encodeURIComponent(data.session);
+                    const orderId = encodeURIComponent(data.order_id);
+                    window.location.href = '../backend/payment/intent_renewal.php?session=' + session + '&orderId=' + orderId;
+                } else {
+                    alert('Error: ' + (data.error || 'Failed to create payment order'));
+                    if (renewBtn) {
+                        renewBtn.disabled = false;
+                        renewBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Renew Now';
+                    }
+                }
+            })
+            .catch(err => {
+                console.error('Renewal error:', err);
+                alert('Error starting renewal. Please try again.');
+                if (renewBtn) {
+                    renewBtn.disabled = false;
+                    renewBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Renew Now';
                 }
             });
         }
