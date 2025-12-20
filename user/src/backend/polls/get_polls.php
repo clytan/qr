@@ -68,7 +68,9 @@ try {
                 p.status,
                 p.is_admin_poll,
                 p.ends_at,
+                p.ends_at,
                 p.created_on,
+                p.payment_id,
                 u.user_full_name as creator_name,
                 u.user_qr_id as creator_qr_id,
                 (SELECT COUNT(*) FROM user_poll_votes WHERE poll_id = p.id) as total_votes
@@ -135,6 +137,7 @@ try {
             'is_admin_poll' => (bool)$row['is_admin_poll'],
             'ends_at' => $row['ends_at'],
             'created_on' => $row['created_on'],
+            'payment_id' => $row['payment_id'],
             'creator_name' => $row['creator_name'] ?? 'Anonymous',
             'creator_qr_id' => $row['creator_qr_id'],
             'total_votes' => intval($row['total_votes']),
