@@ -16,9 +16,16 @@ $cashfreeBaseUrl = "https://api.cashfree.com/pg/";
 $protocol = ($_SERVER['HTTP_HOST'] === 'localhost' || $_SERVER['HTTP_HOST'] === '127.0.0.1') ? 'http' : 'https';
 $baseURL = $protocol . "://" . $_SERVER['HTTP_HOST'];
 
-$notifyURL = $baseURL . "/user/src/backend/payment/callback_poll.php"; // We might need a specific callback or handle in common
+// Adjust path if running in a subdirectory (like XAMPP /qr/)
+$uri = $_SERVER['REQUEST_URI'];
+$projectDir = '';
+if (strpos($uri, '/qr/') !== false) {
+    $projectDir = '/qr';
+}
+
+$notifyURL = $baseURL . $projectDir . "/user/src/backend/payment/callback_poll.php"; 
 // For now, let's assume we use a generic return or poll specific return
-$returnURL = $baseURL . "/user/src/backend/payment/return_poll.php"; 
+$returnURL = $baseURL . $projectDir . "/user/src/backend/payment/return_poll.php"; 
 
 try {
     if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
