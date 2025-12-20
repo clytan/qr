@@ -293,7 +293,8 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
     .carousel-item-enhanced img {
         width: 100%;
         height: 500px;
-        object-fit: cover;
+        object-fit: contain;
+        background: #000;
         border-radius: 20px;
     }
 
@@ -539,7 +540,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                     <div class="enhanced-carousel">
                         <div id="feature-carousel" class="owl-carousel owl-theme">
                             <div class="carousel-item-enhanced">
-                                <img src="../assets/images/carousel/crs-1.jpg" alt="Knowledge Sharing">
+                                <img src="../banners/1.jpeg" alt="Knowledge Sharing">
                                 <div class="carousel-overlay">
                                     <h3><i class="fas fa-book-reader"></i> Knowledge Nexus</h3>
                                     <p>Access curated learning paths, expert workshops, and peer-to-peer tutoring from
@@ -548,7 +549,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                             </div>
 
                             <div class="carousel-item-enhanced">
-                                <img src="../assets/images/carousel/crs-2.jpg" alt="Community Connection">
+                                <img src="../banners/2.jpeg" alt="Community Connection">
                                 <div class="carousel-overlay">
                                     <h3><i class="fas fa-users"></i> A Continent of Connection</h3>
                                     <p>Join Zoks from diverse ages, geographies, interests, and backgrounds in one
@@ -558,7 +559,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                             </div>
 
                             <div class="carousel-item-enhanced">
-                                <img src="../assets/images/carousel/crs-3.jpg" alt="Rewards System">
+                                <img src="../banners/3.jpeg" alt="Rewards System">
                                 <div class="carousel-overlay">
                                     <h3><i class="fas fa-coins"></i> Economic Empowerment</h3>
                                     <p>Get rewarded for your contributions in our transparent, reward-based ecosystem
@@ -567,29 +568,10 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                             </div>
 
                             <div class="carousel-item-enhanced">
-                                <img src="../assets/images/carousel/crs-4.jpg" alt="Creative Collaboration">
+                                <img src="../banners/4.jpeg" alt="Creative Collaboration">
                                 <div class="carousel-overlay">
                                     <h3><i class="fas fa-palette"></i> Creator's Marketplace</h3>
                                     <p>Collaborate on art, music, writing, and innovation with talented Zoks nationwide
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="carousel-item-enhanced">
-                                <img src="../assets/images/carousel/crs-5.jpg" alt="Collective Intelligence">
-                                <div class="carousel-overlay">
-                                    <h3><i class="fas fa-brain"></i> Collective Intelligence</h3>
-                                    <p>Solve complex challenges together by mobilizing 10 million minds for real-world
-                                        impact
-                                    </p>
-                                </div>
-                            </div>
-
-                            <div class="carousel-item-enhanced">
-                                <img src="../assets/images/carousel/crs-6.jpg" alt="Democratic Governance">
-                                <div class="carousel-overlay">
-                                    <h3><i class="fas fa-balance-scale"></i> Decentralized Governance</h3>
-                                    <p>Participate in transparent, democratic processes to shape the community's future
                                     </p>
                                 </div>
                             </div>

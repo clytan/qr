@@ -486,6 +486,16 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
             margin-top: 1rem;
             flex-wrap: wrap;
         }
+        
+        .btn-save-contact {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            color: white;
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+        }
+        .btn-save-contact:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(34, 197, 94, 0.6);
+        }
 
         /* Form Sections */
         .form-section {

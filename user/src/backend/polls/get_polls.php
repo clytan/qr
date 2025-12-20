@@ -23,6 +23,13 @@ if (!isset($_SESSION['user_id'])) {
 $userId = intval($_SESSION['user_id']);
 $filter = $_GET['filter'] ?? 'all'; // 'all', 'my', 'active', 'closed'
 
+// Cleanup: Mark polls older than 7 days as closed
+// This ensures they don't show up in 'active' feeds
+$cleanupSql = "UPDATE user_polls SET status = 'closed' 
+               WHERE created_on < DATE_SUB(NOW(), INTERVAL 7 DAY) 
+               AND status = 'active'";
+$conn->query($cleanupSql);
+
 try {
     $polls = [];
     

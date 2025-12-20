@@ -95,11 +95,10 @@ var eventHandler = {
 
     updatePayAmount: () => {
         let checkedTier = $('input[name="user_tag"]:checked').val();
-        // TESTING: All prices set to 1 (Original: Normal=999, Silver=5555, Gold=9999)
-        let amount = 1;
-        if (checkedTier === 'gold') amount = 1; // Original: 9999
-        else if (checkedTier === 'silver') amount = 1; // Original: 5555
-        if ($('#student_leader').val() === 'yes') amount = 1; // Original: 999
+        let amount = 999;
+        if (checkedTier === 'gold') amount = 9999;
+        else if (checkedTier === 'silver') amount = 5555;
+        if ($('#student_leader').val() === 'yes') amount = 999;
 
         // Reset promo if amount changes
         if (appliedPromoCode && originalAmount !== amount) {
@@ -194,12 +193,12 @@ var eventHandler = {
             } else {
                 $(this).data('waschecked', false);
             }
-            // Update price - TESTING: All prices set to 1
+            // Update price
             let checked = $('input[name="user_tag"]:checked').val();
-            let amount = 1; // Original: 999
-            if (checked === 'gold') amount = 1; // Original: 9999
-            else if (checked === 'silver') amount = 1; // Original: 5555
-            if ($('#student_leader').val() === 'yes') amount = 1; // Original: 999
+            let amount = 999;
+            if (checked === 'gold') amount = 9999;
+            else if (checked === 'silver') amount = 5555;
+            if ($('#student_leader').val() === 'yes') amount = 999;
             $('#pay-amount').text(amount);
             registerFunction.updateSubmitState();
         });
@@ -504,7 +503,7 @@ var registerFunction = {
     referenceTimeout: null,
 
     calculateAmount: function (userType, userTag) {
-        // TESTING: All prices set to 1
+        // Original prices: Normal=999, Silver=5555, Gold=9999
         // Original prices: Normal=999, Silver=5555, Gold=9999
         let amount = 999; // Default Normal tier (Original: 999)
 

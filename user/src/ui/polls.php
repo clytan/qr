@@ -623,7 +623,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         <?php include('../components/footer.php') ?>
     </div>
 
-    <!-- Create Poll Modal -->
+    <!-- Create Poll Modal with Payment -->
     <div class="poll-modal" id="createPollModal">
         <div class="poll-modal-content">
             <div class="poll-modal-header">
@@ -656,9 +656,17 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                             <i class="fas fa-plus"></i> Add Option
                         </button>
                     </div>
+
+                    <div class="payment-info" style="background: rgba(16, 185, 129, 0.1); padding: 15px; border-radius: 10px; margin-top: 20px; border: 1px solid rgba(16, 185, 129, 0.3);">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: #e2e8f0; font-weight: 600;">Poll Creation Fee</span>
+                            <span style="color: #10b981; font-weight: 700; font-size: 1.2rem;">₹99</span>
+                        </div>
+                        <p style="color: #94a3b8; font-size: 0.85rem; margin-top: 5px;">Polls are active for 7 days.</p>
+                    </div>
                     
                     <button type="submit" class="submit-poll-btn" id="submitPollBtn">
-                        <i class="fas fa-paper-plane"></i> Create Poll
+                        <i class="fas fa-bolt"></i> Pay ₹99 & Create Poll
                     </button>
                 </form>
             </div>
@@ -717,8 +725,165 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
             // Submit poll form
             document.getElementById('createPollForm').addEventListener('submit', (e) => {
                 e.preventDefault();
-                this.createPoll();
+                this.handleCreatePollFlow();
             });
+            
+            // Global click handler for voting logic (delegation)
+            document.addEventListener('click', (e) => {
+                // Select Option
+                if (e.target.closest('.poll-option') && !e.target.closest('.poll-option').classList.contains('disabled')) {
+                    this.handleOptionSelect(e.target.closest('.poll-option'));
+                }
+                
+                // Confirm Vote
+                if (e.target.closest('.confirm-vote-btn')) {
+                    this.handleVoteConfirm(e.target.closest('.confirm-vote-btn'));
+                }
+            });
+        },
+        
+        // Handle Option Selection (Visual only first)
+        handleOptionSelect(optionEl) {
+            const pollCard = optionEl.closest('.poll-card');
+            
+            // Remove selected from siblings
+            pollCard.querySelectorAll('.poll-option').forEach(opt => opt.classList.remove('selected'));
+            
+            // Add selected to clicked
+            optionEl.classList.add('selected');
+            
+            // Show confirm button
+            let confirmBtn = pollCard.querySelector('.confirm-vote-container');
+            if (!confirmBtn) {
+                const footer = pollCard.querySelector('.poll-footer');
+                const btnHtml = `
+                    <div class="confirm-vote-container" style="width: 100%; margin-top: 10px; text-align: right; animation: fadeIn 0.3s ease;">
+                        <button class="confirm-vote-btn" style="background: var(--success); color: white; border: none; padding: 8px 20px; border-radius: 20px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);">
+                            Confirm Vote <i class="fas fa-check"></i>
+                        </button>
+                    </div>
+                `;
+                // Insert before footer or inside footer's first child? 
+                // Let's allow voting logic to inject clearly
+                // We'll insert it after options container
+                pollCard.querySelector('.poll-options').insertAdjacentHTML('afterend', btnHtml);
+            }
+        },
+        
+        // Handle Vote Confirmation
+        handleVoteConfirm(btn) {
+            const pollCard = btn.closest('.poll-card');
+            const selectedOption = pollCard.querySelector('.poll-option.selected');
+            
+            if (selectedOption) {
+                const pollId = selectedOption.dataset.pollId;
+                const optionId = selectedOption.dataset.optionId;
+                this.vote(pollId, optionId);
+                
+                // Hide button immediately to prevent double clicks
+                btn.closest('.confirm-vote-container').remove();
+            }
+        },
+
+        async handleCreatePollFlow() {
+            const btn = document.getElementById('submitPollBtn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            btn.disabled = true;
+
+            try {
+                // 1. Create Poll (Pending Payment)
+                const formData = this.getPollFormData();
+                if (!formData) throw new Error('Invalid form data');
+                
+                // Log for debugging
+                console.log('Creating poll...', formData);
+
+                const createResp = await fetch('../backend/polls/create_poll.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                const createData = await createResp.json();
+                
+                if (!createData.status) throw new Error(createData.message || 'Failed to initialize poll');
+                
+                const pollId = createData.poll_id;
+                
+                // 2. Create Payment Order
+                btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Initiating Payment...';
+                
+                const orderResp = await fetch('../backend/polls/create_poll_order.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ poll_id: pollId })
+                });
+                const orderData = await orderResp.json();
+                
+                if (!orderData.status) throw new Error(orderData.error || 'Failed to create payment order');
+                
+                // 3. Open Cashfree Checkout
+                // We need Cashfree JS SDK. Assuming it's loaded or we redirect. 
+                // Since this is generic, let's look at `custom_register.js` approach.
+                // It redirected to intent.php. Does user have Cashfree JS?
+                // The implementation in `order.php` suggests an intent flow or JS flow.
+                // Let's assume we use the session_id to open checkout or redirect.
+                
+                // Important: Using the same redirect approach as register for consistency if SDK not present
+                // But wait, user might stay on page. Let's try to bundle Cashfree SDK if not here.
+                // Or better, redirect to a payment page that returns here.
+                
+                // Strategy: Redirect to intent logic like registration
+                // But we need to come back to polls.php
+                
+                // Let's use the `payment_session_id`
+                if (typeof Cashfree !== 'undefined') {
+                    const cashfree = new Cashfree({ mode: "production" }); // or sandbox
+                    cashfree.checkout({
+                        paymentSessionId: orderData.session,
+                        returnUrl: window.location.href // We'll handle verification on load
+                    }).then(function() {
+                        // This might not be hit if returnUrl handles it
+                    });
+                } else {
+                    // Fallback to loading script or redirecting
+                    // Let's load script dynamically if needed
+                     const script = document.createElement("script");
+                     script.src = "https://sdk.cashfree.com/js/v3/cashfree.js";
+                     script.onload = () => {
+                         const cashfree = new Cashfree({ mode: "production" });
+                         cashfree.checkout({
+                             paymentSessionId: orderData.session,
+                             returnUrl: window.location.href // We will just reload page and check
+                         });
+                     };
+                     document.head.appendChild(script);
+                }
+
+            } catch (error) {
+                console.error(error);
+                this.showToast(error.message, 'error');
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        },
+        
+        getPollFormData() {
+            const title = document.getElementById('pollTitle').value.trim();
+            const desc = document.getElementById('pollDescription').value.trim();
+            const options = Array.from(document.querySelectorAll('.option-input'))
+                                .map(input => input.value.trim())
+                                .filter(val => val !== '');
+            
+            if (!title) { this.showToast('Question is required', 'error'); return null; }
+            if (options.length < 2) { this.showToast('At least 2 options are required', 'error'); return null; }
+            
+            return {
+                title: title,
+                description: desc,
+                options: options,
+                poll_type: 'single'
+            };
         },
         
         async loadPolls() {
@@ -774,7 +939,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                 `;
             }).join('');
             
-            let actionsHtml = '';
+            let actionsHtml = ''; // ... kept existing logic ...
             if (poll.is_owner) {
                 actionsHtml = `
                     <div class="poll-actions">
@@ -814,15 +979,6 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         },
         
         bindPollEvents() {
-            // Vote on poll
-            document.querySelectorAll('.poll-option:not(.voted):not([disabled])').forEach(option => {
-                option.addEventListener('click', async () => {
-                    const pollId = option.dataset.pollId;
-                    const optionId = option.dataset.optionId;
-                    await this.vote(pollId, optionId);
-                });
-            });
-            
             // Delete poll
             document.querySelectorAll('.poll-action-btn.delete').forEach(btn => {
                 btn.addEventListener('click', async () => {

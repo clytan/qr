@@ -69,7 +69,7 @@ try {
     // ============================================
     // SECURITY: Hardcoded tier prices - NEVER trust frontend amounts
     // ============================================
-    // TESTING: All prices set to 1 (Original: normal=999, silver=5555, gold=9999, student_leader=999)
+    // Security: Tier prices defined server-side
     $TIER_PRICES = [
         'normal' => 999,          // Original: 999
         'silver' => 5555,          // Original: 5555

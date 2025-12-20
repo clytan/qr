@@ -89,8 +89,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $stmt->bind_param('ii', $user_id, $collab_id);
                 
                 if ($stmt->execute()) {
+                    // Fetch QR ID for email
+                    $qrStmt = $conn->prepare("SELECT user_qr_id FROM user_user WHERE id = ?");
+                    $qrStmt->bind_param('i', $user_id);
+                    $qrStmt->execute();
+                    $qrRes = $qrStmt->get_result()->fetch_assoc();
+                    $user_qr_id = $qrRes['user_qr_id'] ?? 'N/A';
+
                     // Send emails
-                    sendCollabAcceptanceEmails($conn, $collab, $user_id, $user_name, $user_email);
+                    sendCollabAcceptanceEmails($conn, $collab, $user_id, $user_name, $user_email, $user_qr_id);
                     
                     echo json_encode([
                         'status' => true,
@@ -114,12 +121,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             try {
                 $collab_title = trim($_POST['collab_title'] ?? '');
                 $category = trim($_POST['category'] ?? '');
+                if ($category === 'other') {
+                    $other_cat = trim($_POST['other_category'] ?? '');
+                    if (!empty($other_cat)) {
+                        $category = "Other: " . $other_cat;
+                    }
+                }
+
                 $product_description = trim($_POST['product_description'] ?? '');
                 $product_link = trim($_POST['product_link'] ?? '');
                 $financial_type = trim($_POST['financial_type'] ?? 'barter');
                 $financial_amount = floatval($_POST['financial_amount'] ?? 0);
                 $detailed_summary = trim($_POST['detailed_summary'] ?? '');
-                $brand_email = $user_email; // Use user's email as brand email
+                $brand_email = $user_email; 
                 
                 if (empty($collab_title) || empty($category) || empty($product_description)) {
                     echo json_encode(['status' => false, 'message' => 'Title, category and description are required']);
@@ -231,7 +245,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 }
 
 // Email function
-function sendCollabAcceptanceEmails($conn, $collab, $influencer_id, $influencer_name, $influencer_email) {
+function sendCollabAcceptanceEmails($conn, $collab, $influencer_id, $influencer_name, $influencer_email, $influencer_qr_id) {
     $admin_email = "admin@yourcompany.com"; // Configure this
     
     $subject = "🎉 Collaboration Accepted: " . $collab['collab_title'];
@@ -284,6 +298,10 @@ function sendCollabAcceptanceEmails($conn, $collab, $influencer_id, $influencer_
                     <div class='detail-row'>
                         <span class='label'>Email:</span>
                         <span class='value'>{$influencer_email}</span>
+                    </div>
+                    <div class='detail-row'>
+                        <span class='label'>Reference ID:</span>
+                        <span class='value'>{$influencer_qr_id}</span>
                     </div>
                     <div class='detail-row'>
                         <span class='label'>Financial:</span>
@@ -343,9 +361,31 @@ function sendCollabAcceptanceEmails($conn, $collab, $influencer_id, $influencer_
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <?php include('../components/csslinks.php') ?>
     
     <style>
+        .copy-btn {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            margin-left: 8px;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+        }
+        .copy-btn:hover { color: #E9437A; }
+        
+        .copy-btn-sm {
+            background: none;
+            border: none;
+            color: #64748b;
+            cursor: pointer;
+            margin-left: 5px;
+            font-size: 0.8rem;
+        }
+        .copy-btn-sm:hover { color: #E9437A; }
+
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body, html { background: #0f172a; min-height: 100vh; font-family: 'Inter', sans-serif; color: #e2e8f0; }
         
@@ -1131,7 +1171,7 @@ function sendCollabAcceptanceEmails($conn, $collab, $influencer_id, $influencer_
                     
                     <div class="form-group">
                         <label>Category *</label>
-                        <select class="form-select" name="category" required>
+                        <select class="form-select" name="category" id="categorySelect" required onchange="toggleOtherCategory(this)">
                             <option value="">Select Category</option>
                             <option value="lifestyle">Lifestyle</option>
                             <option value="skincare">Skincare</option>
@@ -1142,6 +1182,11 @@ function sendCollabAcceptanceEmails($conn, $collab, $influencer_id, $influencer_
                             <option value="tech">Technology</option>
                             <option value="other">Other</option>
                         </select>
+                    </div>
+                    
+                    <div class="form-group" id="otherCategoryGroup" style="display: none;">
+                        <label>Specify Category *</label>
+                        <input type="text" class="form-input" name="other_category" placeholder="Enter category name">
                     </div>
                     
                     <div class="form-group">
@@ -1308,13 +1353,23 @@ function sendCollabAcceptanceEmails($conn, $collab, $influencer_id, $influencer_
                         <div class="collab-content">
                             <div class="collab-header">
                                 <div>
-                                    <div class="collab-title">${escapeHtml(c.collab_title)}</div>
-                                    <span class="category-badge">${c.category}</span>
+                                    <div class="collab-title">
+                                        ${escapeHtml(c.collab_title)}
+                                        <button class="copy-btn" onclick="copyToClipboard('${escapeHtml(c.collab_title.replace(/'/g, "\\'"))}')" title="Copy Title">
+                                            <i class="fas fa-copy"></i>
+                                        </button>
+                                    </div>
+                                    <span class="category-badge">${c.category === 'other' ? (c.other_category || 'Other') : c.category}</span>
                                 </div>
                                 <span class="status-badge ${c.status}">${c.status}</span>
                             </div>
                             
-                            <div class="collab-description">${escapeHtml(c.product_description)}</div>
+                            <div class="collab-description">
+                                ${escapeHtml(c.product_description)}
+                                <button class="copy-btn-sm" onclick="copyToClipboard('${escapeHtml(c.product_description.replace(/'/g, "\\'"))}')" title="Copy Description">
+                                    <i class="fas fa-copy"></i>
+                                </button>
+                            </div>
                             
                             ${c.product_link ? `
                                 <a href="${c.product_link}" target="_blank" class="product-link">
@@ -1396,6 +1451,15 @@ function sendCollabAcceptanceEmails($conn, $collab, $influencer_id, $influencer_
             window.open(url, '_blank');
         }
         
+        // Copy to Clipboard
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Copied to clipboard!', 'success');
+            }).catch(err => {
+                showToast('Failed to copy', 'error');
+            });
+        }
+
         // Toast Notification
         function showToast(message, type) {
             const toast = $('#toast');
@@ -1433,6 +1497,17 @@ function sendCollabAcceptanceEmails($conn, $collab, $influencer_id, $influencer_
         // Toggle Amount Field
         function toggleAmount(select) {
             $('#amountGroup').toggle(select.value === 'paid');
+        }
+
+        // Toggle Other Category
+        function toggleOtherCategory(select) {
+            if (select.value === 'other') {
+                $('#otherCategoryGroup').show();
+                $('input[name="other_category"]').prop('required', true);
+            } else {
+                $('#otherCategoryGroup').hide();
+                $('input[name="other_category"]').prop('required', false);
+            }
         }
         
         // Preview Photo

@@ -13,6 +13,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             try {
                 $collab_title = trim($_POST['collab_title'] ?? '');
                 $category = trim($_POST['category'] ?? '');
+                if ($category === 'other') {
+                    $other_cat = trim($_POST['other_category'] ?? '');
+                    if (!empty($other_cat)) {
+                        $category = "Other: " . $other_cat;
+                    }
+                }
                 $product_description = trim($_POST['product_description'] ?? '');
                 $product_link = trim($_POST['product_link'] ?? '');
                 $financial_type = trim($_POST['financial_type'] ?? 'barter'); // barter or paid
@@ -135,11 +141,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     exit();
                 }
                 
-                // Get influencer details
+    // Get influencer details
                 $stmt = $conn->prepare("SELECT * FROM user_user WHERE id = ?");
                 $stmt->bind_param('i', $influencer_id);
                 $stmt->execute();
                 $influencer = $stmt->get_result()->fetch_assoc();
+                $influencer_qr_id = $influencer['user_qr_id'] ?? 'N/A';
                 
                 // Update collab status
                 $stmt = $conn->prepare("UPDATE influencer_collabs SET status = 'active', accepted_by = ?, accepted_on = NOW() WHERE id = ?");
@@ -147,7 +154,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 
                 if ($stmt->execute()) {
                     // Send emails to all 3 parties
-                    $emails_sent = sendCollabAcceptanceEmails($collab, $influencer);
+                    $emails_sent = sendCollabAcceptanceEmails($collab, $influencer, $influencer_qr_id);
                     
                     echo json_encode([
                         'status' => true, 
@@ -209,7 +216,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 // Email function
-function sendCollabAcceptanceEmails($collab, $influencer) {
+function sendCollabAcceptanceEmails($collab, $influencer, $influencer_qr_id) {
     $admin_email = "admin@yourcompany.com"; // Change this
     
     $subject = "Collaboration Accepted: " . $collab['collab_title'];
@@ -240,6 +247,7 @@ function sendCollabAcceptanceEmails($collab, $influencer) {
                     <p><span class='label'>Collaboration:</span> {$collab['collab_title']}</p>
                     <p><span class='label'>Category:</span> {$collab['category']}</p>
                     <p><span class='label'>Influencer:</span> {$influencer['user_full_name']} ({$influencer['user_email']})</p>
+                    <p><span class='label'>Reference ID:</span> {$influencer_qr_id}</p>
                     <p><span class='label'>Financial:</span> " . ($collab['financial_type'] === 'paid' ? '₹' . $collab['financial_amount'] : 'Barter') . "</p>
                     <p><span class='label'>Product Link:</span> <a href='{$collab['product_link']}'>{$collab['product_link']}</a></p>
                 </div>
@@ -1193,7 +1201,7 @@ function sendCollabAcceptanceEmails($collab, $influencer) {
 
                 <div class="form-group">
                     <label class="form-label">Category *</label>
-                    <select class="form-select" name="category" required>
+                    <select class="form-select" name="category" required onchange="toggleOtherCategory(this)">
                         <option value="">Select Category</option>
                         <option value="lifestyle">Lifestyle</option>
                         <option value="skincare">Skincare</option>
@@ -1204,6 +1212,9 @@ function sendCollabAcceptanceEmails($collab, $influencer) {
                         <option value="tech">Technology</option>
                         <option value="other">Other</option>
                     </select>
+                    <div id="otherCategoryInput" style="display: none; margin-top: 10px;">
+                        <input type="text" class="form-input" name="other_category" placeholder="Enter custom category">
+                    </div>
                 </div>
 
                 <div class="form-group">
@@ -1448,6 +1459,17 @@ function sendCollabAcceptanceEmails($collab, $influencer) {
         if (modalId === 'createModal') {
             $('#createCollabForm')[0].reset();
             $('.preview-image').hide();
+        }
+    }
+
+    // Toggle Other Category
+    window.toggleOtherCategory = function(select) {
+        if (select.value === 'other') {
+            $('#otherCategoryInput').slideDown();
+        } else {
+            $('#otherCategoryInput').slideUp();
+            // Clear input
+             $('input[name="other_category"]').val('');
         }
     }
 

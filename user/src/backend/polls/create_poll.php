@@ -78,8 +78,8 @@ try {
     $conn->begin_transaction();
     
     // Insert poll
-    $sqlPoll = "INSERT INTO user_polls (user_id, title, description, poll_type, status, ends_at, created_by, created_on) 
-                VALUES (?, ?, ?, ?, 'active', ?, ?, NOW())";
+    $sqlPoll = "INSERT INTO user_polls (user_id, title, description, poll_type, status, payment_status, ends_at, created_by, created_on) 
+                VALUES (?, ?, ?, ?, 'pending_payment', 'pending', ?, ?, NOW())";
     $stmtPoll = $conn->prepare($sqlPoll);
     $stmtPoll->bind_param('issssi', $userId, $title, $description, $pollType, $endsAt, $userId);
     
