@@ -254,6 +254,145 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             echo json_encode(['status' => true, 'data' => $users]);
             exit();
+            
+        case 'extend_subscription':
+            try {
+                $userId = intval($_POST['user_id'] ?? 0);
+                $months = intval($_POST['months'] ?? 12);
+                $reason = trim($_POST['reason'] ?? 'Extended by admin');
+                
+                if ($userId <= 0) {
+                    echo json_encode(['status' => false, 'message' => 'Invalid user ID']);
+                    exit();
+                }
+                
+                if ($months < 1 || $months > 60) {
+                    echo json_encode(['status' => false, 'message' => 'Months should be between 1 and 60']);
+                    exit();
+                }
+                
+                // Create log table if not exists
+                @$conn->query("CREATE TABLE IF NOT EXISTS subscription_extensions (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    user_id INT NOT NULL,
+                    months_extended INT NOT NULL,
+                    reason VARCHAR(255),
+                    admin_id INT,
+                    created_on DATETIME DEFAULT CURRENT_TIMESTAMP
+                )");
+                
+                // Extend subscription by adding months to created_on
+                $stmt = $conn->prepare("UPDATE user_user SET created_on = DATE_ADD(created_on, INTERVAL ? MONTH), updated_by = ?, updated_on = NOW() WHERE id = ?");
+                if (!$stmt) {
+                    throw new Exception("Prepare failed: " . $conn->error);
+                }
+                $stmt->bind_param('iii', $months, $admin_id, $userId);
+                
+                if ($stmt->execute()) {
+                    // Log the extension (optional)
+                    $logStmt = @$conn->prepare("INSERT INTO subscription_extensions (user_id, months_extended, reason, admin_id, created_on) VALUES (?, ?, ?, ?, NOW())");
+                    if ($logStmt) {
+                        $logStmt->bind_param('iisi', $userId, $months, $reason, $admin_id);
+                        @$logStmt->execute();
+                        @$logStmt->close();
+                    }
+                    echo json_encode(['status' => true, 'message' => "Subscription extended by $months months"]);
+                } else {
+                    throw new Exception("Execute failed: " . $stmt->error);
+                }
+            } catch (Exception $e) {
+                error_log("Extend Subscription Error: " . $e->getMessage());
+                echo json_encode(['status' => false, 'message' => 'Failed to extend: ' . $e->getMessage()]);
+            }
+            exit();
+            
+        case 'change_tier':
+            try {
+                $userId = intval($_POST['user_id'] ?? 0);
+                $newTier = trim($_POST['tier'] ?? '');
+                $reason = trim($_POST['reason'] ?? 'Changed by admin');
+                
+                if ($userId <= 0) {
+                    echo json_encode(['status' => false, 'message' => 'Invalid user ID']);
+                    exit();
+                }
+                
+                $validTiers = ['gold', 'silver', 'normal', 'student'];
+                if (!in_array(strtolower($newTier), $validTiers)) {
+                    echo json_encode(['status' => false, 'message' => 'Invalid tier']);
+                    exit();
+                }
+                
+                // Create log table if not exists
+                @$conn->query("CREATE TABLE IF NOT EXISTS tier_changes (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    user_id INT NOT NULL,
+                    old_tier VARCHAR(50),
+                    new_tier VARCHAR(50),
+                    reason VARCHAR(255),
+                    admin_id INT,
+                    created_on DATETIME DEFAULT CURRENT_TIMESTAMP
+                )");
+                
+                // Get current tier for logging
+                $currentStmt = $conn->prepare("SELECT user_tag FROM user_user WHERE id = ?");
+                if (!$currentStmt) {
+                    throw new Exception("Prepare failed");
+                }
+                $currentStmt->bind_param('i', $userId);
+                $currentStmt->execute();
+                $currentResult = $currentStmt->get_result()->fetch_assoc();
+                $oldTier = $currentResult['user_tag'] ?? 'unknown';
+                $currentStmt->close();
+                
+                // Update tier
+                $stmt = $conn->prepare("UPDATE user_user SET user_tag = ?, updated_by = ?, updated_on = NOW() WHERE id = ?");
+                if (!$stmt) {
+                    throw new Exception("Prepare failed");
+                }
+                $stmt->bind_param('sii', $newTier, $admin_id, $userId);
+                
+                if ($stmt->execute()) {
+                    // Log the tier change (optional)
+                    $logStmt = @$conn->prepare("INSERT INTO tier_changes (user_id, old_tier, new_tier, reason, admin_id, created_on) VALUES (?, ?, ?, ?, ?, NOW())");
+                    if ($logStmt) {
+                        $logStmt->bind_param('isssi', $userId, $oldTier, $newTier, $reason, $admin_id);
+                        @$logStmt->execute();
+                        @$logStmt->close();
+                    }
+                    echo json_encode(['status' => true, 'message' => "Tier changed from $oldTier to $newTier"]);
+                } else {
+                    throw new Exception("Update failed");
+                }
+            } catch (Exception $e) {
+                error_log("Change Tier Error: " . $e->getMessage());
+                echo json_encode(['status' => false, 'message' => 'Failed to change tier']);
+            }
+            exit();
+            
+        case 'get_subscription':
+            $userId = intval($_POST['user_id'] ?? 0);
+            
+            if ($userId <= 0) {
+                echo json_encode(['status' => false, 'message' => 'Invalid user ID']);
+                exit();
+            }
+            
+            $stmt = $conn->prepare("SELECT u.id, u.user_full_name, u.user_tag, u.created_on,
+                                           DATE_ADD(u.created_on, INTERVAL 1 YEAR) as expiry_date,
+                                           DATEDIFF(DATE_ADD(u.created_on, INTERVAL 1 YEAR), NOW()) as days_remaining
+                                    FROM user_user u WHERE u.id = ?");
+            $stmt->bind_param('i', $userId);
+            $stmt->execute();
+            $subData = $stmt->get_result()->fetch_assoc();
+            $stmt->close();
+            
+            if ($subData) {
+                echo json_encode(['status' => true, 'data' => $subData]);
+            } else {
+                echo json_encode(['status' => false, 'message' => 'User not found']);
+            }
+            exit();
     }
 }
 ?>
@@ -481,6 +620,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </div>
     
+    <!-- Subscription Management Modal -->
+    <div class="modal-overlay" id="subscriptionModal">
+        <div class="modal" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-calendar-alt"></i> Manage Subscription</h3>
+                <button class="modal-close" onclick="closeSubscriptionModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="subscriptionModalBody">
+                Loading...
+            </div>
+        </div>
+    </div>
+    
     <div class="toast" id="toast"></div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -546,6 +698,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <td>
                                     <div class="action-btns">
                                         <button class="btn-icon btn-view" onclick="viewUser(${user.id})" title="View"><i class="fas fa-eye"></i></button>
+                                        <button class="btn-icon" onclick="openSubscriptionModal(${user.id})" title="Subscription" style="background: rgba(16, 185, 129, 0.2); color: #34d399;"><i class="fas fa-calendar-alt"></i></button>
                                         <button class="btn-icon btn-ban" onclick="openBanModal(${user.id})" title="Ban"><i class="fas fa-ban"></i></button>
                                     </div>
                                 </td>
@@ -779,6 +932,118 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     showToast('Export complete! ' + response.data.length + ' users', 'success');
                 } else {
                     showToast('No data to export', 'error');
+                }
+            }, 'json');
+        }
+        
+        // Subscription Management Functions
+        let currentSubUserId = null;
+        
+        function openSubscriptionModal(userId) {
+            currentSubUserId = userId;
+            $('#subscriptionModal').addClass('show');
+            $('#subscriptionModalBody').html('<div style="text-align:center;padding:20px;"><i class="fas fa-spinner fa-spin" style="font-size:24px;"></i></div>');
+            
+            $.post('', { action: 'get_subscription', user_id: userId }, function(response) {
+                if (response.status) {
+                    const d = response.data;
+                    const daysRemaining = parseInt(d.days_remaining);
+                    const statusColor = daysRemaining > 30 ? '#10b981' : (daysRemaining > 7 ? '#f59e0b' : '#ef4444');
+                    const tier = (d.user_tag || 'normal').charAt(0).toUpperCase() + (d.user_tag || 'normal').slice(1);
+                    
+                    let html = `
+                        <div style="background: rgba(15,23,42,0.6); padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="color: #94a3b8;">User</span>
+                                <span style="color: #f8fafc; font-weight: 600;">${escapeHtml(d.user_full_name)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="color: #94a3b8;">Current Tier</span>
+                                <span style="color: #fbbf24; font-weight: 600;">${tier}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <span style="color: #94a3b8;">Expiry Date</span>
+                                <span style="color: #f8fafc;">${formatDate(d.expiry_date)}</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                                <span style="color: #94a3b8;">Days Remaining</span>
+                                <span style="color: ${statusColor}; font-weight: 700;">${daysRemaining > 0 ? daysRemaining + ' days' : 'EXPIRED'}</span>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label style="color: #94a3b8; font-size: 13px; display: block; margin-bottom: 8px;">Extend Subscription</label>
+                            <div style="display: flex; gap: 10px;">
+                                <select id="extendMonths" style="flex: 1; padding: 10px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #e2e8f0;">
+                                    <option value="1">1 Month</option>
+                                    <option value="3">3 Months</option>
+                                    <option value="6">6 Months</option>
+                                    <option value="12" selected>12 Months (1 Year)</option>
+                                    <option value="24">24 Months (2 Years)</option>
+                                </select>
+                                <button onclick="extendSubscription()" style="padding: 10px 15px; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                                    <i class="fas fa-plus"></i> Extend
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div style="margin-bottom: 15px;">
+                            <label style="color: #94a3b8; font-size: 13px; display: block; margin-bottom: 8px;">Change Tier</label>
+                            <div style="display: flex; gap: 10px;">
+                                <select id="changeTierSelect" style="flex: 1; padding: 10px; background: rgba(15,23,42,0.8); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #e2e8f0;">
+                                    <option value="gold" ${d.user_tag === 'gold' ? 'selected' : ''}>Gold</option>
+                                    <option value="silver" ${d.user_tag === 'silver' ? 'selected' : ''}>Silver</option>
+                                    <option value="normal" ${d.user_tag === 'normal' ? 'selected' : ''}>Normal</option>
+                                    <option value="student" ${d.user_tag === 'student' ? 'selected' : ''}>Student</option>
+                                </select>
+                                <button onclick="changeTier()" style="padding: 10px 15px; background: linear-gradient(135deg, #f59e0b, #d97706); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+                                    <i class="fas fa-exchange-alt"></i> Change
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; text-align: right;">
+                            <button onclick="closeSubscriptionModal()" style="padding: 10px 20px; background: rgba(255,255,255,0.1); color: #94a3b8; border: none; border-radius: 8px; cursor: pointer;">Close</button>
+                        </div>
+                    `;
+                    
+                    $('#subscriptionModalBody').html(html);
+                } else {
+                    $('#subscriptionModalBody').html('<p style="color:#ef4444;">Failed to load subscription data.</p>');
+                }
+            }, 'json');
+        }
+        
+        function closeSubscriptionModal() {
+            $('#subscriptionModal').removeClass('show');
+            currentSubUserId = null;
+        }
+        
+        function extendSubscription() {
+            if (!currentSubUserId) return;
+            const months = $('#extendMonths').val();
+            
+            $.post('', { action: 'extend_subscription', user_id: currentSubUserId, months: months, reason: 'Extended by admin' }, function(response) {
+                if (response.status) {
+                    showToast(response.message, 'success');
+                    openSubscriptionModal(currentSubUserId); // Refresh modal
+                } else {
+                    showToast(response.message, 'error');
+                }
+            }, 'json');
+        }
+        
+        function changeTier() {
+            if (!currentSubUserId) return;
+            const newTier = $('#changeTierSelect').val();
+            
+            $.post('', { action: 'change_tier', user_id: currentSubUserId, tier: newTier, reason: 'Changed by admin' }, function(response) {
+                if (response.status) {
+                    showToast(response.message, 'success');
+                    openSubscriptionModal(currentSubUserId); // Refresh modal
+                    loadUsers(currentPage); // Refresh table
+                } else {
+                    showToast(response.message, 'error');
                 }
             }, 'json');
         }

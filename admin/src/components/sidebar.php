@@ -24,6 +24,8 @@ $menuItems = [
     ['url' => 'rewards.php', 'name' => 'Rewards', 'icon' => 'fas fa-gift'],
     ['url' => 'users.php', 'name' => 'Users', 'icon' => 'fas fa-users'],
     ['url' => 'renewals.php', 'name' => 'Renewals', 'icon' => 'fas fa-sync-alt'],
+    ['url' => 'invoices.php', 'name' => 'Invoices', 'icon' => 'fas fa-file-invoice'],
+    ['url' => 'analytics.php', 'name' => 'Analytics', 'icon' => 'fas fa-chart-line'],
     ['url' => 'notifications.php', 'name' => 'Notifications', 'icon' => 'fas fa-bell'],
 ];
 

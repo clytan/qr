@@ -65,6 +65,40 @@ try {
         $updateStmt->bind_param("i", $poll['id']);
         
         if ($updateStmt->execute()) {
+            // Create invoice with GST if not exists
+            $totalAmount = floatval($cfData['order_amount'] ?? 99.00);
+            $baseAmount = round($totalAmount / 1.18, 2);
+            $gstTotal = round($totalAmount - $baseAmount, 2);
+            $cgst = round($gstTotal / 2, 2);
+            $sgst = round($gstTotal / 2, 2);
+            $gstRate = 0.18;
+            $referenceId = $cfData['cf_order_id'] ?? '';
+            
+            $invoiceNumber = 'INV-POLL-' . date('Ymd') . '-' . str_pad($poll['id'], 4, '0', STR_PAD_LEFT);
+            
+            // Check if invoice exists
+            $checkInv = $conn->prepare("SELECT id FROM user_invoice WHERE order_id = ?");
+            $checkInv->bind_param("s", $orderId);
+            $checkInv->execute();
+            $existingInv = $checkInv->get_result()->fetch_assoc();
+            $checkInv->close();
+            
+            if (!$existingInv) {
+                $invSql = "INSERT INTO user_invoice 
+                           (user_id, invoice_number, invoice_type, order_id, payment_reference, 
+                            amount, gst_rate, cgst, sgst, gst_total, total_amount, status, created_on, is_deleted) 
+                           VALUES (?, ?, 'poll', ?, ?, ?, ?, ?, ?, ?, ?, 'Paid', NOW(), 0)";
+                $invStmt = @$conn->prepare($invSql);
+                if ($invStmt) {
+                    $invStmt->bind_param('isssdddddd', 
+                        $userId, $invoiceNumber, $orderId, $referenceId,
+                        $baseAmount, $gstRate, $cgst, $sgst, $gstTotal, $totalAmount
+                    );
+                    $invStmt->execute();
+                    $invStmt->close();
+                }
+            }
+            
             echo json_encode(['status' => true, 'message' => 'Payment verified and poll activated!', 'poll_id' => $poll['id']]);
         } else {
             throw new Exception("Database update failed");
