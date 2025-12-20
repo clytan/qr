@@ -89,9 +89,12 @@ if (!$orderId || !$sessionId) {
             updateStatus("Opening payment gateway...");
 
             const cashfree = new Cashfree({ mode: "production" });
+            // Detect if localhost or production
+            const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            const subdirectory = isLocalhost ? '/qr' : '';
             cashfree.checkout({
                 paymentSessionId: sessionId,
-                returnUrl: window.location.origin + '/qr/user/src/backend/payment/return_renewal.php?order_id=' + orderId
+                returnUrl: window.location.origin + subdirectory + '/user/src/backend/payment/return_renewal.php?order_id=' + orderId
             }).then(function(result) {
                 console.log('Checkout result:', result);
                 if (result.error) {

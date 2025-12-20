@@ -1621,6 +1621,10 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                             <button class="btn btn-secondary mt-3" id="subscription-btn" style="width: 100%; display: none;">
                                 <i class="fas fa-credit-card"></i> <span id="subscription-btn-text">Subscription Status</span>
                             </button>
+                            <?php else: ?>
+                            <a href="../backend/profile_new/generate_vcard.php?qr=<?php echo htmlspecialchars($viewed_qr); ?>" class="btn btn-primary mt-3" style="width: 100%; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <i class="fas fa-address-book"></i> Save to Contacts
+                            </a>
                             <?php endif; ?>
 
                             <div id="qr-color-controls" class="hidden">

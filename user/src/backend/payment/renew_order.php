@@ -51,7 +51,8 @@ $customer_id = 'CUST_' . $user_id . '_' . time();
 // Build return URL dynamically
 $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
 $host = $_SERVER['HTTP_HOST'];
-$subdirectory = '/qr';
+// Set subdirectory: use '/qr' for localhost, '' for production
+$subdirectory = (strpos($host, 'localhost') !== false) ? '/qr' : '';
 $returnURL = $protocol . '://' . $host . $subdirectory . '/user/src/backend/payment/return_renewal.php?order_id=' . $order_id;
 
 // Create Cashfree order

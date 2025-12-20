@@ -23,6 +23,7 @@ $menuItems = [
     ['url' => 'supercharge.php', 'name' => 'Super Charge', 'icon' => 'fas fa-bolt'],
     ['url' => 'rewards.php', 'name' => 'Rewards', 'icon' => 'fas fa-gift'],
     ['url' => 'users.php', 'name' => 'Users', 'icon' => 'fas fa-users'],
+    ['url' => 'renewals.php', 'name' => 'Renewals', 'icon' => 'fas fa-sync-alt'],
     ['url' => 'notifications.php', 'name' => 'Notifications', 'icon' => 'fas fa-bell'],
 ];
 

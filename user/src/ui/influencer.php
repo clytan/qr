@@ -1255,6 +1255,60 @@ function sendCollabAcceptanceEmails($conn, $collab, $influencer_id, $influencer_
         const userId = <?php echo $user_id; ?>;
         const isBizUser = <?php echo $is_biz_user ? 'true' : 'false'; ?>;
         
+        // Download photo function
+        function downloadPhoto(photoUrl) {
+            if (!photoUrl || photoUrl.includes('undefined')) {
+                showToast('No photo to download', 'error');
+                return;
+            }
+            
+            const link = document.createElement('a');
+            link.href = photoUrl;
+            link.download = 'collab_photo_' + Date.now() + '.jpg';
+            link.target = '_blank';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast('Downloading photo...', 'success');
+        }
+        
+        // Copy to clipboard function
+        function copyToClipboard(text) {
+            if (!text) {
+                showToast('Nothing to copy', 'error');
+                return;
+            }
+            
+            // Unescape the text
+            const unescapedText = text.replace(/\\'/g, "'").replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+            
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(unescapedText).then(() => {
+                    showToast('Copied to clipboard!', 'success');
+                }).catch(() => {
+                    fallbackCopy(unescapedText);
+                });
+            } else {
+                fallbackCopy(unescapedText);
+            }
+        }
+        
+        function fallbackCopy(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-999999px';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast('Copied to clipboard!', 'success');
+            } catch (e) {
+                showToast('Failed to copy', 'error');
+            }
+            document.body.removeChild(textarea);
+        }
+        
         $(document).ready(function() {
             loadCollabs('available');
             <?php if ($is_biz_user): ?>
