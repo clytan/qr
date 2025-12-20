@@ -56,6 +56,7 @@ try {
     );
 
     $cfResponse = requestWithHeader($cashfreeBaseUrl . "orders/$orderId", $headers);
+    error_log("Cashfree Verification Response for $orderId: " . $cfResponse); // DEBUG LOG
     $cfData = json_decode($cfResponse, true);
 
     if (isset($cfData['order_status']) && $cfData['order_status'] === 'PAID') {
