@@ -691,7 +691,38 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         
         init() {
             this.bindEvents();
+            this.checkPaymentVerification();
             this.loadPolls();
+        },
+
+        async checkPaymentVerification() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('order_id');
+            
+            if (orderId) {
+                // Clear URL param without reload
+                window.history.replaceState({}, document.title, window.location.pathname);
+                
+                this.showToast('Verifying payment...', 'info');
+                
+                try {
+                    const response = await fetch('../backend/polls/verify_poll_payment.php', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ order_id: orderId })
+                    });
+                    const data = await response.json();
+                    
+                    if (data.status) {
+                        this.showToast('Payment verified! Poll is now active.', 'success');
+                    } else {
+                        this.showToast(data.error || 'Payment verification failed', 'error');
+                    }
+                } catch (error) {
+                    console.error('Payment verification error:', error);
+                    this.showToast('Error verifying payment', 'error');
+                }
+            }
         },
         
         bindEvents() {
