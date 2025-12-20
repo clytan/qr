@@ -891,8 +891,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
             };
         },
         
-            };
-        },
+
 
         async verifyPayment(orderId) {
             if (!orderId) return;
