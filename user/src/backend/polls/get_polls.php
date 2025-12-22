@@ -46,7 +46,8 @@ try {
     $types = '';
     
     if ($filter === 'my') {
-        $whereConditions[] = "p.user_id = ? AND p.status != 'pending_payment'";
+        // Show all my polls including pending ones
+        $whereConditions[] = "p.user_id = ?";
         $params[] = $userId;
         $types .= 'i';
     } elseif ($filter === 'active') {
@@ -58,8 +59,8 @@ try {
         $params[] = 'closed';
         $types .= 's';
     } else {
-        // All polls - only show active for community, show all for user's own (except pending)
-        $whereConditions[] = "(p.status = 'active' OR (p.user_id = ? AND p.status != 'pending_payment'))";
+        // All polls - only show active for community, show all for user's own including pending
+        $whereConditions[] = "(p.status = 'active' OR p.user_id = ?)";
         $params[] = $userId;
         $types .= 'i';
     }

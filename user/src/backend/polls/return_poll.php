@@ -17,13 +17,13 @@ if (session_status() === PHP_SESSION_NONE) {
 $orderId = $_GET['order_id'] ?? '';
 
 if (empty($orderId)) {
-    header("Location: /user/src/pages/polls.php?error=invalid_order");
+    header("Location: /user/src/ui/polls.php?error=invalid_order");
     exit;
 }
 
 // Verify user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: /user/src/pages/login.php");
+    header("Location: /user/src/ui/login.php");
     exit;
 }
 
@@ -48,20 +48,20 @@ try {
 
     if (!$poll) {
         error_log("Return Handler: Poll not found for order $orderId");
-        header("Location: /user/src/pages/polls.php?error=poll_not_found");
+        header("Location: /user/src/ui/polls.php?error=poll_not_found");
         exit;
     }
 
     if ($poll['user_id'] != $userId) {
         error_log("Return Handler: User mismatch for order $orderId");
-        header("Location: /user/src/pages/polls.php?error=unauthorized");
+        header("Location: /user/src/ui/polls.php?error=unauthorized");
         exit;
     }
 
     // If already completed, just redirect
     if ($poll['payment_status'] === 'completed') {
         error_log("Return Handler: Payment already completed for order $orderId");
-        header("Location: /user/src/pages/polls.php?success=already_verified");
+        header("Location: /user/src/ui/polls.php?success=already_verified");
         exit;
     }
 
@@ -150,17 +150,17 @@ try {
         error_log("Return Handler: Successfully verified and activated poll {$poll['id']} for order $orderId");
         
         // Redirect to polls page with success message
-        header("Location: /user/src/pages/polls.php?verified=success&poll_id=" . $poll['id']);
+        header("Location: /user/src/ui/polls.php?verified=success&poll_id=" . $poll['id']);
         exit;
 
     } elseif (in_array($paymentStatus, ['FAILED', 'CANCELLED', 'USER_DROPPED'])) {
         error_log("Return Handler: Payment $paymentStatus for order $orderId");
-        header("Location: /user/src/pages/polls.php?error=payment_failed&status=$paymentStatus");
+        header("Location: /user/src/ui/polls.php?error=payment_failed&status=$paymentStatus");
         exit;
     } else {
         // PENDING or other status
         error_log("Return Handler: Payment still PENDING for order $orderId");
-        header("Location: /user/src/pages/polls.php?pending=true&order_id=$orderId");
+        header("Location: /user/src/ui/polls.php?pending=true&order_id=$orderId");
         exit;
     }
 
@@ -169,7 +169,7 @@ try {
         $conn->rollback();
     }
     error_log("Return Handler Exception: " . $e->getMessage());
-    header("Location: /user/src/pages/polls.php?error=verification_failed");
+    header("Location: /user/src/ui/polls.php?error=verification_failed");
     exit;
 }
 ?>
