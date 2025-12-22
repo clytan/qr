@@ -7,7 +7,7 @@ require_once('../components/auth_check.php');
 
 <head>
     <title>Dashboard - Admin Panel</title>
-    <link rel="icon" href="../../assets/logo2.png" type="image/gif" sizes="16x16">
+    <link rel="icon" href="../../../logo/logo.png" type="image/gif" sizes="16x16">
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">

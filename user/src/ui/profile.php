@@ -30,7 +30,7 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Profile | ZQR Connect</title>
-    <link rel="icon" href="../assets/logo2.png" type="image/gif" sizes="16x16">
+    <link rel="icon" href="../../../logo/logo.png" type="image/gif" sizes="16x16">
     <?php include('../components/csslinks.php') ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- Custom CSS -->

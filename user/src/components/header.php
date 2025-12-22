@@ -13,7 +13,7 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
                     <div class="left-section">
                         <div id="logo">
                             <a href="index.php">
-                                <img alt="Logo" class="logo-image" src="/qr/logo/logo.png" />
+                                <img alt="Logo" class="logo-image" src="../../../logo/logo.png" />
                             </a>
                         </div>
                     </div>
@@ -21,7 +21,7 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
                     <!-- Center Section: Logo Word (Zokli) -->
                     <div class="center-section">
                         <a href="index.php">
-                            <img alt="Zokli" class="logo-word-image" src="/qr/logo/logo-word.png" />
+                            <img alt="Zokli" class="logo-word-image" src="../../../logo/logo-word.png" />
                         </a>
                     </div>
                     

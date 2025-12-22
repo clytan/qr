@@ -9,7 +9,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
 
 <head>
     <title>Zokli - Digital Social Community for Dynamic Generation</title>
-    <link rel="icon" href="../assets/logo2.png" type="image/gif" sizes="16x16">
+    <link rel="icon" href="../../../logo/logo.png" type="image/gif" sizes="16x16">
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <meta

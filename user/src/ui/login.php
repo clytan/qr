@@ -3,7 +3,7 @@
 
 <head>
     <title>ZQR - Login</title>
-    <link rel="icon" href="../assets/logo2.png" type="image/gif" sizes="16x16">
+    <link rel="icon" href="../../../logo/logo.png" type="image/gif" sizes="16x16">
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <meta content="" name="keywords" />
@@ -159,7 +159,7 @@
             <!-- Logo inside form -->
             <div class="auth-logo">
                 <a href="index.php">
-                    <img src="/qr/logo/logo-both.png" alt="Zokli Logo" />
+                    <img src="../../../logo/logo-both.png" alt="Zokli Logo" />
                 </a>
             </div>
 
