@@ -200,8 +200,8 @@ if (!$is_logged_in) {
 
                         // Setup share links - using production zokli.in URLs
                         const shareText = `Join Zokli community, using my referral code: ${data.referral_code}`;
-                        const profileUrl = `https://www.zokli.in/user/src/ui/profile.php?QR=${encodeURIComponent(data.referral_code)}`;
-                        const registerUrl = `https://www.zokli.in/user/src/ui/register.php?ref=${data.referral_code}`;
+                        const profileUrl = `https://www.zokli.in/profile?QR=${encodeURIComponent(data.referral_code)}`;
+                        const registerUrl = `https://www.zokli.in/register?ref=${data.referral_code}`;
                         const tagline = `Be a part of this wonderful, digital social media community.`;
                         const fullMessage = `${shareText}\nView Profile: ${profileUrl}\nRegister: ${registerUrl}\n${tagline}`;
 

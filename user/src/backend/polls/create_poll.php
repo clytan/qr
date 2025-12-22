@@ -8,6 +8,7 @@
 
 header('Content-Type: application/json');
 
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -27,14 +28,18 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $userId = intval($_SESSION['user_id']);
 
-// Get POST data
-$data = json_decode(file_get_contents('php://input'), true);
+// Get POST data (FormData)
+$title = trim($_POST['title'] ?? '');
+$description = trim($_POST['description'] ?? '');
+$pollType = $_POST['poll_type'] ?? 'single';
+$encodedOptions = $_POST['options'] ?? null; 
+// Frontend might send options as JSON string or array depending on implementation
+// But with FormData, we can use array convention options[]
+// Let's assume frontend sends specialized arrays: "option_texts[]" and "option_images_indices[]" or mapped by index.
+// Strategy: use "option_texts[]" array
 
-$title = trim($data['title'] ?? '');
-$description = trim($data['description'] ?? '');
-$pollType = $data['poll_type'] ?? 'single';
-$options = $data['options'] ?? [];
-$endsAt = $data['ends_at'] ?? null;
+$optionTexts = $_POST['option_texts'] ?? [];
+$endsAt = $_POST['ends_at'] ?? null;
 
 // Validation
 if (empty($title)) {
@@ -47,23 +52,23 @@ if (strlen($title) > 255) {
     exit;
 }
 
-if (count($options) < 2) {
+if (count($optionTexts) < 2) {
     echo json_encode(['status' => false, 'message' => 'At least 2 options are required']);
     exit;
 }
 
-if (count($options) > 10) {
+if (count($optionTexts) > 10) {
     echo json_encode(['status' => false, 'message' => 'Maximum 10 options allowed']);
     exit;
 }
 
 // Validate each option
-foreach ($options as $option) {
-    if (empty(trim($option))) {
+foreach ($optionTexts as $text) {
+    if (empty(trim($text))) {
         echo json_encode(['status' => false, 'message' => 'All options must have text']);
         exit;
     }
-    if (strlen($option) > 255) {
+    if (strlen($text) > 255) {
         echo json_encode(['status' => false, 'message' => 'Option text is too long (max 255 characters)']);
         exit;
     }
@@ -72,6 +77,53 @@ foreach ($options as $option) {
 // Validate poll type
 if (!in_array($pollType, ['single', 'multiple'])) {
     $pollType = 'single';
+}
+
+// Image Handling Helper
+function uploadPollImage($fileIndex) {
+    if (!isset($_FILES['option_images']['name'][$fileIndex]) || empty($_FILES['option_images']['name'][$fileIndex])) {
+        return null;
+    }
+
+    $file = [
+        'name' => $_FILES['option_images']['name'][$fileIndex],
+        'type' => $_FILES['option_images']['type'][$fileIndex],
+        'tmp_name' => $_FILES['option_images']['tmp_name'][$fileIndex],
+        'error' => $_FILES['option_images']['error'][$fileIndex],
+        'size' => $_FILES['option_images']['size'][$fileIndex]
+    ];
+
+    if ($file['error'] !== UPLOAD_ERR_OK) {
+        return null; // or throw exception
+    }
+
+    $allowed = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+    
+    if (!in_array($ext, $allowed)) {
+        throw new Exception("Invalid file type for option " . ($fileIndex + 1));
+    }
+
+    // 2MB Limit
+    if ($file['size'] > 2 * 1024 * 1024) {
+        throw new Exception("File too large for option " . ($fileIndex + 1));
+    }
+
+    // Adjust path for XAMPP root 'user/src/uploads/polls/'
+    // We are in 'user/src/backend/polls/'
+    $uploadDir = __DIR__ . '/../../uploads/polls/';
+    if (!file_exists($uploadDir)) {
+        mkdir($uploadDir, 0777, true);
+    }
+
+    $filename = uniqid('poll_opt_') . '.' . $ext;
+    $targetPath = $uploadDir . $filename;
+
+    if (move_uploaded_file($file['tmp_name'], $targetPath)) {
+        return 'user/src/uploads/polls/' . $filename;
+    }
+    
+    return null;
 }
 
 try {
@@ -91,14 +143,27 @@ try {
     $stmtPoll->close();
     
     // Insert options
-    $sqlOption = "INSERT INTO user_poll_options (poll_id, option_text, option_order) VALUES (?, ?, ?)";
+    // Assuming 'option_image' column exists (added via schema update)
+    $sqlOption = "INSERT INTO user_poll_options (poll_id, option_text, option_image, option_order) VALUES (?, ?, ?, ?)";
     $stmtOption = $conn->prepare($sqlOption);
     
     $order = 1;
-    foreach ($options as $optionText) {
+    // Iterate through option texts
+    foreach ($optionTexts as $index => $optionText) {
         $optionText = trim($optionText);
         if (!empty($optionText)) {
-            $stmtOption->bind_param('isi', $pollId, $optionText, $order);
+            // Handle Image Upload
+            $imagePath = null;
+            try {
+                // $_FILES['option_images'] is structured as ['name'=>[0=>...], 'tmp_name'=>[0=>...]] 
+                // matched by index to optionTexts if array works out
+                $imagePath = uploadPollImage($index);
+            } catch (Exception $imgErr) {
+                // Fail the whole poll if image validation fails? Yes, better UX to be strict.
+                throw $imgErr;
+            }
+
+            $stmtOption->bind_param('issi', $pollId, $optionText, $imagePath, $order);
             if (!$stmtOption->execute()) {
                 throw new Exception("Failed to create poll option");
             }
@@ -116,8 +181,10 @@ try {
     ]);
     
 } catch (Exception $e) {
-    $conn->rollback();
+    if ($conn->in_transaction) {
+        $conn->rollback();
+    }
     error_log("Create poll error: " . $e->getMessage());
-    echo json_encode(['status' => false, 'message' => 'Failed to create poll']);
+    echo json_encode(['status' => false, 'message' => $e->getMessage()]);
 }
 ?>

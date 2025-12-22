@@ -597,6 +597,136 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         .poll-title { font-size: 1.1rem; }
         .create-poll-btn { bottom: 120px; right: 15px; width: 55px; height: 55px; }
     }
+
+    /* Option Image Upload Styles */
+    .option-image-upload {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px dashed rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+        cursor: pointer;
+        color: #94a3b8;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+    }
+
+    .option-image-upload:hover {
+        background: rgba(102, 126, 234, 0.1);
+        border-color: var(--primary);
+        color: var(--primary);
+    }
+
+    .option-image-upload.has-file {
+        background: rgba(16, 185, 129, 0.1);
+        border-color: var(--success);
+        color: var(--success);
+        background-size: cover;
+        background-position: center;
+        border-style: solid;
+    }
+
+    .option-image-upload.has-file i {
+        display: none;
+    }
+
+    /* Premium Nav Bar */
+    .polls-nav-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(30, 41, 59, 0.6);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 16px;
+        padding: 6px 8px 6px 8px; /* Balanced padding */
+        margin: 0 auto 30px;
+        max-width: 800px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .polls-tabs-group {
+        display: flex;
+        gap: 4px;
+        background: rgba(0,0,0,0.2);
+        padding: 4px;
+        border-radius: 12px;
+    }
+
+    .poll-tab-item {
+        background: transparent;
+        color: #94a3b8;
+        padding: 8px 20px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        border: none;
+    }
+
+    .poll-tab-item:hover {
+        color: #e2e8f0;
+    }
+
+    .poll-tab-item.active {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+        font-weight: 600;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .create-poll-btn-premium {
+        background: var(--gradient-2);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 10px;
+        border: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 12px rgba(233, 67, 122, 0.2);
+    }
+    
+    .create-poll-btn-premium:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px rgba(233, 67, 122, 0.3);
+        filter: brightness(1.1);
+    }
+
+    /* Mobile Responsive Nav */
+    @media (max-width: 600px) {
+        .polls-nav-bar {
+            flex-direction: column;
+            gap: 15px;
+            padding: 15px;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+        }
+        .polls-tabs-group {
+            width: 100%;
+            justify-content: center;
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            padding: 6px;
+            border-radius: 14px;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .poll-tab-item { flex: 1; }
+        .create-poll-btn-premium {
+            width: 100%;
+            justify-content: center;
+        }
+    }
     </style>
 </head>
 
@@ -621,9 +751,15 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                 <p class="polls-subtitle">Vote on polls and share your opinion with the community!</p>
             </section>
 
-            <div class="polls-tabs">
-                <button class="poll-tab active" data-filter="all">All Polls</button>
-                <button class="poll-tab" data-filter="my">My Polls</button>
+            <div class="polls-nav-bar">
+                <div class="polls-tabs-group">
+                    <button class="poll-tab-item active" data-filter="all">All Polls</button>
+                    <button class="poll-tab-item" data-filter="my">My Polls</button>
+                </div>
+                
+                <button class="create-poll-btn-premium" id="createPollBtn" title="Create Poll">
+                    <i class="fas fa-plus"></i> Create Poll
+                </button>
             </div>
 
             <div class="polls-container" id="pollsContainer">
@@ -633,9 +769,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                 </div>
             </div>
 
-            <button class="create-poll-btn" id="createPollBtn" title="Create Poll">
-                <i class="fas fa-plus"></i>
-            </button>
+
 
             <?php endif; ?>
         </div>
@@ -667,9 +801,17 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                         <div class="options-container" id="optionsContainer">
                             <div class="option-input-wrapper">
                                 <input type="text" class="form-input option-input" placeholder="Option 1" required maxlength="255">
+                                <label class="option-image-upload" title="Upload Image (Optional)">
+                                    <i class="fas fa-image"></i>
+                                    <input type="file" class="option-image-file" accept="image/*" style="display:none" onchange="PollsApp.handleFileSelect(this)">
+                                </label>
                             </div>
                             <div class="option-input-wrapper">
                                 <input type="text" class="form-input option-input" placeholder="Option 2" required maxlength="255">
+                                <label class="option-image-upload" title="Upload Image (Optional)">
+                                    <i class="fas fa-image"></i>
+                                    <input type="file" class="option-image-file" accept="image/*" style="display:none" onchange="PollsApp.handleFileSelect(this)">
+                                </label>
                             </div>
                         </div>
                         <button type="button" class="add-option-btn" id="addOptionBtn">
@@ -742,9 +884,9 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         
         bindEvents() {
             // Tab switching
-            document.querySelectorAll('.poll-tab').forEach(tab => {
+            document.querySelectorAll('.poll-tab-item').forEach(tab => {
                 tab.addEventListener('click', () => {
-                    document.querySelectorAll('.poll-tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.poll-tab-item').forEach(t => t.classList.remove('active'));
                     tab.classList.add('active');
                     this.currentFilter = tab.dataset.filter;
                     this.loadPolls();
@@ -844,16 +986,21 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
 
             try {
                 // 1. Create Poll (Pending Payment)
+                // 1. Create Poll (Pending Payment)
                 const formData = this.getPollFormData();
-                if (!formData) throw new Error('Invalid form data');
+                if (!formData) {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    return; // Stop if validation failed (toast already shown)
+                }
                 
                 // Log for debugging
-                console.log('Creating poll...', formData);
+                console.log('Creating poll with images...');
 
                 const createResp = await fetch('../backend/polls/create_poll.php', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(formData)
+                    // HEADERS REMOVED to let browser set boundary for FormData
+                    body: formData 
                 });
                 const createData = await createResp.json();
                 
@@ -922,19 +1069,35 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         getPollFormData() {
             const title = document.getElementById('pollTitle').value.trim();
             const desc = document.getElementById('pollDescription').value.trim();
-            const options = Array.from(document.querySelectorAll('.option-input'))
-                                .map(input => input.value.trim())
-                                .filter(val => val !== '');
+            
+            // Get Option Texts and Files
+            const wrappers = document.querySelectorAll('.option-input-wrapper');
+            let validOptionsCount = 0;
+            const formData = new FormData();
+
+            formData.append('title', title);
+            formData.append('description', desc);
+            formData.append('poll_type', 'single'); // Default to single
+            
+            wrappers.forEach((wrapper, index) => {
+                const textInput = wrapper.querySelector('.option-input');
+                const fileInput = wrapper.querySelector('.option-image-file');
+                const text = textInput.value.trim();
+
+                if (text) {
+                    formData.append('option_texts[]', text);
+                    if (fileInput.files.length > 0) {
+                        // Keyed by index to match backend logic
+                        formData.append(`option_images[${validOptionsCount}]`, fileInput.files[0]);
+                    }
+                    validOptionsCount++;
+                }
+            });
             
             if (!title) { this.showToast('Question is required', 'error'); return null; }
-            if (options.length < 2) { this.showToast('At least 2 options are required', 'error'); return null; }
+            if (validOptionsCount < 2) { this.showToast('At least 2 options are required', 'error'); return null; }
             
-            return {
-                title: title,
-                description: desc,
-                options: options,
-                poll_type: 'single'
-            };
+            return formData;
         },
         
 
@@ -1014,6 +1177,10 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                 const votedClass = poll.user_voted ? 'voted' : '';
                 const userVotedClass = isUserVoted ? 'user-voted selected' : '';
                 
+                const imageHtml = opt.image ? 
+                    `<div class="poll-option-image" style="width: 40px; height: 40px; border-radius: 6px; overflow: hidden; margin-right: 12px; flex-shrink: 0; background-image: url('${opt.image}'); background-size: cover; background-position: center; border: 1px solid rgba(255,255,255,0.1);"></div>` 
+                    : '';
+
                 return `
                     <div class="poll-option ${votedClass} ${userVotedClass}" 
                          data-poll-id="${poll.id}" 
@@ -1021,7 +1188,10 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                          ${poll.user_voted || poll.status === 'closed' ? 'disabled' : ''}>
                         <div class="poll-option-bar" style="width: ${poll.user_voted || poll.status === 'closed' ? percentage : 0}%"></div>
                         <div class="poll-option-content">
-                            <span class="poll-option-text">${this.escapeHtml(opt.text)}</span>
+                            <div style="display:flex; align-items:center;">
+                                ${imageHtml}
+                                <span class="poll-option-text">${this.escapeHtml(opt.text)}</span>
+                            </div>
                             <span class="poll-option-stats">
                                 ${poll.user_voted || poll.status === 'closed' ? `<span>${percentage}%</span>` : ''}
                                 ${isUserVoted ? '<i class="fas fa-check-circle" style="color: var(--primary)"></i>' : ''}
@@ -1138,18 +1308,11 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         async createPoll() {
             const title = document.getElementById('pollTitle').value.trim();
             const description = document.getElementById('pollDescription').value.trim();
-            const optionInputs = document.querySelectorAll('.option-input');
-            const options = Array.from(optionInputs).map(input => input.value.trim()).filter(v => v);
+            // Checking logic moved to getPollFormData
+            const formData = this.getPollFormData();
+            if (!formData) return; // Validation failed
             
-            if (!title) {
-                this.showToast('Please enter a question', 'error');
-                return;
-            }
-            
-            if (options.length < 2) {
-                this.showToast('Please add at least 2 options', 'error');
-                return;
-            }
+
             
             const submitBtn = document.getElementById('submitPollBtn');
             submitBtn.disabled = true;
@@ -1158,8 +1321,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
             try {
                 const response = await fetch('../backend/polls/create_poll.php', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ title, description, options, poll_type: 'single' })
+                    body: formData
                 });
                 
                 const data = await response.json();
@@ -1195,6 +1357,10 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
             wrapper.className = 'option-input-wrapper';
             wrapper.innerHTML = `
                 <input type="text" class="form-input option-input" placeholder="Option ${count + 1}" required maxlength="255">
+                <label class="option-image-upload" title="Upload Image (Optional)">
+                    <i class="fas fa-image"></i>
+                    <input type="file" class="option-image-file" accept="image/*" style="display:none" onchange="PollsApp.handleFileSelect(this)">
+                </label>
                 <button type="button" class="remove-option-btn"><i class="fas fa-times"></i></button>
             `;
             
@@ -1203,6 +1369,23 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
             });
             
             container.appendChild(wrapper);
+        },
+
+        handleFileSelect(input) {
+            const label = input.closest('.option-image-upload');
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    label.style.backgroundImage = `url('${e.target.result}')`;
+                    label.classList.add('has-file');
+                    label.title = input.files[0].name;
+                };
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                label.style.backgroundImage = '';
+                label.classList.remove('has-file');
+                label.title = 'Upload Image (Optional)';
+            }
         },
 
         getExpiryTimerHtml(createdOn) {
@@ -1232,9 +1415,17 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
             container.innerHTML = `
                 <div class="option-input-wrapper">
                     <input type="text" class="form-input option-input" placeholder="Option 1" required maxlength="255">
+                    <label class="option-image-upload" title="Upload Image (Optional)">
+                        <i class="fas fa-image"></i>
+                        <input type="file" class="option-image-file" accept="image/*" style="display:none" onchange="PollsApp.handleFileSelect(this)">
+                    </label>
                 </div>
                 <div class="option-input-wrapper">
                     <input type="text" class="form-input option-input" placeholder="Option 2" required maxlength="255">
+                    <label class="option-image-upload" title="Upload Image (Optional)">
+                        <i class="fas fa-image"></i>
+                        <input type="file" class="option-image-file" accept="image/*" style="display:none" onchange="PollsApp.handleFileSelect(this)">
+                    </label>
                 </div>
             `;
         },

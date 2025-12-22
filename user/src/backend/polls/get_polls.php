@@ -94,6 +94,7 @@ try {
         $optionsSql = "SELECT 
                             o.id,
                             o.option_text,
+                            o.option_image,
                             o.option_order,
                             (SELECT COUNT(*) FROM user_poll_votes WHERE option_id = o.id) as vote_count
                        FROM user_poll_options o
@@ -109,6 +110,7 @@ try {
             $options[] = [
                 'id' => intval($opt['id']),
                 'text' => $opt['option_text'],
+                'image' => $opt['option_image'] ? '/' . $opt['option_image'] : null,
                 'order' => intval($opt['option_order']),
                 'votes' => intval($opt['vote_count'])
             ];
