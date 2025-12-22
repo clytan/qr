@@ -133,7 +133,7 @@ try {
                        (user_id, invoice_number, invoice_type, amount, cgst, sgst, igst, gst_total, total_amount, status, payment_mode, payment_reference, created_on, updated_on, is_deleted) 
                        VALUES (?, ?, 'poll_creation', ?, ?, ?, 0, ?, ?, 'Paid', 'Online', ?, NOW(), NOW(), 0)";
             $invStmt = $conn->prepare($invSql);
-            $invStmt->bind_param('isdddddds', 
+            $invStmt->bind_param('isddddds', 
                 $userId, $invoiceNumber,
                 $baseAmount, $cgst, $sgst, $gstTotal, $totalAmount, $referenceId
             );

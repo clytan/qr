@@ -91,7 +91,7 @@ try {
                            VALUES (?, ?, 'poll_creation', ?, ?, ?, 0, ?, ?, 'Paid', 'Online', ?, NOW(), NOW(), 0)";
                 $invStmt = @$conn->prepare($invSql);
                 if ($invStmt) {
-                    $invStmt->bind_param('isdddddds', 
+                    $invStmt->bind_param('isddddds', 
                         $userId, $invoiceNumber,
                         $baseAmount, $cgst, $sgst, $gstTotal, $totalAmount, $referenceId
                     );
