@@ -87,14 +87,13 @@ try {
             
             if (!$existingInv) {
                 $invSql = "INSERT INTO user_invoice 
-                           (user_id, invoice_number, payment_reference, 
-                            amount, gst_rate, cgst, sgst, gst_total, total_amount, status, created_on, is_deleted) 
-                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Paid', NOW(), 0)";
+                           (user_id, invoice_number, invoice_type, amount, cgst, sgst, igst, gst_total, total_amount, status, payment_mode, payment_reference, created_on, updated_on, is_deleted) 
+                           VALUES (?, ?, 'poll_creation', ?, ?, ?, 0, ?, ?, 'Paid', 'Online', ?, NOW(), NOW(), 0)";
                 $invStmt = @$conn->prepare($invSql);
                 if ($invStmt) {
-                    $invStmt->bind_param('issdddddd', 
-                        $userId, $invoiceNumber, $referenceId,
-                        $baseAmount, $gstRate, $cgst, $sgst, $gstTotal, $totalAmount
+                    $invStmt->bind_param('isdddddds', 
+                        $userId, $invoiceNumber,
+                        $baseAmount, $cgst, $sgst, $gstTotal, $totalAmount, $referenceId
                     );
                     if ($invStmt->execute()) {
                          error_log("Poll Verify: Invoice Created.");
