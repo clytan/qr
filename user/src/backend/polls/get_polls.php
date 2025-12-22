@@ -25,10 +25,17 @@ $filter = $_GET['filter'] ?? 'all'; // 'all', 'my', 'active', 'closed'
 
 // Cleanup: Mark polls older than 7 days as closed
 // This ensures they don't show up in 'active' feeds
+// Cleanup: Mark polls older than 7 days as closed
 $cleanupSql = "UPDATE user_polls SET status = 'closed' 
                WHERE created_on < DATE_SUB(NOW(), INTERVAL 7 DAY) 
                AND status = 'active'";
 $conn->query($cleanupSql);
+
+// Cleanup: Delete abandoned pending polls older than 24 hours
+$abandonedSql = "DELETE FROM user_polls 
+                 WHERE status = 'pending_payment' 
+                 AND created_on < DATE_SUB(NOW(), INTERVAL 24 HOUR)";
+$conn->query($abandonedSql);
 
 try {
     $polls = [];
@@ -39,7 +46,7 @@ try {
     $types = '';
     
     if ($filter === 'my') {
-        $whereConditions[] = 'p.user_id = ?';
+        $whereConditions[] = 'p.user_id = ? AND p.status != "pending_payment"';
         $params[] = $userId;
         $types .= 'i';
     } elseif ($filter === 'active') {
@@ -51,8 +58,8 @@ try {
         $params[] = 'closed';
         $types .= 's';
     } else {
-        // All polls - only show active for community, show all for user's own
-        $whereConditions[] = "(p.status = 'active' OR p.user_id = ?)";
+        // All polls - only show active for community, show all for user's own (except pending)
+        $whereConditions[] = "(p.status = 'active' OR (p.user_id = ? AND p.status != 'pending_payment'))";
         $params[] = $userId;
         $types .= 'i';
     }
