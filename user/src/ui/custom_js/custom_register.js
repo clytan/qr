@@ -48,10 +48,10 @@ var eventHandler = {
                 // not from the displayed #pay-amount (which could already be discounted)
                 let checkedTier = $('input[name="user_tag"]:checked').val();
                 // TESTING: All prices set to 1 (Original: Normal=999, Silver=5555, Gold=9999)
-                let amount = 999; // Default
+                let amount = 449; // Default
                 if (checkedTier === 'gold') amount = 9999; // Original: 9999
                 else if (checkedTier === 'silver') amount = 5555; // Original: 5555
-                if ($('#student_leader').val() === 'yes') amount = 999; // Original: 999
+                if ($('#student_leader').val() === 'yes') amount = 449; // Original: 999
                 $.ajax({
                     url: '../backend/payment/validate_promo.php',
                     type: 'POST',
@@ -95,10 +95,10 @@ var eventHandler = {
 
     updatePayAmount: () => {
         let checkedTier = $('input[name="user_tag"]:checked').val();
-        let amount = 999;
+        let amount = 449;
         if (checkedTier === 'gold') amount = 9999;
         else if (checkedTier === 'silver') amount = 5555;
-        if ($('#student_leader').val() === 'yes') amount = 999;
+        if ($('#student_leader').val() === 'yes') amount = 449;
 
         // Reset promo if amount changes
         if (appliedPromoCode && originalAmount !== amount) {
@@ -195,10 +195,10 @@ var eventHandler = {
             }
             // Update price
             let checked = $('input[name="user_tag"]:checked').val();
-            let amount = 999;
+            let amount = 449;
             if (checked === 'gold') amount = 9999;
             else if (checked === 'silver') amount = 5555;
-            if ($('#student_leader').val() === 'yes') amount = 999;
+            if ($('#student_leader').val() === 'yes') amount = 449;
             $('#pay-amount').text(amount);
             registerFunction.updateSubmitState();
         });
@@ -505,7 +505,7 @@ var registerFunction = {
     calculateAmount: function (userType, userTag) {
         // Original prices: Normal=999, Silver=5555, Gold=9999
         // Original prices: Normal=999, Silver=5555, Gold=9999
-        let amount = 999; // Default Normal tier (Original: 999)
+        let amount = 449; // Default Normal tier (Original: 999)
 
         // Adjust amount based on membership tier
         if (userTag === 'gold') {
@@ -513,7 +513,7 @@ var registerFunction = {
         } else if (userTag === 'silver') {
             amount = 5555; // Original: 5555
         } else {
-            amount = 999; // Original: 999
+            amount = 449; // Original: 999
         }
 
         return amount;

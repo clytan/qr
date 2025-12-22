@@ -71,10 +71,10 @@ try {
     // ============================================
     // Security: Tier prices defined server-side
     $TIER_PRICES = [
-        'normal' => 999,          // Original: 999
+        'normal' => 449,          // Original: 999
         'silver' => 5555,          // Original: 5555
         'gold' => 9999,            // Original: 9999
-        'student_leader' => 999   // Original: 999
+        'student_leader' => 449   // Original: 999
     ];
 
     // Get user_tag from frontend (gold/silver/normal)
