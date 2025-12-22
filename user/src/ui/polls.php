@@ -872,6 +872,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                     
                     if (data.status) {
                         this.showToast('Payment verified! Poll is now active.', 'success');
+                        this.loadPolls(); // Refresh list immediately
                     } else {
                         this.showToast(data.error || 'Payment verification failed', 'error');
                     }

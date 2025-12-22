@@ -85,9 +85,9 @@ try {
             
             if (!$existingInv) {
                 $invSql = "INSERT INTO user_invoice 
-                           (user_id, invoice_number, invoice_type, order_id, payment_reference, 
+                           (user_id, invoice_number, order_id, payment_reference, 
                             amount, gst_rate, cgst, sgst, gst_total, total_amount, status, created_on, is_deleted) 
-                           VALUES (?, ?, 'poll', ?, ?, ?, ?, ?, ?, ?, ?, 'Paid', NOW(), 0)";
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Paid', NOW(), 0)";
                 $invStmt = @$conn->prepare($invSql);
                 if ($invStmt) {
                     $invStmt->bind_param('isssdddddd', 

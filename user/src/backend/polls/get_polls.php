@@ -46,7 +46,7 @@ try {
     $types = '';
     
     if ($filter === 'my') {
-        $whereConditions[] = 'p.user_id = ? AND p.status != "pending_payment"';
+        $whereConditions[] = "p.user_id = ? AND p.status != 'pending_payment'";
         $params[] = $userId;
         $types .= 'i';
     } elseif ($filter === 'active') {
