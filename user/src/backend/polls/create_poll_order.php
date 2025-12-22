@@ -69,11 +69,19 @@ try {
     }
 
     // Amount is fixed ₹99
-    // Amount is fixed ₹1 for testing
-    $amount = 1.00; // TESTING: ₹1 per poll
-    $customerName = $_SESSION['user_name'] ?? 'User';
-    $customerEmail = $_SESSION['user_email'] ?? 'user@example.com';
-    $customerPhone = $_SESSION['user_phone'] ?? '9999999999';
+    $amount = 99.00; // Fixed ₹99 per poll
+
+    // Fetch user details from DB
+    $custStmt = $conn->prepare("SELECT user_full_name, user_email, user_phone FROM user_user WHERE id = ?");
+    $custStmt->bind_param("i", $userId);
+    $custStmt->execute();
+    $custResult = $custStmt->get_result();
+    $custRow = $custResult->fetch_assoc();
+    $custStmt->close();
+
+    $customerName = $custRow['user_full_name'] ?? 'User';
+    $customerEmail = $custRow['user_email'] ?? 'user@example.com';
+    $customerPhone = $custRow['user_phone'] ?? '9999999999';
 
     // Cashfree Credentials
     $clientId = "1106277eab36909b950443d4c757726011"; 
