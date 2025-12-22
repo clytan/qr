@@ -1,0 +1,61 @@
+Options +FollowSymLinks -MultiViews
+RewriteEngine On
+RewriteBase /
+
+# 1. API & Backend Mapping (CRITICAL - Must be at top)
+
+# Special handling: If request comes from an Admin page, route "backend/" to admin backend
+RewriteCond %{HTTP_REFERER} /admin/ [NC]
+RewriteRule ^backend/(.*)$ admin/src/backend/$1 [L,NC]
+
+# Maps /backend/ -> user/src/backend/ (Default for User pages)
+# This fixes the "../backend/login.php" 404 issue by rewriting it to the correct internal path
+RewriteRule ^backend/(.*)$ user/src/backend/$1 [L,NC]
+
+# Maps /admin/backend/ -> admin/src/backend/ (Explicit admin requests)
+RewriteRule ^admin/backend/(.*)$ admin/src/backend/$1 [L,NC]
+
+# 2. Assets & Banners & Components
+RewriteRule ^assets/(.*)$ user/src/assets/$1 [L,NC]
+RewriteRule ^banners/(.*)$ user/src/banners/$1 [L,NC]
+RewriteRule ^components/(.*)$ user/src/components/$1 [L,NC]
+RewriteRule ^libs/(.*)$ user/src/libs/$1 [L,NC]
+RewriteRule ^custom_js/(.*)$ user/src/ui/custom_js/$1 [L,NC]
+
+# 3. Clean URLs (Redirects from .php and long paths)
+# Redirect user/src/ui/page.php -> /page
+RewriteCond %{THE_REQUEST} \s/user/src/ui/([^/]+)\.php [NC]
+RewriteRule ^ %1 [L,R=301,NE]
+
+# Redirect admin/src/ui/page.php -> /admin/page
+RewriteCond %{THE_REQUEST} \s/admin/src/ui/([^/]+)\.php [NC]
+RewriteRule ^ /admin/%1 [L,R=301,NE]
+
+# Strip .php from /admin/page.php -> /admin/page
+RewriteCond %{THE_REQUEST} \s/admin/([^/]+)\.php [NC]
+RewriteRule ^ /admin/%1 [L,R=301,NE]
+
+# Strip .php extension from root requests
+RewriteCond %{THE_REQUEST} \s/([^/]+)\.php [NC]
+RewriteRule ^ %1 [L,R=301,NE]
+
+# 4. Route Pages
+# Landing Page
+RewriteRule ^$ user/src/ui/index.php [L]
+RewriteRule ^index$ user/src/ui/index.php [L]
+
+# Force serve static files from user/src/ui if they exist
+RewriteCond %{DOCUMENT_ROOT}/user/src/ui/$1 -f
+RewriteRule ^([^/]+\.(css|js|png|jpg|jpeg|gif|svg))$ user/src/ui/$1 [L]
+
+# User Pages (login, register, etc.)
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{DOCUMENT_ROOT}/user/src/ui/$1.php -f
+RewriteRule ^([^/]+)$ user/src/ui/$1.php [L]
+
+# Admin Pages
+RewriteRule ^admin/login$ admin/src/ui/login.php [L]
+RewriteRule ^admin/dashboard$ admin/src/ui/dashboard.php [L]
+RewriteCond %{DOCUMENT_ROOT}/admin/src/ui/$1.php -f
+RewriteRule ^admin/([^/]+)$ admin/src/ui/$1.php [L]

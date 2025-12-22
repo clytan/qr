@@ -64,7 +64,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         text-align: center;
         padding: 0 20px;
         max-width: 1200px;
-        margin: 0 auto;
+        margin-top: -40px;
     }
 
     .hero-badge {
@@ -76,7 +76,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         color: white;
         font-size: 0.9rem;
         font-weight: 600;
-        margin-bottom: 2rem;
+        margin-bottom: 0    ;
         animation: fadeInDown 1s ease;
     }
 
