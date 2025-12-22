@@ -23,10 +23,9 @@ if (strpos($uri, '/qr/') !== false) {
     $projectDir = '/qr';
 }
 
-$notifyURL = $baseURL . $projectDir . "/user/src/backend/payment/callback_poll.php"; 
+$notifyURL = $baseURL . $projectDir . "/user/src/backend/polls/callback_poll.php"; 
 // For now, let's assume we use a generic return or poll specific return
-$returnURL = $baseURL . $projectDir . "/user/src/backend/payment/return_poll.php"; 
-
+$returnURL = $baseURL . $projectDir . "/user/src/backend/polls/return_poll.php";
 // FIX: Localhost HTTP causes Gateway Error 400. Force HTTPS for return URL signature.
 if (strpos($returnURL, 'http://localhost') === 0) {
     $returnURL = str_replace('http://', 'https://', $returnURL);

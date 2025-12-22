@@ -1179,19 +1179,20 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                 const userVotedClass = isUserVoted ? 'user-voted selected' : '';
                 
                 const imageHtml = opt.image ? 
-                    `<div class="poll-option-image" style="width: 40px; height: 40px; border-radius: 6px; overflow: hidden; margin-right: 12px; flex-shrink: 0; background-image: url('${opt.image}'); background-size: cover; background-position: center; border: 1px solid rgba(255,255,255,0.1);"></div>` 
+                    `<div class="poll-option-image" style="width: 100%; height: 150px; border-radius: 8px; overflow: hidden; margin-bottom: 8px; background-image: url('${opt.image}'); background-size: cover; background-position: center; border: 1px solid rgba(255,255,255,0.1);"></div>` 
                     : '';
 
                 return `
                     <div class="poll-option ${votedClass} ${userVotedClass}" 
                          data-poll-id="${poll.id}" 
                          data-option-id="${opt.id}"
-                         ${poll.user_voted || poll.status === 'closed' ? 'disabled' : ''}>
+                         ${poll.user_voted || poll.status === 'closed' ? 'disabled' : ''}
+                         style="flex-direction: column; align-items: flex-start; padding: 12px;">
                         <div class="poll-option-bar" style="width: ${poll.user_voted || poll.status === 'closed' ? percentage : 0}%"></div>
-                        <div class="poll-option-content">
-                            <div style="display:flex; align-items:center;">
+                        <div class="poll-option-content" style="width: 100%; flex-direction: column; align-items: flex-start;">
+                            <div style="display:flex; flex-direction:column; width:100%;">
                                 ${imageHtml}
-                                <span class="poll-option-text">${this.escapeHtml(opt.text)}</span>
+                                <span class="poll-option-text" style="font-size: 1.1em; font-weight: 500;">${this.escapeHtml(opt.text)}</span>
                             </div>
                             <span class="poll-option-stats">
                                 ${poll.user_voted || poll.status === 'closed' ? `<span>${percentage}%</span>` : ''}

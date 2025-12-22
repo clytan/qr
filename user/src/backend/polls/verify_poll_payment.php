@@ -60,11 +60,13 @@ try {
     $cfData = json_decode($cfResponse, true);
 
     if (isset($cfData['order_status']) && $cfData['order_status'] === 'PAID') {
+        error_log("Poll Verify: Status is PAID. Updating DB...");
         // Update DB
         $updateStmt = $conn->prepare("UPDATE user_polls SET payment_status = 'completed', status = 'active' WHERE id = ?");
         $updateStmt->bind_param("i", $poll['id']);
         
         if ($updateStmt->execute()) {
+            error_log("Poll Verify: DB Updated for Poll ID " . $poll['id']);
             // Create invoice with GST if not exists
             $totalAmount = floatval($cfData['order_amount'] ?? 99.00);
             $baseAmount = round($totalAmount / 1.18, 2);
@@ -94,20 +96,31 @@ try {
                         $userId, $invoiceNumber, $orderId, $referenceId,
                         $baseAmount, $gstRate, $cgst, $sgst, $gstTotal, $totalAmount
                     );
-                    $invStmt->execute();
+                    if ($invStmt->execute()) {
+                         error_log("Poll Verify: Invoice Created.");
+                    } else {
+                         error_log("Poll Verify: Invoice Insert Failed: " . $invStmt->error);
+                    }
                     $invStmt->close();
+                } else {
+                    error_log("Poll Verify: Invoice Prepare Failed: " . $conn->error);
                 }
+            } else {
+                error_log("Poll Verify: Invoice Already Exists.");
             }
             
             echo json_encode(['status' => true, 'message' => 'Payment verified and poll activated!', 'poll_id' => $poll['id']]);
         } else {
+            error_log("Poll Verify: DB Update Failed: " . $updateStmt->error);
             throw new Exception("Database update failed");
         }
     } else {
+        error_log("Poll Verify: Payment Status is " . ($cfData['order_status'] ?? 'Unknown'));
         throw new Exception("Payment not completed. Status: " . ($cfData['order_status'] ?? 'Unknown'));
     }
 
 } catch (Exception $e) {
+    error_log("Poll Verify Exception: " . $e->getMessage());
     echo json_encode(['status' => false, 'error' => $e->getMessage()]);
 }
 
