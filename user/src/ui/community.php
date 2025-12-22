@@ -22,6 +22,7 @@ $hide_header_extras = true; // Hide notification/wallet buttons on this page
     <link href="discord_chat_layout.css?v=<?php echo time(); ?>" rel="stylesheet" type="text/css" />
     <link href="community_mod_styles.css?v=<?php echo time(); ?>" rel="stylesheet" type="text/css" />
     <link href="timeout_styles.css?v=<?php echo time(); ?>" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body class="dark-scheme de-grey">

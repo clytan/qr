@@ -80,7 +80,7 @@ function generateInitialsAvatar(name, size = 64) {
             <circle cx='${r}' cy='${r}' r='${innerR}' fill='url(#g)' stroke='rgba(0,0,0,0.28)' stroke-width='${stroke}' />
             <text x='50%' y='50%' dy='.36em' text-anchor='middle' font-family='Inter, Arial, sans-serif' font-size='${fontSize}' font-weight='700' fill='rgba(255,255,255,0.95)'>${initials}</text>
         </svg>`;
-    return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg).replace(/'/g, '%27');
 }
 
 let currentCommunityId = null;
