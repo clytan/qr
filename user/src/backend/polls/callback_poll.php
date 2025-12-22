@@ -102,20 +102,20 @@ try {
         $invoiceNumber = 'INV-POLL-' . date('Ymd') . '-' . str_pad($pollId, 4, '0', STR_PAD_LEFT);
 
         // Check if invoice exists
-        $checkInv = $conn->prepare("SELECT id FROM user_invoice WHERE order_id = ?");
-        $checkInv->bind_param("s", $orderId);
+        $checkInv = $conn->prepare("SELECT id FROM user_invoice WHERE invoice_number = ?");
+        $checkInv->bind_param("s", $invoiceNumber);
         $checkInv->execute();
         $existingInv = $checkInv->get_result()->fetch_assoc();
         $checkInv->close();
 
         if (!$existingInv) {
             $invSql = "INSERT INTO user_invoice 
-                       (user_id, invoice_number, order_id, payment_reference, 
+                       (user_id, invoice_number, payment_reference, 
                         amount, gst_rate, cgst, sgst, gst_total, total_amount, status, created_on, is_deleted) 
-                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'Paid', NOW(), 0)";
+                       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'Paid', NOW(), 0)";
             $invStmt = $conn->prepare($invSql);
-            $invStmt->bind_param('isssdddddd', 
-                $userId, $invoiceNumber, $orderId, $referenceId,
+            $invStmt->bind_param('issdddddd', 
+                $userId, $invoiceNumber, $referenceId,
                 $baseAmount, $gstRate, $cgst, $sgst, $gstTotal, $totalAmount
             );
             
