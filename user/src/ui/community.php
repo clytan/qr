@@ -6,6 +6,7 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 $user_id = $_SESSION['user_id'];
+$hide_header_extras = true; // Hide notification/wallet buttons on this page
 ?>
 <!DOCTYPE html>
 <html lang="zxx">
@@ -25,8 +26,8 @@ $user_id = $_SESSION['user_id'];
 
 <body class="dark-scheme de-grey">
     <div id="wrapper">
-        <?php include('../components/header.php') ?>
-        <div class="no-bottom no-top" id="content">
+        <?php // Header hidden for full chat experience - include('../components/header.php') ?>
+        <div class="no-bottom no-top" id="content" style="padding-top: 0 !important;">
             <div id="top"></div>
             <section id="section-community" aria-label="section">
                 <div class="container">
@@ -114,9 +115,16 @@ $user_id = $_SESSION['user_id'];
                     </div>
                     <div class="row">
                         <div class="col-lg-12">
-                            <div class="community-tabs" id="communityTabs">
-                                <!-- Communities will be loaded here -->
-                                <div class="text-center">Loading communities...</div>
+                            <div class="community-dropdown-wrapper">
+                                <button class="community-dropdown-btn" id="communityDropdownBtn">
+                                    <i class="fa fa-comments"></i>
+                                    <span id="selectedCommunityName">Select Community</span>
+                                    <i class="fa fa-chevron-down dropdown-arrow"></i>
+                                </button>
+                                <div class="community-dropdown-menu" id="communityDropdownMenu">
+                                    <!-- Communities will be loaded here -->
+                                    <div class="text-center" style="padding: 15px; color: #94a3b8;">Loading communities...</div>
+                                </div>
                             </div>
                         </div>
                     </div>

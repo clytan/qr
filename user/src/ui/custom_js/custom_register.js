@@ -47,11 +47,19 @@ var eventHandler = {
                 // IMPORTANT: Always calculate original tier amount from tier selection,
                 // not from the displayed #pay-amount (which could already be discounted)
                 let checkedTier = $('input[name="user_tag"]:checked').val();
-                // TESTING: All prices set to 1 (Original: Normal=999, Silver=5555, Gold=9999)
-                let amount = 449; // Default
-                if (checkedTier === 'gold') amount = 9999; // Original: 9999
-                else if (checkedTier === 'silver') amount = 5555; // Original: 5555
-                if ($('#student_leader').val() === 'yes') amount = 449; // Original: 999
+                let userType = $('input[name="user_type"]:checked').val();
+
+                // 1. Determine Base Price by User Type
+                let amount = 449; // Default Individual
+                if (userType === '2' || userType === '3') amount = 999; // Creator or Business
+
+                // 2. Apply Tier overrides ONLY if NOT Student Leader
+                if ($('#student_leader').val() === 'yes') {
+                    // Amount stays as base price (449 or 999)
+                } else {
+                    if (checkedTier === 'gold') amount = 9999;
+                    else if (checkedTier === 'silver') amount = 5555;
+                }
                 $.ajax({
                     url: '../backend/payment/validate_promo.php',
                     type: 'POST',
@@ -95,10 +103,19 @@ var eventHandler = {
 
     updatePayAmount: () => {
         let checkedTier = $('input[name="user_tag"]:checked').val();
-        let amount = 449;
-        if (checkedTier === 'gold') amount = 9999;
-        else if (checkedTier === 'silver') amount = 5555;
-        if ($('#student_leader').val() === 'yes') amount = 449;
+        let userType = $('input[name="user_type"]:checked').val();
+
+        // 1. Determine Base Price by User Type
+        let amount = 449; // Default Individual
+        if (userType === '2' || userType === '3') amount = 999; // Creator or Business
+
+        // 2. Apply Tier overrides ONLY if NOT Student Leader
+        if ($('#student_leader').val() === 'yes') {
+            // Amount stays as base price (449 or 999)
+        } else {
+            if (checkedTier === 'gold') amount = 9999;
+            else if (checkedTier === 'silver') amount = 5555;
+        }
 
         // Reset promo if amount changes
         if (appliedPromoCode && originalAmount !== amount) {
@@ -368,7 +385,7 @@ var eventHandler = {
 
         // Always update price on load and on membership/student leader change
         eventHandler.updatePayAmount();
-        $('input[name="user_tag"], #student_leader').on('change click', eventHandler.updatePayAmount);
+        $('input[name="user_tag"], input[name="user_type"], #student_leader').on('change click', eventHandler.updatePayAmount);
     },
 
     onInput: () => {
@@ -503,17 +520,19 @@ var registerFunction = {
     referenceTimeout: null,
 
     calculateAmount: function (userType, userTag) {
-        // Original prices: Normal=999, Silver=5555, Gold=9999
-        // Original prices: Normal=999, Silver=5555, Gold=9999
-        let amount = 449; // Default Normal tier (Original: 999)
+        // 1. Determine Base Price by User Type
+        let amount = 449; // Default Individual
+        if (userType === '2' || userType === '3') {
+            amount = 999; // Creator or Business
+        }
 
-        // Adjust amount based on membership tier
-        if (userTag === 'gold') {
-            amount = 9999; // Original: 9999
-        } else if (userTag === 'silver') {
-            amount = 5555; // Original: 5555
+        // 2. Apply Tier overrides ONLY if NOT Student Leader
+        // Note: For calculateAmount, we check the global #student_leader input
+        if ($('#student_leader').val() === 'yes') {
+            // Amount stays as base price
         } else {
-            amount = 449; // Original: 999
+            if (userTag === 'gold') amount = 9999;
+            else if (userTag === 'silver') amount = 5555;
         }
 
         return amount;
@@ -832,6 +851,12 @@ $(document).ready(function () {
 
         // Check if this email was previously verified
         registerFunction.checkEmailVerified(email);
+    }
+
+    // Auto-validate pre-filled reference code from URL parameter
+    var prefillRefCode = $('#reference_code').val().trim();
+    if (prefillRefCode !== '' && /^[A-Za-z0-9]{10}$/.test(prefillRefCode)) {
+        registerFunction.validateReference(prefillRefCode);
     }
 
     // Also re-check on page visibility change (user returning from payment app)

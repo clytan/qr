@@ -154,18 +154,31 @@ function loadCommunities() {
                     return acc;
                 }, {});
 
-                const tabs = document.getElementById('communityTabs');
-                tabs.innerHTML = data.communities.map(community => `
-                <div class="community-tab ${community.is_user_community ? 'active' : ''}" 
-                     onclick="selectCommunity(${community.id}, ${community.is_user_community})">
-                    ${community.name}
-                    ${community.is_moderator ? '<span class="mod-badge"><i class="fa fa-shield"></i></span>' : ''}
-                    <span class="badge">${community.current_members}/100</span>
-                </div>
-            `).join('');
+                const dropdownMenu = document.getElementById('communityDropdownMenu');
+                const dropdownBtn = document.getElementById('communityDropdownBtn');
+                const selectedName = document.getElementById('selectedCommunityName');
 
-                // Load messages for user's community and set initial input visibility
-                if (data.user_community_id) {
+                // Populate dropdown menu
+                dropdownMenu.innerHTML = data.communities.map(community => `
+                    <div class="community-dropdown-item ${community.is_user_community ? 'active' : ''}" 
+                         data-community-id="${community.id}"
+                         data-is-user-community="${community.is_user_community}"
+                         onclick="selectCommunityFromDropdown(${community.id}, ${community.is_user_community}, '${community.name.replace(/'/g, "\\'")}')">
+                        <div class="community-name">
+                            <i class="fa fa-comments"></i>
+                            ${community.name}
+                            ${community.is_moderator ? '<span class="mod-badge"><i class="fa fa-shield"></i></span>' : ''}
+                        </div>
+                        <div class="community-meta">
+                            <span class="member-count">${community.current_members}/100 members</span>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Set initial selected community name
+                const userCommunity = data.communities.find(c => c.is_user_community);
+                if (userCommunity) {
+                    selectedName.textContent = userCommunity.name;
                     currentCommunityId = data.user_community_id;
                     const chatInput = document.querySelector('.chat-input');
                     if (chatInput) {
@@ -173,10 +186,56 @@ function loadCommunities() {
                     }
                     loadMessages();
                     loadMembers();
+                } else if (data.communities.length > 0) {
+                    selectedName.textContent = 'Select Community';
                 }
+
+                // Dropdown toggle
+                dropdownBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    dropdownBtn.classList.toggle('open');
+                    dropdownMenu.classList.toggle('open');
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', function (e) {
+                    if (!dropdownBtn.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                        dropdownBtn.classList.remove('open');
+                        dropdownMenu.classList.remove('open');
+                    }
+                });
             }
         })
         .catch(error => console.error('Error:', error));
+}
+
+// Select community from dropdown
+function selectCommunityFromDropdown(communityId, isUserCommunity, communityName) {
+    currentCommunityId = communityId;
+    lastMessageTime = null; // Reset last message time for new community
+
+    // Update selected name in button
+    document.getElementById('selectedCommunityName').textContent = communityName;
+
+    // Update active state in dropdown
+    document.querySelectorAll('.community-dropdown-item').forEach(item => {
+        item.classList.remove('active');
+    });
+    document.querySelector(`.community-dropdown-item[data-community-id="${communityId}"]`).classList.add('active');
+
+    // Close dropdown
+    document.getElementById('communityDropdownBtn').classList.remove('open');
+    document.getElementById('communityDropdownMenu').classList.remove('open');
+
+    // Show/hide input area based on community membership
+    const chatInput = document.querySelector('.chat-input');
+    if (chatInput) {
+        chatInput.style.display = isUserCommunity ? 'flex' : 'none';
+    }
+
+    // Load community data
+    loadMessages();
+    loadMembers();
 }
 
 // Function to render a single message

@@ -299,30 +299,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
     }
 
     .carousel-overlay {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, transparent 100%);
-        padding: 30px;
-        color: white;
-        transform: translateY(20px);
-        opacity: 0;
-        transition: all 0.4s ease;
-    }
-
-    .carousel-item-enhanced:hover .carousel-overlay {
-        transform: translateY(0);
-        opacity: 1;
-    }
-
-    .carousel-overlay h3 {
-        font-size: 1.5rem;
-        margin-bottom: 0.5rem;
-    }
-
-    .carousel-overlay p {
-        color: #94a3b8;
+        display: none;
     }
 
     /* Features Grid with Parallax */
@@ -330,6 +307,10 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         padding: 60px 0;
         background: var(--dark);
         position: relative;
+    }
+
+    .vision-section {
+        background: transparent;
     }
 
     .features-grid {
@@ -467,10 +448,64 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         opacity: 0.95;
     }
 
-    /* Responsive */
+    /* Responsive - Tablet/iPad */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .welcome-margin {
+            margin-top: 10% !important;
+        }
+
+        .hero-parallax {
+            margin-top: 30px !important;
+            height: auto;
+            min-height: 60vh;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+        }
+
+        .hero-subtitle {
+            font-size: 1.2rem;
+        }
+
+        .carousel-item-enhanced img {
+            height: 400px;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+        }
+
+        .features-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 40px;
+        }
+
+        .features-parallax {
+            padding: 40px 0;
+            margin-top: 0 !important;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+        }
+
+        .cta-title {
+            font-size: 2.5rem;
+        }
+    }
+
+    /* Responsive - Mobile */
     @media (max-width: 768px) {
         .welcome-margin {
             margin-top: 22% !important;
+        }
+
+        .hero-parallax {
+            margin-top: -80px !important;
+            height: auto;
+            min-height: 70vh;
         }
 
         .hero-title {
@@ -507,6 +542,40 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         .carousel-item-enhanced img {
             height: 300px;
         }
+
+        .features-parallax {
+            padding: 30px 0;
+            margin-top: 0 !important;
+        }
+
+        .features-grid {
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .feature-card {
+            padding: 20px 15px;
+        }
+
+        .stats-section {
+            padding: 20px 0;
+        }
+
+        .cta-parallax {
+            padding: 30px 0;
+        }
+    }
+
+    /* Large Desktop */
+    @media (min-width: 1025px) {
+        .hero-parallax {
+            margin-top: 30px !important;
+        }
+
+        .features-parallax {
+            margin-top: 0 !important;
+        }
     }
 
     /* Smooth Scroll */
@@ -540,47 +609,42 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                     <div class="enhanced-carousel">
                         <div id="feature-carousel" class="owl-carousel owl-theme">
                             <div class="carousel-item-enhanced">
-                                <img src="../banners/1.jpeg" alt="Knowledge Sharing">
-                                <div class="carousel-overlay">
-                                    <h3><i class="fas fa-book-reader"></i> Knowledge Nexus</h3>
-                                    <p>Access curated learning paths, expert workshops, and peer-to-peer tutoring from
-                                        10 million minds</p>
-                                </div>
+                                <img src="../banners/1.jpeg" alt="Banner 1">
                             </div>
 
                             <div class="carousel-item-enhanced">
-                                <img src="../banners/2.jpeg" alt="Community Connection">
-                                <div class="carousel-overlay">
-                                    <h3><i class="fas fa-users"></i> A Continent of Connection</h3>
-                                    <p>Join Zoks from diverse ages, geographies, interests, and backgrounds in one
-                                        vibrant community
-                                    </p>
-                                </div>
+                                <img src="../banners/2.jpeg" alt="Banner 2">
                             </div>
 
                             <div class="carousel-item-enhanced">
-                                <img src="../banners/3.jpeg" alt="Rewards System">
-                                <div class="carousel-overlay">
-                                    <h3><i class="fas fa-coins"></i> Economic Empowerment</h3>
-                                    <p>Get rewarded for your contributions in our transparent, reward-based ecosystem
-                                    </p>
-                                </div>
+                                <img src="../banners/3.jpeg" alt="Banner 3">
                             </div>
 
                             <div class="carousel-item-enhanced">
-                                <img src="../banners/4.jpeg" alt="Creative Collaboration">
-                                <div class="carousel-overlay">
-                                    <h3><i class="fas fa-palette"></i> Creator's Marketplace</h3>
-                                    <p>Collaborate on art, music, writing, and innovation with talented Zoks nationwide
-                                    </p>
-                                </div>
+                                <img src="../banners/4.jpeg" alt="Banner 4">
+                            </div>
+
+                            <div class="carousel-item-enhanced">
+                                <img src="../banners/1.jpeg" alt="Banner 1">
+                            </div>
+
+                            <div class="carousel-item-enhanced">
+                                <img src="../banners/2.jpeg" alt="Banner 2">
+                            </div>
+
+                            <div class="carousel-item-enhanced">
+                                <img src="../banners/3.jpeg" alt="Banner 3">
+                            </div>
+
+                            <div class="carousel-item-enhanced">
+                                <img src="../banners/4.jpeg" alt="Banner 4">
                             </div>
                         </div>
                     </div>
                 </div>
             </section>
             <!-- Hero Section with Parallax -->
-            <section class="hero-parallax" data-parallax="scroll" style="margin-top: -110px;">
+            <section class="hero-parallax" data-parallax="scroll" style="margin-top: 20px;">
                 <div class="parallax-bg"></div>
 
                 <div class="floating-shapes">
@@ -625,7 +689,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
 
 
             <!-- Features with Parallax -->
-            <section class="features-parallax" style="margin-top: -110px;">
+            <section class="features-parallax">
                 <div class="container">
                     <div class="section-header">
                         <h2 class="section-title">Community Zokli Goals</h2>
@@ -705,7 +769,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
             </section>
 
             <!-- Vision Section -->
-            <section class="features-parallax" style="margin-top: -110px; background: transparent;">
+            <section class="features-parallax vision-section">
                 <div class="container">
                     <div class="section-header">
                         <h2 class="section-title">Our Vision</h2>
@@ -912,10 +976,12 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
             loop: true,
             margin: 20,
             nav: false,
-            dots: true,
+            dots: false,
             autoplay: true,
-            autoplayTimeout: 5000,
+            autoplayTimeout: 4000,
             autoplayHoverPause: true,
+            smartSpeed: 600,
+            fluidSpeed: true,
             navText: ['<i class="fa fa-chevron-left"></i>', '<i class="fa fa-chevron-right"></i>'],
             responsive: {
                 0: {
@@ -924,7 +990,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                 768: {
                     items: 2
                 },
-                1024: {
+                1200: {
                     items: 3
                 }
             }

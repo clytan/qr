@@ -9,15 +9,23 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
         <div class="row">
             <div class="col-md-12">
                 <div class="header-content d-flex align-items-center justify-content-between">
+                    <!-- Left Section: Logo -->
                     <div class="left-section">
-                        <!-- logo begin -->
                         <div id="logo">
                             <a href="index.php">
-                                <img alt="Logo" class="logo-image" src="../assets/logo.png" />
+                                <img alt="Logo" class="logo-image" src="/qr/logo/logo.png" />
                             </a>
                         </div>
-                        <!-- logo close -->
                     </div>
+                    
+                    <!-- Center Section: Logo Word (Zokli) -->
+                    <div class="center-section">
+                        <a href="index.php">
+                            <img alt="Zokli" class="logo-word-image" src="/qr/logo/logo-word.png" />
+                        </a>
+                    </div>
+                    
+                    <!-- Right Section: Notification & Wallet -->
                     <div class="right-section">
                         <?php if ($header_is_logged_in): ?>
                         <!-- Notifications Dropdown -->
@@ -61,20 +69,42 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
                     .left-section {
                         display: flex;
                         align-items: center;
-                        gap: 15px;
+                        flex: 0 0 auto;
+                    }
+                    
+                    .center-section {
+                        position: absolute;
+                        left: 50%;
+                        transform: translateX(-50%);
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    }
+                    
+                    .center-section a {
+                        display: flex;
+                        align-items: center;
+                    }
+                    
+                    .logo-word-image {
+                        height: 28px;
+                        width: auto;
                     }
 
-    .right-section {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }                    #logo {
+                    .right-section {
+                        display: flex;
+                        align-items: center;
+                        gap: 10px;
+                        flex: 0 0 auto;
+                    }
+                    
+                    #logo {
                         display: flex;
                         align-items: center;
                     }
 
                     .logo-image {
-                        height: 50px;
+                        height: 45px;
                         width: auto;
                     }
 
@@ -83,6 +113,7 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
                         z-index: 9999;
                     }
 
+    /* Gradient styled notification & wallet buttons */
     header a.btn-notification,
     header a.btn-wallet,
     header a.btn-rewards,
@@ -98,17 +129,16 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
         display: flex !important;
         align-items: center;
         justify-content: center;
-        width: 38px !important;
-        height: 38px !important;
+        width: 40px !important;
+        height: 40px !important;
         border-radius: 12px !important;
-        background: transparent !important;
-        border: 1.5px solid rgba(255, 255, 255, 0.8) !important;
+        background: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%) !important;
+        border: none !important;
         color: #ffffff !important;
         text-decoration: none !important;
         position: relative;
         transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+        box-shadow: 0 4px 15px rgba(233, 67, 122, 0.3) !important;
         padding: 0 !important;
         min-width: auto !important;
     }
@@ -142,11 +172,12 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
     .btn-notification:hover,
     .btn-wallet:hover,
     .btn-rewards:hover {
-        background: rgba(255, 255, 255, 0.15) !important;
-        border-color: rgba(255, 255, 255, 1) !important;
-        transform: translateY(-2px) !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-    }                    .notification-content {
+        background: linear-gradient(135deg, #d43668 0%, #d5623f 50%, #d49a20 100%) !important;
+        transform: translateY(-2px) scale(1.05) !important;
+        box-shadow: 0 6px 20px rgba(233, 67, 122, 0.5) !important;
+    }
+    
+                    .notification-content {
                         position: absolute;
                         right: 0;
                         top: 50px;
@@ -609,3 +640,4 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
     </script>
     </div>
 </header>
+<br>

@@ -58,7 +58,7 @@
         }
 
         .auth-logo img {
-            width: 100px;
+            width: 130px;
             height: auto;
         }
 
@@ -142,7 +142,7 @@
             }
 
             .auth-logo img {
-                width: 80px;
+                width: 130px;
             }
 
             .auth-title {
@@ -159,7 +159,7 @@
             <!-- Logo inside form -->
             <div class="auth-logo">
                 <a href="index.php">
-                    <img src="../assets/logo2.png" alt="ZQR Logo" />
+                    <img src="/qr/logo/logo-both.png" alt="Zokli Logo" />
                 </a>
             </div>
 

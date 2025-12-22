@@ -891,23 +891,40 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
         }
 
         .social-input-header .form-label i {
-            font-size: 1.2rem;
-            color: white;
+            font-size: 1.4rem;
         }
+
+        /* Social Media Brand Colors */
+        .social-input-header .fa-instagram {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .social-input-header .fa-facebook { color: #1877F2 !important; }
+        .social-input-header .fa-youtube { color: #FF0000 !important; }
+        .social-input-header .fa-whatsapp { color: #25D366 !important; }
+        .social-input-header .fa-twitter { color: #1DA1F2 !important; }
+        .social-input-header .fa-linkedin { color: #0A66C2 !important; }
+        .social-input-header .fa-telegram { color: #0088cc !important; }
+        .social-input-header .fa-snapchat { color: #FFFC00 !important; }
+        .social-input-header .fa-globe { color: #4CAF50 !important; }
 
         .social-input-field {
             position: relative;
             display: flex;
             align-items: center;
+            gap: 10px;
         }
 
         .social-input-field .form-control {
             background: rgba(0, 0, 0, 0.2);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            padding-right: 40px;
+            padding-right: 12px;
             height: 42px;
             font-size: 0.875rem;
             color: var(--text-color);
+            flex: 1;
         }
 
         .social-input-field .form-control:focus {
@@ -921,20 +938,28 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
         }
 
         .btn-link {
-            position: absolute;
-            right: 8px;
-            background: none;
+            position: relative;
+            right: auto;
+            background: linear-gradient(135deg, #E9437A 0%, #E2AD2A 100%);
             border: none;
-            color: var(--primary-color);
-            padding: 8px;
+            color: white;
+            padding: 10px 12px;
+            border-radius: 8px;
             cursor: pointer;
-            opacity: 0.7;
+            opacity: 1;
             transition: all 0.3s ease;
+            flex-shrink: 0;
+            box-shadow: 0 2px 8px rgba(233, 67, 122, 0.3);
         }
 
         .btn-link:hover {
             opacity: 1;
-            transform: scale(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(233, 67, 122, 0.5);
+        }
+        
+        .btn-link i {
+            color: white !important;
         }
 
         /* Public Toggle - New Design */

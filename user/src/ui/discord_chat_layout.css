@@ -58,18 +58,120 @@ nav {
     background: #1A1A1B !important;
 }
 
-/* Community Tabs Styling */
-.community-tabs {
-    overflow-x: auto;
-    white-space: nowrap;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-    -ms-overflow-style: auto;
-    padding: 15px 0;
-    margin-bottom: 20px;
+/* Community Dropdown Selector */
+.community-dropdown-wrapper {
+    position: relative;
+    margin-bottom: 15px;
+}
+
+.community-dropdown-btn {
     display: flex;
-    gap: 12px;
     align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 14px 20px;
+    background: linear-gradient(135deg, #E9437A 0%, #E2AD2A 100%);
+    border: none;
+    border-radius: 12px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(233, 67, 122, 0.4);
+}
+
+.community-dropdown-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(233, 67, 122, 0.5);
+}
+
+.community-dropdown-btn .dropdown-arrow {
+    margin-left: auto;
+    transition: transform 0.3s ease;
+}
+
+.community-dropdown-btn.open .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.community-dropdown-menu {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    background: #2B2D31;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.community-dropdown-menu.open {
+    max-height: 400px;
+    overflow-y: auto;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.community-dropdown-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 20px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.community-dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.community-dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.community-dropdown-item.active {
+    background: linear-gradient(135deg, rgba(233, 67, 122, 0.2) 0%, rgba(226, 173, 42, 0.2) 100%);
+}
+
+.community-dropdown-item .community-name {
+    font-weight: 600;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.community-dropdown-item .community-meta {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.community-dropdown-item .member-count {
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.community-dropdown-item .mod-badge {
+    background: #5865F2;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+/* Keep old tabs hidden but styles for backward compatibility */
+.community-tabs {
+    display: none;
 }
 
 .community-tabs::-webkit-scrollbar {
@@ -197,8 +299,8 @@ nav {
     border-radius: 0;
     /* let child sections show rounded corners if needed */
     overflow: visible;
-    min-height: 80vh;
-    max-height: 85vh;
+    min-height: 75vh;
+    max-height: 80vh;
     position: relative;
 }
 
@@ -242,7 +344,7 @@ nav {
 /* Individual Message - Better Organization */
 .message {
     /* padding: 12px 16px 12px 72px; */
-        padding: 0px 2px 0px 70px;
+    padding: 0px 2px 0px 70px;
     margin: 0 0 8px 0;
     position: relative;
     transition: all 0.2s ease;
@@ -1340,7 +1442,8 @@ nav {
         width: 36px;
         height: 36px;
     }
-/* 
+
+    /* 
     .message-actions {
         flex-wrap: wrap;
         gap: 6px;

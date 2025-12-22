@@ -3,7 +3,7 @@
 
 <head>
     <title>Admin Login - Zokli</title>
-    <link rel="icon" href="../../assets/logo2.png" type="image/gif" sizes="16x16">
+    <link rel="icon" href="/qr/logo/logo-both.png" type="image/gif" sizes="16x16">
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -103,7 +103,7 @@
         }
 
         .auth-logo img {
-            width: 80px;
+            width: 180px;
             height: auto;
             margin-bottom: 15px;
         }
@@ -272,7 +272,7 @@
 
             <!-- Logo -->
             <div class="auth-logo">
-                <img src="../../assets/logo2.png" alt="Zokli Logo" onerror="this.style.display='none'" />
+                <img src="/qr/logo/logo-both.png" alt="Zokli Logo" onerror="this.style.display='none'" />
             </div>
 
             <h1 class="auth-title">Admin Login</h1>

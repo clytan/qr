@@ -390,7 +390,7 @@ $isSuperAdmin = (isset($_SESSION['admin_role_id']) && $_SESSION['admin_role_id']
 <aside class="admin-sidebar" id="adminSidebar">
     <div class="sidebar-header">
         <a href="dashboard.php" class="sidebar-logo">
-            <img src="../../assets/logo2.png" alt="Logo" onerror="this.style.display='none'">
+            <img src="/qr/logo/logo.png" alt="Logo" onerror="this.style.display='none'">
             <span class="sidebar-logo-text">Admin Panel</span>
         </a>
         <button class="sidebar-close" onclick="closeSidebar()">

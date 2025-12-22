@@ -170,10 +170,11 @@ function processReferral($conn, $referred_by_user_id, $new_user_id)
     $now = date('Y-m-d H:i:s');
 
     try {
-        // Get referrer details
-        $sqlReferrer = "SELECT id, user_slab_id FROM user_user WHERE user_qr_id = ? AND is_deleted = 0";
+        // Get referrer details - check both by numeric id and by user_qr_id
+        // since referred_by_user_id might be stored as either
+        $sqlReferrer = "SELECT id, user_slab_id FROM user_user WHERE (id = ? OR user_qr_id = ?) AND is_deleted = 0 LIMIT 1";
         $stmtReferrer = $conn->prepare($sqlReferrer);
-        $stmtReferrer->bind_param('s', $referred_by_user_id);
+        $stmtReferrer->bind_param('ss', $referred_by_user_id, $referred_by_user_id);
         $stmtReferrer->execute();
         $resultReferrer = $stmtReferrer->get_result();
 

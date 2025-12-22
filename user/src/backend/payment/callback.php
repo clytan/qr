@@ -256,75 +256,79 @@ function processReferral($conn, $referred_by_user_id, $new_user_id)
 {
     $now = date('Y-m-d H:i:s');
 
-    // Get referrer details
-    $sqlReferrer = "SELECT id, user_slab_id FROM user_user WHERE user_qr_id = ? AND is_deleted = 0";
-    $stmtReferrer = $conn->prepare($sqlReferrer);
-    $stmtReferrer->bind_param('s', $referred_by_user_id);
-    $stmtReferrer->execute();
-    $resultReferrer = $stmtReferrer->get_result();
+    try {
+        // Get referrer details - check both by numeric id and by user_qr_id
+        // since referred_by_user_id might be stored as either
+        $sqlReferrer = "SELECT id, user_slab_id FROM user_user WHERE (id = ? OR user_qr_id = ?) AND is_deleted = 0 LIMIT 1";
+        $stmtReferrer = $conn->prepare($sqlReferrer);
+        $stmtReferrer->bind_param('ss', $referred_by_user_id, $referred_by_user_id);
+        $stmtReferrer->execute();
+        $resultReferrer = $stmtReferrer->get_result();
 
-    if ($resultReferrer->num_rows > 0) {
-        $referrer = $resultReferrer->fetch_assoc();
-        $referrer_id = $referrer['id'];
-        $referrer_slab_id = $referrer['user_slab_id'];
+        if ($resultReferrer->num_rows > 0) {
+            $referrer = $resultReferrer->fetch_assoc();
+            $referrer_id = $referrer['id'];
+            $referrer_slab_id = $referrer['user_slab_id'];
 
-        // Get commission percentage
-        $sqlSlab = "SELECT ref_commission FROM user_slab WHERE id = ?";
-        $stmtSlab = $conn->prepare($sqlSlab);
-        $stmtSlab->bind_param('i', $referrer_slab_id);
-        $stmtSlab->execute();
-        $resultSlab = $stmtSlab->get_result();
+            // Get commission percentage
+            $sqlSlab = "SELECT ref_commission FROM user_slab WHERE id = ?";
+            $stmtSlab = $conn->prepare($sqlSlab);
+            $stmtSlab->bind_param('i', $referrer_slab_id);
+            $stmtSlab->execute();
+            $resultSlab = $stmtSlab->get_result();
 
-        if ($resultSlab->num_rows > 0) {
-            $rowSlab = $resultSlab->fetch_assoc();
-            // Quick slab-name based fixed commission rule
-            $slabName = strtolower($rowSlab['name'] ?? $rowSlab['slab_name'] ?? '');
-            if (in_array($slabName, ['creator', 'gold', 'silver'])) {
-                $commission_amount = 200.0;
-            } else {
-                $commission_amount = 100.0;
+            if ($resultSlab->num_rows > 0) {
+                $rowSlab = $resultSlab->fetch_assoc();
+                // Quick slab-name based fixed commission rule
+                $slabName = strtolower($rowSlab['name'] ?? $rowSlab['slab_name'] ?? '');
+                if (in_array($slabName, ['creator', 'gold', 'silver'])) {
+                    $commission_amount = 200.0;
+                } else {
+                    $commission_amount = 100.0;
+                }
+                // If a percentage commission is configured, use that instead
+                if (!empty($rowSlab['ref_commission']) && is_numeric($rowSlab['ref_commission'])) {
+                    $commission_percent = floatval($rowSlab['ref_commission']);
+                    $base_amount = 100;
+                    $commission_amount = $base_amount * ($commission_percent / 100);
+                }
+
+                // Update or create wallet
+                $sqlWallet = "SELECT id, balance FROM user_wallet WHERE user_id = ? AND is_deleted = 0";
+                $stmtWallet = $conn->prepare($sqlWallet);
+                $stmtWallet->bind_param('i', $referrer_id);
+                $stmtWallet->execute();
+                $resultWallet = $stmtWallet->get_result();
+
+                if ($resultWallet->num_rows > 0) {
+                    $rowWallet = $resultWallet->fetch_assoc();
+                    $new_balance = $rowWallet['balance'] + $commission_amount;
+                    $wallet_id = $rowWallet['id'];
+
+                    $sqlUpdateWallet = "UPDATE user_wallet SET balance = ?, updated_by = ?, updated_on = ? WHERE id = ?";
+                    $stmtUpdateWallet = $conn->prepare($sqlUpdateWallet);
+                    $stmtUpdateWallet->bind_param('disi', $new_balance, $referrer_id, $now, $wallet_id);
+                    $stmtUpdateWallet->execute();
+                } else {
+                    $sqlInsertWallet = "INSERT INTO user_wallet (user_id, balance, created_by, created_on, updated_by, updated_on, is_deleted) VALUES (?, ?, ?, ?, ?, ?, 0)";
+                    $stmtInsertWallet = $conn->prepare($sqlInsertWallet);
+                    $stmtInsertWallet->bind_param('idisis', $referrer_id, $commission_amount, $referrer_id, $now, $referrer_id, $now);
+                    $stmtInsertWallet->execute();
+                }
+
+                // Record transaction
+                $description = "Referral commission for new user registration";
+                $sqlTrans = "INSERT INTO user_wallet_transaction (user_id, amount, transaction_type, description, created_by, updated_by, created_on, updated_on, is_deleted) VALUES (?, ?, 'Referral', ?, ?, ?, ?, ?, 0)";
+                $stmtTrans = $conn->prepare($sqlTrans);
+                $stmtTrans->bind_param('idsiiss', $referrer_id, $commission_amount, $description, $referrer_id, $referrer_id, $now, $now);
+                $stmtTrans->execute();
+                
+                error_log("Referral commission of {$commission_amount} processed for referrer ID: {$referrer_id}");
             }
-            // If a percentage commission is configured, use that instead
-            if (!empty($rowSlab['ref_commission']) && is_numeric($rowSlab['ref_commission'])) {
-                $commission_percent = floatval($rowSlab['ref_commission']);
-                $base_amount = 100;
-                $commission_amount = $base_amount * ($commission_percent / 100);
-            }
-
-            // Calculate commission
-            $base_amount = 100; // Adjust this based on your business logic
-            // $commission_amount = $base_amount * ($commission_percent / 100); // This line is now handled above
-
-            // Update or create wallet
-            $sqlWallet = "SELECT id, balance FROM user_wallet WHERE user_id = ? AND is_deleted = 0";
-            $stmtWallet = $conn->prepare($sqlWallet);
-            $stmtWallet->bind_param('i', $referrer_id);
-            $stmtWallet->execute();
-            $resultWallet = $stmtWallet->get_result();
-
-            if ($resultWallet->num_rows > 0) {
-                $rowWallet = $resultWallet->fetch_assoc();
-                $new_balance = $rowWallet['balance'] + $commission_amount;
-                $wallet_id = $rowWallet['id'];
-
-                $sqlUpdateWallet = "UPDATE user_wallet SET balance = ?, updated_by = ?, updated_on = ? WHERE id = ?";
-                $stmtUpdateWallet = $conn->prepare($sqlUpdateWallet);
-                $stmtUpdateWallet->bind_param('disi', $new_balance, $referrer_id, $now, $wallet_id);
-                $stmtUpdateWallet->execute();
-            } else {
-                $sqlInsertWallet = "INSERT INTO user_wallet (user_id, balance, created_by, created_on, updated_by, updated_on, is_deleted) VALUES (?, ?, ?, ?, ?, ?, 0)";
-                $stmtInsertWallet = $conn->prepare($sqlInsertWallet);
-                $stmtInsertWallet->bind_param('idisis', $referrer_id, $commission_amount, $referrer_id, $now, $referrer_id, $now);
-                $stmtInsertWallet->execute();
-            }
-
-            // Record transaction
-            $description = "Referral commission for new user registration";
-            $sqlTrans = "INSERT INTO user_wallet_transaction (user_id, amount, transaction_type, description, created_by, updated_by, created_on, updated_on, is_deleted) VALUES (?, ?, 'Referral', ?, ?, ?, ?, ?, 0)";
-            $stmtTrans = $conn->prepare($sqlTrans);
-            $stmtTrans->bind_param('idsiiss', $referrer_id, $commission_amount, $description, $referrer_id, $referrer_id, $now, $now);
-            $stmtTrans->execute();
         }
+    } catch (Exception $e) {
+        error_log("Error processing referral: " . $e->getMessage());
+        // Don't throw - we don't want to fail the registration if referral processing fails
     }
 }
 ?>

@@ -606,7 +606,7 @@ const profileFunction = {
         ctx.fillStyle = '#2d3748';
         ctx.font = 'bold 60px Arial';
         ctx.textAlign = 'center';
-        ctx.fillText('Scan My QR Code', canvas.width / 2, whiteBoxY + 100);
+        ctx.fillText('', canvas.width / 2, whiteBoxY + 100);
 
         // QR Code size and position (centered in white box)
         const qrSize = 550;
@@ -635,7 +635,7 @@ const profileFunction = {
         // Bottom text
         ctx.fillStyle = '#718096';
         ctx.font = '40px Arial';
-        ctx.fillText('Connect with me instantly!', canvas.width / 2, whiteBoxY + whiteBoxSize - 60);
+        ctx.fillText('', canvas.width / 2, whiteBoxY + whiteBoxSize - 60);
 
         // Convert to blob and download
         canvas.toBlob(function (blob) {

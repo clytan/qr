@@ -1,4 +1,8 @@
 <!DOCTYPE html>
+<?php
+// Capture referral code from URL parameter
+$ref_code = isset($_GET['ref']) ? htmlspecialchars($_GET['ref']) : '';
+?>
 <html lang="zxx">
 
 <head>
@@ -59,7 +63,7 @@
         }
 
         .auth-logo img {
-            width: 70px;
+            width: 130px;
             height: auto;
         }
 
@@ -484,7 +488,7 @@
             }
 
             .auth-logo img {
-                width: 55px;
+                width: 130px;
             }
 
             .auth-title {
@@ -537,7 +541,7 @@
             <!-- Logo inside form -->
             <div class="auth-logo">
                 <a href="index.php">
-                    <img src="../assets/logo2.png" alt="ZQR Logo" />
+                    <img src="/qr/logo/logo-both.png" alt="Zokli Logo" />
                 </a>
             </div>
 
@@ -649,7 +653,7 @@
                 <!-- Reference Code Section -->
                 <div class="field-set">
                     <label for="reference_code">🎯 Reference Code</label>
-                    <input type="text" name="reference_code" id="reference_code" class="form-input" maxlength="10" placeholder="10-character code">
+                    <input type="text" name="reference_code" id="reference_code" class="form-input" maxlength="10" placeholder="10-character code" value="<?php echo $ref_code; ?>">
                     <span id="reference-status" class="validation-status"></span>
                 </div>
 

@@ -69,40 +69,39 @@ try {
     // ============================================
     // SECURITY: Hardcoded tier prices - NEVER trust frontend amounts
     // ============================================
-    // Security: Tier prices defined server-side
+    // Pricing: Individual=449, Creator/Business=999, Gold=9999, Silver=5555
+    // Student Leader = same as their user type base price
+    $BASE_PRICES = [
+        '1' => 449,   // Individual
+        '2' => 999,   // Creator
+        '3' => 999    // Business
+    ];
+    
     $TIER_PRICES = [
-        'normal' => 449,          // Original: 999
-        'silver' => 5555,          // Original: 5555
-        'gold' => 9999,            // Original: 9999
-        'student_leader' => 449   // Original: 999
+        'silver' => 5555,
+        'gold' => 9999
     ];
 
-    // Get user_tag from frontend (gold/silver/normal)
+    // Get user type and tag from frontend
+    $userType = isset($data['user_type']) ? trim($data['user_type']) : '1';
     $userTag = isset($data['user_tag']) ? strtolower(trim($data['user_tag'])) : 'normal';
     
-    // Check if student leader (overrides tier selection)
+    // Check if student leader
     $isStudentLeader = isset($data['student_leader']) && $data['student_leader'] === 'yes';
     
-    // Determine the correct tier for pricing
-    if ($isStudentLeader) {
-        $pricingTier = 'student_leader';
-    } else if (in_array($userTag, ['gold', 'silver', 'normal'])) {
-        $pricingTier = $userTag;
+    // Determine the correct price
+    // Start with base price based on user type
+    $basePrice = isset($BASE_PRICES[$userType]) ? $BASE_PRICES[$userType] : 449;
+    
+    // Check for Gold/Silver tier (overrides base price unless student leader)
+    if (!$isStudentLeader && isset($TIER_PRICES[$userTag])) {
+        $originalAmount = $TIER_PRICES[$userTag];
     } else {
-        $pricingTier = 'normal'; // Default fallback
+        // Use base price (Individual/Creator/Business or Student Leader)
+        $originalAmount = $basePrice;
     }
     
-    // Get the HARDCODED price for this tier (NEVER use frontend amount directly)
-    $originalAmount = $TIER_PRICES[$pricingTier];
-    
-    // Validate that frontend sent the correct amount (detect tampering)
-    $frontendAmount = floatval($data['amount']);
-    if ($frontendAmount != $originalAmount) {
-        error_log("⚠️ SECURITY WARNING: Frontend amount ($frontendAmount) doesn't match tier price ($originalAmount) for tier: $pricingTier");
-        // We'll use our hardcoded amount anyway, but log the discrepancy
-    }
-    
-    error_log("✓ Tier: $pricingTier, Hardcoded Price: ₹$originalAmount");
+    error_log("✓ User Type: $userType, Tag: $userTag, Student Leader: " . ($isStudentLeader ? 'yes' : 'no') . ", Price: ₹$originalAmount");
 
     // Your Cashfree credentials - replace with actual credentials
     $clientId = "1106277eab36909b950443d4c757726011"; // Replace with your client ID

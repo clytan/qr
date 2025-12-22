@@ -46,6 +46,36 @@ if (!$is_logged_in) {
                         </p>
                     </div>
 
+                    <!-- Banner Carousel - outside hero-content for mobile visibility -->
+                    <div class="enhanced-carousel" style="margin: 20px 0; position: relative; z-index: 5;">
+                        <div id="referral-carousel" class="owl-carousel owl-theme">
+                            <div class="carousel-item-enhanced">
+                                <img src="../banners/1.jpeg" alt="Banner 1" style="border-radius: 12px; width: 100%; height: auto;">
+                            </div>
+                            <div class="carousel-item-enhanced">
+                                <img src="../banners/2.jpeg" alt="Banner 2" style="border-radius: 12px; width: 100%; height: auto;">
+                            </div>
+                            <div class="carousel-item-enhanced">
+                                <img src="../banners/3.jpeg" alt="Banner 3" style="border-radius: 12px; width: 100%; height: auto;">
+                            </div>
+                            <div class="carousel-item-enhanced">
+                                <img src="../banners/4.jpeg" alt="Banner 4" style="border-radius: 12px; width: 100%; height: auto;">
+                            </div>
+                            <div class="carousel-item-enhanced">
+                                <img src="../banners/1.jpeg" alt="Banner 1" style="border-radius: 12px; width: 100%; height: auto;">
+                            </div>
+                            <div class="carousel-item-enhanced">
+                                <img src="../banners/2.jpeg" alt="Banner 2" style="border-radius: 12px; width: 100%; height: auto;">
+                            </div>
+                            <div class="carousel-item-enhanced">
+                                <img src="../banners/3.jpeg" alt="Banner 3" style="border-radius: 12px; width: 100%; height: auto;">
+                            </div>
+                            <div class="carousel-item-enhanced">
+                                <img src="../banners/4.jpeg" alt="Banner 4" style="border-radius: 12px; width: 100%; height: auto;">
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Referral Card -->
                     <div style="margin-top:10px;"class="referral-card wow fadeInUp" data-wow-delay="0.4s">
                         <div class="referral-card-content">
@@ -168,18 +198,20 @@ if (!$is_logged_in) {
                         $('#active-referrals').text(data.active_referrals || 0);
                         $('#total-earnings').text('₹' + (data.total_earnings || 0));
 
-                        // Setup share links - using profile QR link format
-                        const shareText = `Join Zokli using my referral code: ${data.referral_code}`;
-                        const shareUrl = window.location.origin + '/user/src/ui/profile.php?QR=' + encodeURIComponent(data.referral_code);
-                        const registerUrl = window.location.origin + '/user/src/ui/register.php?ref=' + data.referral_code;
+                        // Setup share links - using production zokli.in URLs
+                        const shareText = `Join Zokli community, using my referral code: ${data.referral_code}`;
+                        const profileUrl = `https://www.zokli.in/user/src/ui/profile.php?QR=${encodeURIComponent(data.referral_code)}`;
+                        const registerUrl = `https://www.zokli.in/user/src/ui/register.php?ref=${data.referral_code}`;
+                        const tagline = `Be a part of this wonderful, digital social media community.`;
+                        const fullMessage = `${shareText}\nView Profile: ${profileUrl}\nRegister: ${registerUrl}\n${tagline}`;
 
-                        $('#share-whatsapp').attr('href', `https://wa.me/?text=${encodeURIComponent(shareText + '\nView Profile: ' + shareUrl + '\nRegister: ' + registerUrl)}`);
-                        $('#share-telegram').attr('href', `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`);
-                        $('#share-twitter').attr('href', `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`);
+                        $('#share-whatsapp').attr('href', `https://wa.me/?text=${encodeURIComponent(fullMessage)}`);
+                        $('#share-telegram').attr('href', `https://t.me/share/url?url=${encodeURIComponent(registerUrl)}&text=${encodeURIComponent(shareText + '\n' + tagline)}`);
+                        $('#share-twitter').attr('href', `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText + ' ' + tagline)}&url=${encodeURIComponent(registerUrl)}`);
 
                         // Facebook Messenger: use mobile deep link and fallback to Facebook sharer (no app_id required)
-                        const messengerDeep = `fb-messenger://share?link=${encodeURIComponent(shareUrl)}`;
-                        const fbSharer = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
+                        const messengerDeep = `fb-messenger://share?link=${encodeURIComponent(registerUrl)}`;
+                        const fbSharer = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(registerUrl)}&quote=${encodeURIComponent(shareText)}`;
                         $('#share-messenger').attr('href', messengerDeep);
                         // Try deep link first; if it fails (desktop browsers), open Facebook sharer as fallback
                         $('#share-messenger').off('click').on('click', function (e) {
@@ -202,7 +234,6 @@ if (!$is_logged_in) {
                         $('#share-instagram').attr('href', '#');
                         $('#share-instagram').on('click', function (e) {
                             e.preventDefault();
-                            const fullMessage = `${shareText}\nView Profile: ${shareUrl}\nRegister: ${registerUrl}`;
                             navigator.clipboard.writeText(fullMessage).then(() => {
                                 window.open('https://www.instagram.com', '_blank');
                                 alert('Share text copied to clipboard. Paste it in Instagram to share.');
@@ -287,6 +318,23 @@ if (!$is_logged_in) {
         $(document).ready(function () {
             loadReferralStats();
             loadLeaderboard();
+            
+            // Initialize Banner Carousel
+            $('#referral-carousel').owlCarousel({
+                loop: true,
+                margin: 15,
+                nav: false,
+                dots: false,
+                autoplay: true,
+                autoplayTimeout: 4000,
+                autoplayHoverPause: true,
+                smartSpeed: 600,
+                responsive: {
+                    0: { items: 1 },
+                    768: { items: 2 },
+                    1200: { items: 3 }
+                }
+            });
         });
     </script>
 
