@@ -609,7 +609,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                     <div class="enhanced-carousel">
                         <div id="feature-carousel" class="owl-carousel owl-theme">
                             <div class="carousel-item-enhanced">
-                                <img src="../banners/1.jpg" alt="Banner 1">
+                                <img src="../banners/3.jpg" alt="Banner 1">
                             </div>
 
                             <div class="carousel-item-enhanced">
@@ -617,7 +617,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                             </div>
 
                             <div class="carousel-item-enhanced">
-                                <img src="../banners/3.jpg" alt="Banner 3">
+                                <img src="../banners/5.jpg" alt="Banner 3">
                             </div>
 
                             <div class="carousel-item-enhanced">
@@ -625,7 +625,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                             </div>
 
                             <div class="carousel-item-enhanced">
-                                <img src="../banners/1.jpg" alt="Banner 1">
+                                <img src="../banners/5.jpg" alt="Banner 5">
                             </div>
 
                             <div class="carousel-item-enhanced">

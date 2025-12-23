@@ -173,7 +173,6 @@ document.addEventListener('DOMContentLoaded', function(){
             <div class="more-popover" role="menu" aria-hidden="true">
                 <a href="/user/src/ui/biz.php" class="more-item">Biz</a>
                 <a href="/user/src/ui/polls.php" class="more-item">Poll</a>
-                <a href="#" class="more-item coming-soon" data-name="Game">Game</a>
                 <a href="/user/src/ui/influencer.php" class="more-item">Influencer Program</a>
             </div>
         </div>
@@ -195,7 +194,6 @@ document.addEventListener('DOMContentLoaded', function(){
                     <div class="more-desktop" aria-hidden="true">
                         <a href="/user/src/ui/biz.php">Biz</a>
                         <a href="/user/src/ui/polls.php">Poll</a>
-                        <a href="#" class="coming-soon" data-name="Game">Game</a>
                         <a href="/user/src/ui/influencer.php">Influencer Program</a>
                     </div>
                 </div>
@@ -215,17 +213,17 @@ document.addEventListener('DOMContentLoaded', function(){
 <style>
 /* Mobile Footer Styles - Jeeto Daily Inspired */
 .mobile-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(10, 14, 39, 0.98) 100%);
-    border-top: 2px solid rgba(102, 126, 234, 0.3);
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: #0a0e1a !important; /* Fully opaque solid dark background */
+    background-color: #0a0e1a !important;
+    border-top: 1px solid rgba(102, 126, 234, 0.3);
     padding: 8px 0 8px;
-    z-index: 1000;
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.3);
+    z-index: 9500 !important; /* High z-index to stay above other elements */
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.6);
+    opacity: 1 !important;
 }
 
 .mobile-nav {
@@ -235,6 +233,9 @@ document.addEventListener('DOMContentLoaded', function(){
     max-width: 600px;
     margin: 0 auto;
     padding: 0 10px;
+    background: #0a0e1a; /* Ensure solid background */
+    position: relative;
+    z-index: 1;
 }
 
 .mobile-nav .nav-item {
@@ -259,11 +260,12 @@ document.addEventListener('DOMContentLoaded', function(){
     bottom: 60px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(6,10,20,0.95);
+    background: #0a0e1a; /* Fully opaque */
+    border: 1px solid #1e293b;
     border-radius: 10px;
     padding: 6px;
     display: none;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.8);
     min-width: 120px;
     z-index: 1200;
 }
@@ -282,8 +284,8 @@ document.addEventListener('DOMContentLoaded', function(){
     border-radius: 12px;
     margin-bottom: 4px;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: #1e293b; /* Fully opaque */
+    border: 1px solid #334155;
 }
 
 .nav-icon-wrapper i {
@@ -336,8 +338,8 @@ document.addEventListener('DOMContentLoaded', function(){
 /* Hover and Active States */
 .mobile-nav .nav-item:hover .nav-icon-wrapper,
 .mobile-nav .nav-item.active .nav-icon-wrapper {
-    background: linear-gradient(135deg, rgba(233, 67, 122, 0.2) 0%, rgba(230, 119, 83, 0.2) 50%, rgba(226, 173, 42, 0.2) 100%);
-    border-color: rgba(230, 119, 83, 0.5);
+    background: #2d3548; /* Fully opaque hover */
+    border-color: #e67753;
     transform: translateY(-2px);
 }
 

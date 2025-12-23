@@ -300,7 +300,11 @@ function sendReferralEmails($programme, $client_name, $client_phone, $client_ema
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body, html { background: #0f172a; min-height: 100vh; font-family: 'Inter', sans-serif; color: #e2e8f0; }
         
-        .page-container { padding: 40px 20px 100px; max-width: 1400px; margin: 0 auto; }
+        .page-container { padding: 40px 15px 100px; max-width: 1400px; margin: 0 auto; }
+        
+        @media (max-width: 600px) {
+            .page-container { padding: 30px 8px 100px; }
+        }
         
         /* Hero Section */
         .hero-section {
@@ -498,35 +502,39 @@ function sendReferralEmails($programme, $client_name, $client_phone, $client_ema
         
         /* Referrals Table */
         .referrals-section {
-            background: rgba(30, 41, 59, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
+            background: transparent;
+            border-radius: 12px;
             overflow: hidden;
         }
         
         table {
             width: 100%;
-            border-collapse: collapse;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: rgba(30, 41, 59, 0.4);
+            border-radius: 12px;
+            overflow: hidden;
         }
         
         th {
-            background: rgba(15, 23, 42, 0.5);
-            padding: 14px 16px;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 12px 14px;
             text-align: left;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
-            color: #94a3b8;
+            color: #64748b;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         td {
-            padding: 14px 16px;
+            padding: 12px 14px;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 13px;
-            color: #e2e8f0;
+            font-size: 12px;
+            color: #cbd5e1;
         }
         
-        tr:hover td { background: rgba(255, 255, 255, 0.02); }
+        tr:hover td { background: rgba(255, 255, 255, 0.03); }
         
         .status-badge {
             padding: 5px 12px;
@@ -925,6 +933,126 @@ function sendReferralEmails($programme, $client_name, $client_phone, $client_ema
             transform: rotate(-15deg);
         }
 
+        /* Premium Nav Bar - Polls Style */
+        .polls-nav-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(30, 41, 59, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 6px 8px;
+            margin: 0 auto 30px;
+            max-width: 800px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .polls-tabs-group {
+            display: flex;
+            gap: 4px;
+            background: rgba(0,0,0,0.2);
+            padding: 4px;
+            border-radius: 12px;
+        }
+
+        .poll-tab-item {
+            background: transparent;
+            color: #94a3b8;
+            padding: 8px 20px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: none;
+        }
+
+        .poll-tab-item:hover {
+            color: #e2e8f0;
+        }
+
+        .poll-tab-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .create-poll-btn-premium {
+            background: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(233, 67, 122, 0.2);
+        }
+        
+        .create-poll-btn-premium:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(233, 67, 122, 0.3);
+            filter: brightness(1.1);
+        }
+
+        /* Mobile Responsive Nav - Matching polls.php */
+        @media (max-width: 600px) {
+            .polls-nav-bar {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px 0;
+                background: transparent;
+                border: none;
+                box-shadow: none;
+                max-width: 100%;
+                margin: 0 auto 20px;
+            }
+            .polls-tabs-group {
+                width: 100%;
+                justify-content: center;
+                background: rgba(30, 41, 59, 0.6);
+                backdrop-filter: blur(12px);
+                padding: 6px;
+                border-radius: 14px;
+                border: 1px solid rgba(255,255,255,0.08);
+            }
+            .poll-tab-item { 
+                flex: 1;
+                text-align: center;
+            }
+            .create-poll-btn-premium {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            /* Carousel mobile */
+            .prize-carousel-section {
+                max-width: 100% !important;
+                margin: 15px 0 !important;
+                padding: 0 !important;
+            }
+            
+            .prize-banner-item {
+                margin: 0 3px;
+            }
+            
+            /* Hero mobile */
+            .polls-hero {
+                padding: 20px 0 10px !important;
+            }
+            
+            .polls-title {
+                font-size: 2rem !important;
+            }
+        }
+
         @media (max-width: 768px) {
             .prize-banner-item {
                 height: 110px;
@@ -934,28 +1062,10 @@ function sendReferralEmails($programme, $client_name, $client_phone, $client_ema
             .banner-content p { font-size: 0.8rem; }
             .banner-icon { font-size: 3rem; right: 10px; }
             
-            .polls-nav-bar {
-                flex-direction: column !important;
-                gap: 15px !important;
-                padding: 15px !important;
-                max-width: 100% !important;
-                margin: 0 10px 30px !important;
-            }
-            .polls-tabs-group {
-                width: 100% !important;
-                justify-content: center !important;
-                flex-wrap: wrap !important;
-            }
-            .poll-tab-item {
-                flex: 1 1 auto !important;
-                min-width: 80px !important;
-                padding: 10px 12px !important;
-                font-size: 0.8rem !important;
-                white-space: nowrap !important;
-            }
-            .create-poll-btn-premium {
-                width: 100% !important;
-                justify-content: center !important;
+            .hero-section {
+                padding: 30px 15px;
+                border-radius: 16px;
+                margin-bottom: 30px;
             }
         }
     </style>
@@ -1005,17 +1115,17 @@ function sendReferralEmails($programme, $client_name, $client_phone, $client_ema
                 </section>
 
                 <!-- Premium Nav Bar (Polls-Style) -->
-                <div class="polls-nav-bar" style="display: flex; flex-direction: column; gap: 15px; background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 15px; margin: 0 auto 30px; max-width: 800px;">
-                    <div class="polls-tabs-group" style="display: flex; gap: 4px; background: rgba(0,0,0,0.3); padding: 6px; border-radius: 12px; width: 100%;">
-                        <button class="poll-tab-item active" onclick="showTab('programmes')" style="flex: 1; background: rgba(255, 255, 255, 0.15); color: #fff; padding: 12px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border: none; text-align: center;">All</button>
-                        <button class="poll-tab-item" onclick="showTab('my_referrals')" style="flex: 1; background: transparent; color: #94a3b8; padding: 12px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 500; cursor: pointer; border: none; text-align: center;">Referrals</button>
+                <div class="polls-nav-bar">
+                    <div class="polls-tabs-group">
+                        <button class="poll-tab-item active" onclick="showTab('programmes')">All</button>
+                        <button class="poll-tab-item" onclick="showTab('my_referrals')">Referrals</button>
                         <?php if ($is_biz_user): ?>
-                        <button class="poll-tab-item" onclick="showTab('my_collabs')" style="flex: 1; background: transparent; color: #94a3b8; padding: 12px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 500; cursor: pointer; border: none; text-align: center;">Created</button>
+                        <button class="poll-tab-item" onclick="showTab('my_collabs')">Created</button>
                         <?php endif; ?>
                     </div>
                     
                     <?php if ($is_biz_user): ?>
-                    <button class="create-poll-btn-premium" onclick="openCreateModal()" style="width: 100%; background: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%); color: white; padding: 14px 20px; border-radius: 10px; border: none; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
+                    <button class="create-poll-btn-premium" onclick="openCreateModal()">
                         <i class="fas fa-plus"></i> Create Programme
                     </button>
                     <?php endif; ?>

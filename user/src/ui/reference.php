@@ -47,7 +47,7 @@ if (!$is_logged_in) {
                         </p>
 
                     <!-- Prize Carousel -->
-                    <div class="prize-carousel-section container">
+                    <div class="prize-carousel-section container" style="background-size: cover;margin-top: 20px!important;margin-bottom: 20px;">
                         <div class="owl-carousel owl-theme" id="prizeCarousel">
                             <div class="item">
                                 <div class="prize-banner-item banner-1">
@@ -146,18 +146,27 @@ if (!$is_logged_in) {
             </section>
 
             <!-- Leaderboard Section -->
-            <section class="leaderboard-section">
+            <section class="leaderboard-section" style="margin-top: -35px!important;">
                 <div class="container">
                     <div class="section-header">
                         <h2 class="section-title wow fadeInUp">
                             <i class="fas fa-medal"></i> Top Referrers
                         </h2>
                         <p class="section-subtitle wow fadeInUp" data-wow-delay="0.2s">
-                            See who's leading the referral race this month
+                            Community leaders making an impact
                         </p>
                     </div>
 
-                    <div class="leaderboard-table wow fadeInUp" data-wow-delay="0.4s">
+                    <!-- Premium Nav Bar with Tabs -->
+                    <div class="leaderboard-nav-bar">
+                        <div class="leaderboard-tabs-group">
+                            <button class="leaderboard-tab active" data-period="all">All Time</button>
+                            <button class="leaderboard-tab" data-period="month">This Month</button>
+                            <button class="leaderboard-tab" data-period="week">This Week</button>
+                        </div>
+                    </div>
+
+                    <div class="leaderboard-table wow fadeInUp" data-wow-delay="0.3s">
                         <div class="leaderboard-header">
                             <div>Rank</div>
                             <div>User</div>
@@ -266,22 +275,49 @@ if (!$is_logged_in) {
                         let html = '';
 
                         if (leaderboard.length === 0) {
-                            html = '<div class="loading"><p>No data yet. Be the first to refer!</p></div>';
+                            html = `
+                                <div class="empty-leaderboard">
+                                    <i class="fas fa-trophy"></i>
+                                    <p>No referrals yet. Be the first to climb the leaderboard!</p>
+                                </div>
+                            `;
                         } else {
+                            // Render clean professional rows
                             leaderboard.forEach((user, index) => {
                                 const rank = index + 1;
-                                const rankClass = rank === 1 ? 'rank-1' : rank === 2 ? 'rank-2' : rank === 3 ? 'rank-3' : '';
-                                const badgeClass = user.user_tag === 'gold' ? 'badge-gold' : user.user_tag === 'silver' ? 'badge-silver' : 'badge-normal';
-                                const badgeText = user.user_tag === 'gold' ? 'Gold' : user.user_tag === 'silver' ? 'Silver' : 'Member';
-                                const initial = (user.user_name || 'U').charAt(0).toUpperCase();
-
+                                const initial = (user.user_qr_id || 'U').charAt(0).toUpperCase();
+                                const displayName = user.user_qr_id || 'Anonymous';
+                                
+                                // Top row class
+                                let topClass = '';
+                                let rankIcon = '';
+                                let rankClass = '';
+                                
+                                if (rank === 1) {
+                                    topClass = 'top-1';
+                                    rankClass = 'rank-1';
+                                    rankIcon = '<i class="fas fa-crown rank-icon gold"></i>';
+                                } else if (rank === 2) {
+                                    topClass = 'top-2';
+                                    rankClass = 'rank-2';
+                                    rankIcon = '<i class="fas fa-medal rank-icon silver"></i>';
+                                } else if (rank === 3) {
+                                    topClass = 'top-3';
+                                    rankClass = 'rank-3';
+                                    rankIcon = '<i class="fas fa-medal rank-icon bronze"></i>';
+                                }
+                                
                                 html += `
-                                    <div class="leaderboard-row">
-                                        <div class="rank ${rankClass}">#${rank}</div>
+                                    <div class="leaderboard-row ${topClass}">
+                                        <div class="rank ${rankClass}">${rankIcon}#${rank}</div>
                                         <div class="user-info">
-                                            <div class="user-name">${user.user_qr_id || 'N/A'}</div>
+                                            <div class="user-avatar d-none">${initial}</div>
+                                            <div class="user-name">${displayName}</div>
                                         </div>
-                                        <div class="referral-count">${user.referral_count || 0}</div>
+                                        <div class="referral-count">
+                                            <i class="fas fa-users"></i>
+                                            <span>${user.referral_count || 0}</span>
+                                        </div>
                                     </div>
                                 `;
                             });
@@ -291,7 +327,12 @@ if (!$is_logged_in) {
                     }
                 },
                 error: function () {
-                    $('#leaderboard-content').html('<div class="loading"><p>Error loading leaderboard</p></div>');
+                    $('#leaderboard-content').html(`
+                        <div class="empty-leaderboard">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <p>Error loading leaderboard. Please try again later.</p>
+                        </div>
+                    `);
                 }
             });
         }
@@ -311,6 +352,15 @@ if (!$is_logged_in) {
                     }, 2000);
                 });
             }
+        });
+
+        // Tab switching (visual only - backend filtering can be added later)
+        $('.leaderboard-tab').on('click', function() {
+            $('.leaderboard-tab').removeClass('active');
+            $(this).addClass('active');
+            // For now, just reload the same data
+            // You can add period parameter to the API later
+            loadLeaderboard();
         });
 
         // Load data on page load

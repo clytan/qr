@@ -4,14 +4,14 @@
 $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id']);
 ?>
 
-<header class="transparent scroll-dark">
+<header id="zokli-header" class="transparent scroll-dark">
     <div class="container">
         <div class="row">
             <div class="col-md-12">
                 <div class="header-content d-flex align-items-center justify-content-between">
                     <!-- Left Section: Logo -->
                     <div class="left-section">
-                        <div id="logo">
+                        <div id="zokli-logo">
                             <a href="index.php">
                                 <img alt="Logo" class="logo-image" src="../../../logo/logo.png" />
                             </a>
@@ -29,37 +29,46 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
                     <div class="right-section">
                         <?php if ($header_is_logged_in): ?>
                         <!-- Notifications Dropdown -->
-                        <div class="notification-dropdown">
-                            <a href="javascript:void(0)" class="btn-main btn-notification" id="notificationBtn">
+                        <div class="notification-dropdown" id="zokli-notification-dropdown">
+                            <a href="javascript:void(0)" class="btn-main btn-notification" id="zokli-notification-btn">
                                 <i class="fas fa-bell"></i>
-                                <span class="notification-count" style="display: none;">0</span>
+                                <span class="notification-count" id="zokli-notification-count" style="display: none;">0</span>
                             </a>
-                            <div class="notification-content">
+                            <div class="notification-content" id="zokli-notification-content">
                                 <div class="notification-header">
                                     <h4>Notifications</h4>
                                 </div>
-                                <div class="notification-list">
+                                <div class="notification-list" id="zokli-notification-list">
                                     <!-- Notifications will be inserted here via JavaScript -->
                                 </div>
                             </div>
                         </div>
                         <!-- Wallet Button -->
-                        <a href="wallet.php" class="btn-main btn-wallet" id="walletBtn" title="Wallet">
+                        <a href="wallet.php" class="btn-main btn-wallet" id="zokli-wallet-btn" title="Wallet">
                             <i class="fas fa-wallet"></i>
                             <span class="wallet-balance" style="display:none;"></span>
                         </a>
                         <?php endif; ?>
                     </div>
                     <style>
-                    header {
+                    /* Header Base Styles */
+                    #zokli-header {
                         padding: 10px 0;
-                        min-height: 80px;
+                        min-height: 70px;
                         display: flex;
                         align-items: center;
+                        position: fixed;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        z-index: 9000;
+                        background: rgba(15, 23, 42, 0.95);
+                        backdrop-filter: blur(10px);
+                        -webkit-backdrop-filter: blur(10px);
                     }
 
                     .header-content {
-                        min-height: 80px;
+                        min-height: 70px;
                         width: 100%;
                         display: flex;
                         justify-content: space-between;
@@ -98,7 +107,7 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
                         flex: 0 0 auto;
                     }
                     
-                    #logo {
+                    #zokli-logo {
                         display: flex;
                         align-items: center;
                     }
@@ -108,7 +117,7 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
                         width: auto;
                     }
 
-                    .notification-dropdown {
+                    #zokli-notification-dropdown {
                         position: relative;
                         z-index: 9999;
                     }
@@ -264,13 +273,13 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
                         font-size: 16px;
                     }
 
-                    .notification-list {
+                    #zokli-notification-list {
                         max-height: 300px;
                         overflow-y: auto;
                         padding: 10px;
                     }
 
-                    #logo {
+                    #zokli-logo {
                         margin: 0;
                         padding: 0;
                         display: flex;
@@ -293,17 +302,47 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
                             height: auto;
                         }
 
-                        header {
-                            min-height: 60px;
+                        #zokli-header {
+                            min-height: 50px;
+                            padding: 6px 0;
                         }
 
                         .header-content {
-                            min-height: 60px;
+                            min-height: 50px;
+                        }
+                        
+                        .logo-image {
+                            height: 34px;
+                        }
+                        
+                        .logo-word-image {
+                            height: 20px;
                         }
 
                         .btn-notification,
                         .btn-wallet {
-                            border-radius: 12px !important;
+                            border-radius: 8px !important;
+                            width: 30px !important;
+                            height: 30px !important;
+                        }
+                        
+                        .btn-notification i,
+                        .btn-wallet i {
+                            font-size: 13px !important;
+                        }
+                        
+                        .right-section {
+                            gap: 6px;
+                            margin-right: -4px; /* Move slightly to the right */
+                        }
+                        
+                        .notification-count {
+                            top: -5px !important;
+                            right: -5px !important;
+                            font-size: 9px !important;
+                            min-width: 14px !important;
+                            height: 14px !important;
+                            padding: 1px 4px !important;
                         }
                     }
                     </style>
@@ -421,15 +460,15 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
 
     <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const notificationBtn = document.getElementById('notificationBtn');
-        const notificationContent = document.querySelector('.notification-content');
-        const notificationCount = document.querySelector('.notification-count');
-        const notificationList = document.querySelector('.notification-list');
+        const notificationBtn = document.getElementById('zokli-notification-btn');
+        const notificationContent = document.getElementById('zokli-notification-content');
+        const notificationCount = document.getElementById('zokli-notification-count');
+        const notificationList = document.getElementById('zokli-notification-list');
 
         // Safety guards and diagnostics
-        if (!notificationBtn) console.warn('notificationBtn element not found');
-        if (!notificationContent) console.warn('notificationContent element not found');
-        if (!notificationList) console.warn('notificationList element not found');
+        if (!notificationBtn) console.warn('zokli-notification-btn element not found');
+        if (!notificationContent) console.warn('zokli-notification-content element not found');
+        if (!notificationList) console.warn('zokli-notification-list element not found');
 
         if (!notificationBtn || !notificationContent || !notificationList) {
             console.error('Notification UI elements missing — aborting notification setup');
@@ -641,3 +680,12 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
     </div>
 </header>
 <br>
+<style>
+    @media only screen and (max-width: 768px) {
+        .mobile-only-dev {
+            margin-bottom: 10%;
+        }
+    }
+</style>
+<div class="mobile-only-dev">
+</div>

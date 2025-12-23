@@ -744,10 +744,12 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         .polls-nav-bar {
             flex-direction: column;
             gap: 15px;
-            padding: 15px;
+            padding: 15px 0;
             background: transparent;
             border: none;
             box-shadow: none;
+            max-width: 100%;
+            margin: 0 auto 20px;
         }
         .polls-tabs-group {
             width: 100%;
@@ -758,10 +760,44 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
             border-radius: 14px;
             border: 1px solid rgba(255,255,255,0.08);
         }
-        .poll-tab-item { flex: 1; }
+        .poll-tab-item { 
+            flex: 1;
+            text-align: center;
+        }
         .create-poll-btn-premium {
             width: 100%;
             justify-content: center;
+        }
+        
+        /* Carousel mobile */
+        .prize-carousel-section {
+            max-width: 100% !important;
+            margin: 15px 0 !important;
+            padding: 0 !important;
+        }
+        
+        .prize-banner-item {
+            margin: 0 3px;
+        }
+        
+        /* Container mobile */
+        .polls-container {
+            padding: 0 8px;
+        }
+        
+        /* Hero mobile */
+        .polls-hero {
+            padding: 20px 0 10px;
+            margin-top: 10%;
+        }
+        
+        .polls-title {
+            font-size: 2rem;
+        }
+        
+        #content {
+            padding-left: 8px !important;
+            padding-right: 8px !important;
         }
     }
 
