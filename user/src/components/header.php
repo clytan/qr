@@ -308,11 +308,11 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
                         }
 
                         .header-content {
-                            min-height: 50px;
+                            min-height: 40px;
                         }
                         
                         .logo-image {
-                            height: 34px;
+                            height: 30px;
                         }
                         
                         .logo-word-image {
