@@ -32,7 +32,7 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
     <title>Profile | ZQR Connect</title>
     <link rel="icon" href="../../../logo/logo.png" type="image/gif" sizes="16x16">
     <?php include('../components/csslinks.php') ?>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Custom CSS -->
     <style>
         :root {
@@ -904,7 +904,7 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
         .social-input-header .fa-facebook { color: #1877F2 !important; }
         .social-input-header .fa-youtube { color: #FF0000 !important; }
         .social-input-header .fa-whatsapp { color: #25D366 !important; }
-        .social-input-header .fa-twitter { color: #1DA1F2 !important; }
+        .social-input-header .fa-x-twitter { color: #fff !important; }
         .social-input-header .fa-linkedin { color: #0A66C2 !important; }
         .social-input-header .fa-telegram { color: #0088cc !important; }
         .social-input-header .fa-snapchat { color: #FFFC00 !important; }
@@ -1068,11 +1068,14 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
             }
 
             .action-buttons {
-                flex-direction: column;
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
             }
 
             .action-buttons .btn {
                 width: 100%;
+                min-width: auto;
             }
         }
 
@@ -1840,7 +1843,7 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                                 <div class="form-group social-input-container">
                                     <div class="social-input-header">
                                         <label class="form-label" for="twitter_username">
-                                            <i class="fab fa-twitter"></i> Twitter
+                                            <i class="fab fa-x-twitter"></i> X
                                         </label>
                                         <div class="public-toggle">
                                             <input type="checkbox" id="public_twitter_username"
@@ -1850,7 +1853,7 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                                     </div>
                                     <div class="social-input-field">
                                         <input type="text" id="twitter_username" name="twitter_username"
-                                            class="form-control" placeholder="Enter your Twitter username">
+                                            class="form-control" placeholder="Enter your X username">
                                         <button type="button" class="btn-link">
                                             <i class="fas fa-external-link-alt"></i>
                                         </button>
@@ -2001,10 +2004,7 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                         <?php if (!$viewing_qr): ?>
                             <div class="action-buttons">
                                 <button type="submit" class="btn btn-primary" id="update-profile-btn">
-                                    <i class="fas fa-save"></i> Save All Changes
-                                </button>
-                                <button type="button" class="btn btn-secondary" onclick="location.reload()">
-                                    <i class="fas fa-undo"></i> Reset Form
+                                    <i class="fas fa-save"></i> Save
                                 </button>
                                 <a href="../backend/logout.php" class="btn btn-danger">
                                     <i class="fas fa-sign-out-alt"></i> Logout
@@ -2618,8 +2618,8 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
 
         // Share Profile Button
         document.getElementById('share-profile-btn')?.addEventListener('click', function () {
-            const userQrId = '<?php echo $user_qr; ?>';
-            const profileUrl = window.location.origin + '/user/src/ui/profile.php?QR=' + userQrId;
+            const userQrId = '<?php echo $viewing_qr ? $viewed_qr : $user_qr; ?>';
+            const profileUrl = window.location.origin + window.location.pathname + '?QR=' + userQrId;
 
             // Try using the Web Share API first (mobile devices)
             if (navigator.share) {
@@ -2792,21 +2792,40 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
             // Load user's current frame
             function loadCurrentFrame() {
                 const userId = document.getElementById('user_id').value;
-                if (!userId) return;
+                const viewedQr = '<?php echo $viewed_qr; ?>';
+                
+                let data = {};
+                if (viewedQr) {
+                    data.qr_id = viewedQr;
+                } else if (userId) {
+                    data.user_id = userId;
+                } else {
+                    return;
+                }
 
                 $.ajax({
                     url: '../backend/profile_new/get_frame.php',
                     type: 'POST',
-                    data: { user_id: userId },
+                    data: data,
                     dataType: 'json',
                     success: function(response) {
-                        if (response.status && response.frameUrl) {
+                        if (response.status) {
                             currentFrame = response.frame;
                             if (frameOverlay) {
                                 if (response.frameUrl === null) {
                                     frameOverlay.style.display = 'none';
                                 } else {
-                                    frameOverlay.src = response.frameUrl;
+                                    // Fix relative paths for frames
+                                    let frameUrl = response.frameUrl;
+                                    if (frameUrl && !frameUrl.startsWith('http') && !frameUrl.startsWith('data:')) {
+                                        // Ensure path starts correctly relative to current page location
+                                        // If frameUrl starts with /user/src, it is absolute from web root
+                                        // We can use it directly if server allows, or prepend .. if needed
+                                        if (frameUrl.startsWith('/user/src')) {
+                                             frameUrl = '..' + frameUrl.substring('/user/src'.length);
+                                        }
+                                    }
+                                    frameOverlay.src = frameUrl || response.frameUrl;
                                     frameOverlay.style.display = 'block';
                                 }
                             }

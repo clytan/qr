@@ -37,7 +37,7 @@ if (!$is_logged_in) {
 
             <!-- Hero Section -->
             <section class="hero-section">
-                <div class="container" style="margin-top:65px;">
+                <div class="container" style="margin-top:21%!important;">
                     <div class="hero-content">
                         <h1 class="hero-title wow fadeInUp">
                             <i class="fas fa-trophy"></i> Referral Program

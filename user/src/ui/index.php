@@ -903,9 +903,14 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                         <i class="fas fa-user-plus"></i> Join Community Zokli
                     </a>
                     <?php else: ?>
-                    <a href="profile.php" class="btn-hero btn-primary" style="background: white; color: #e67753;">
-                        <i class="fas fa-arrow-right"></i> My Zoks Profile
-                    </a>
+                    <div class="hero-buttons">
+                        <a href="profile.php" class="btn-hero btn-primary" style="background: white; color: #e67753;">
+                            <i class="fas fa-arrow-right"></i> My Zoks Profile
+                        </a>
+                        <a href="../backend/logout.php" class="btn-hero" style="background: rgba(255,255,255,0.15); border: 2px solid rgba(255,255,255,0.8); color: white;">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
                     <?php endif; ?>
                 </div>
             </section>

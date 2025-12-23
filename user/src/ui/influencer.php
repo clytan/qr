@@ -1242,7 +1242,7 @@ function sendCollabAcceptanceEmails($conn, $collab, $influencer_id, $influencer_
         
         <!-- Content -->
         <div class="no-bottom no-top" id="content">
-            <div class="page-container" style="margin-top:15%;">
+            <div class="page-container" style="margin-top: 21%!important;">
                 <!-- Hero Section (Polls-Style) -->
                 <section class="polls-hero" style="text-align: center; padding: 30px 0 20px;">
                     <h1 class="polls-title" style="font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.5rem;">Influencer Program</h1>
