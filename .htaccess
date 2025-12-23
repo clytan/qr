@@ -22,6 +22,7 @@ RewriteRule ^components/(.*)$ user/src/components/$1 [L,NC]
 RewriteRule ^libs/(.*)$ user/src/libs/$1 [L,NC]
 RewriteRule ^custom_js/(.*)$ user/src/ui/custom_js/$1 [L,NC]
 RewriteRule ^ui/(.*)$ user/src/ui/$1 [L,NC]
+RewriteRule ^frames/(.*)$ user/src/frames/$1 [L,NC]
 RewriteRule ^btnimg/(.*)$ user/src/btnimg/$1 [L,NC]
 
 # 3. Clean URLs (Redirects from .php and long paths)

@@ -515,7 +515,7 @@ document.addEventListener('DOMContentLoaded', function(){
     }
 
     /* show popover full width on very small screens */
-    .more-popover { left: 8%; bottom: 72px; transform: translateX(-50%); }
+    .more-popover { left: 4%; bottom: 72px; transform: translateX(-50%); }
 
     /* Keep the back-to-top hidden on mobile */
     #back-to-top {
