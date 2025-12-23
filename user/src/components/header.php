@@ -138,9 +138,9 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
         display: flex !important;
         align-items: center;
         justify-content: center;
-        width: 40px !important;
-        height: 40px !important;
-        border-radius: 12px !important;
+        width: 28px !important;
+        height: 28px !important;
+        border-radius: 5px !important;
         background: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%) !important;
         border: none !important;
         color: #ffffff !important;
@@ -303,16 +303,23 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
                         }
 
                         #zokli-header {
-                            min-height: 45px;
-                            padding: 4px 0;
+                            min-height: 55px !important;
+                            height: 58px !important; /* Force explicit height */
+                            padding: 0 !important;
+                            overflow: hidden !important;
+                            display: flex !important;
+                            align-items: center !important;
                         }
 
                         .header-content {
-                            min-height: 40px;
+                            min-height: 60px !important;
+                            height: 100% !important;
+                            padding: 0 6px !important; /* Reduced side padding to move elements to edges */
                         }
                         
                         .logo-image {
                             height: 30px;
+                            margin-left: -4px; /* Move logo closer to left edge */
                         }
                         
                         .logo-word-image {
@@ -324,6 +331,7 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
                             border-radius: 8px !important;
                             width: 30px !important;
                             height: 30px !important;
+                            margin: 0 !important; /* Remove any default margins */
                         }
                         
                         .btn-notification i,
@@ -332,8 +340,8 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
                         }
                         
                         .right-section {
-                            gap: 6px;
-                            margin-right: -4px; /* Move slightly to the right */
+                            gap: 5px;
+                            margin-right: -10px; /* Move buttons closer to right edge */
                         }
                         
                         .notification-count {
