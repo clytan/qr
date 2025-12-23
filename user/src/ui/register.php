@@ -265,6 +265,33 @@ $ref_code = isset($_GET['ref']) ? htmlspecialchars($_GET['ref']) : '';
             color: #e67753 !important;
         }
 
+        /* Tier Image Card Styles */
+        .tier-card-img {
+            padding: 0 !important;
+            overflow: hidden;
+        }
+
+        .tier-card-img .tier-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        .tier-card-img:hover .tier-img {
+            transform: scale(1.02);
+        }
+
+        .tier-card-img:has(input:checked) {
+            border-color: #e67753 !important;
+            box-shadow: 0 0 0 3px rgba(230, 119, 83, 0.3);
+        }
+
+        .tier-card-img:has(input:checked) .tier-img {
+            opacity: 0.9;
+        }
+
         /* ==================== TERMS CHECKBOX ==================== */
         .terms-box {
             background: rgba(15, 23, 42, 0.4);
@@ -614,15 +641,13 @@ $ref_code = isset($_GET['ref']) ? htmlspecialchars($_GET['ref']) : '';
                 <div class="field-set" id="membership_tier_section">
                     <label class="section-label">💎 Membership Tier</label>
                     <div class="cards-grid cards-grid-2">
-                        <label class="selection-card tier-card" data-tier="gold">
+                        <label class="selection-card tier-card tier-card-img" data-tier="gold">
                             <input type="radio" name="user_tag" value="gold" id="tier_gold">
-                            <div class="card-icon">👑</div>
-                            <span class="card-text">Gold</span>
+                            <img src="../btnimg/gold.jpeg" alt="Gold" class="tier-img">
                         </label>
-                        <label class="selection-card tier-card" data-tier="silver">
+                        <label class="selection-card tier-card tier-card-img" data-tier="silver">
                             <input type="radio" name="user_tag" value="silver" id="tier_silver">
-                            <div class="card-icon" style="filter: grayscale(1) brightness(1.3);">👑</div>
-                            <span class="card-text">Silver</span>
+                            <img src="../btnimg/silver.jpeg" alt="Silver" class="tier-img">
                         </label>
                     </div>
                     <input type="hidden" name="user_slab" id="user_slab">
@@ -644,7 +669,7 @@ $ref_code = isset($_GET['ref']) ? htmlspecialchars($_GET['ref']) : '';
                 </div>
 
                 <!-- Promo Code Section -->
-                <div class="field-set">
+                <div class="field-set d-none">
                     <label for="promo_code">🎁 Promo Code</label>
                     <input type="text" name="promo_code" id="promo_code" class="form-input" placeholder="Enter promo code" style="text-transform: uppercase;">
                     <span id="promo-status" class="validation-status"></span>

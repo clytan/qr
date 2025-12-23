@@ -23,6 +23,7 @@ if (!$is_logged_in) {
     <?php include('../components/csslinks.php') ?>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../assets/css/referral_leaderboard.css">
+
 </head>
 
 <body class="dark-scheme de-grey">
@@ -36,7 +37,7 @@ if (!$is_logged_in) {
 
             <!-- Hero Section -->
             <section class="hero-section">
-                <div class="container">
+                <div class="container" style="margin-top:65px;">
                     <div class="hero-content">
                         <h1 class="hero-title wow fadeInUp">
                             <i class="fas fa-trophy"></i> Referral Program
@@ -44,40 +45,44 @@ if (!$is_logged_in) {
                         <p class="hero-subtitle wow fadeInUp" data-wow-delay="0.2s">
                             Share your referral code and earn rewards when your friends join Zokli
                         </p>
-                    </div>
 
-                    <!-- Banner Carousel - outside hero-content for mobile visibility -->
-                    <div class="enhanced-carousel" style="margin: 20px 0; position: relative; z-index: 5;">
-                        <div id="referral-carousel" class="owl-carousel owl-theme">
-                            <div class="carousel-item-enhanced">
-                                <img src="../banners/1.jpeg" alt="Banner 1" style="border-radius: 12px; width: 100%; height: auto;">
+                    <!-- Prize Carousel -->
+                    <div class="prize-carousel-section container">
+                        <div class="owl-carousel owl-theme" id="prizeCarousel">
+                            <div class="item">
+                                <div class="prize-banner-item banner-1">
+                                    <div class="banner-content">
+                                        <h3>Grand Prize</h3>
+                                        <p>Spin to win exclusive community rewards!</p>
+                                    </div>
+                                    <i class="fas fa-trophy banner-icon"></i>
+                                </div>
                             </div>
-                            <div class="carousel-item-enhanced">
-                                <img src="../banners/2.jpeg" alt="Banner 2" style="border-radius: 12px; width: 100%; height: auto;">
+                            <div class="item">
+                                <div class="prize-banner-item banner-2">
+                                    <div class="banner-content">
+                                        <h3>Daily Winners</h3>
+                                        <p>30 winners selected every single day.</p>
+                                    </div>
+                                    <i class="fas fa-medal banner-icon"></i>
+                                </div>
                             </div>
-                            <div class="carousel-item-enhanced">
-                                <img src="../banners/3.jpeg" alt="Banner 3" style="border-radius: 12px; width: 100%; height: auto;">
-                            </div>
-                            <div class="carousel-item-enhanced">
-                                <img src="../banners/4.jpeg" alt="Banner 4" style="border-radius: 12px; width: 100%; height: auto;">
-                            </div>
-                            <div class="carousel-item-enhanced">
-                                <img src="../banners/1.jpeg" alt="Banner 1" style="border-radius: 12px; width: 100%; height: auto;">
-                            </div>
-                            <div class="carousel-item-enhanced">
-                                <img src="../banners/2.jpeg" alt="Banner 2" style="border-radius: 12px; width: 100%; height: auto;">
-                            </div>
-                            <div class="carousel-item-enhanced">
-                                <img src="../banners/3.jpeg" alt="Banner 3" style="border-radius: 12px; width: 100%; height: auto;">
-                            </div>
-                            <div class="carousel-item-enhanced">
-                                <img src="../banners/4.jpeg" alt="Banner 4" style="border-radius: 12px; width: 100%; height: auto;">
+                            <div class="item">
+                                <div class="prize-banner-item banner-3">
+                                    <div class="banner-content">
+                                        <h3>Join the Fun</h3>
+                                        <p>Be active in your community to win next.</p>
+                                    </div>
+                                    <i class="fas fa-gift banner-icon"></i>
+                                </div>
                             </div>
                         </div>
                     </div>
 
+
+
                     <!-- Referral Card -->
-                    <div style="margin-top:10px;"class="referral-card wow fadeInUp" data-wow-delay="0.4s">
+                    <div style="margin-top:-30px;"class="referral-card wow fadeInUp" data-wow-delay="0.4s">
                         <div class="referral-card-content">
                             <div class="referral-code-section">
                                 <span class="referral-code-label text-white">Your Referral Code</span>
@@ -156,8 +161,7 @@ if (!$is_logged_in) {
                         <div class="leaderboard-header">
                             <div>Rank</div>
                             <div>User</div>
-                            <div>Referrals</div>
-                            <div class="earning-header">Earnings</div>
+                            <div class="text-right">Referrals</div>
                         </div>
                         <div id="leaderboard-content">
                             <div class="loading">
@@ -275,14 +279,9 @@ if (!$is_logged_in) {
                                     <div class="leaderboard-row">
                                         <div class="rank ${rankClass}">#${rank}</div>
                                         <div class="user-info">
-                                            <div class="user-avatar">${initial}</div>
-                                            <div class="user-details">
-                                                <div class="user-name">${user.user_name || 'User'}</div>
-                                                <span class="user-badge ${badgeClass}">${badgeText}</span>
-                                            </div>
+                                            <div class="user-name">${user.user_qr_id || 'N/A'}</div>
                                         </div>
                                         <div class="referral-count">${user.referral_count || 0}</div>
-                                        <div class="earning-amount">₹${user.total_earnings || 0}</div>
                                     </div>
                                 `;
                             });
@@ -318,23 +317,24 @@ if (!$is_logged_in) {
         $(document).ready(function () {
             loadReferralStats();
             loadLeaderboard();
-            
-            // Initialize Banner Carousel
-            $('#referral-carousel').owlCarousel({
-                loop: true,
-                margin: 15,
-                nav: false,
-                dots: false,
-                autoplay: true,
-                autoplayTimeout: 4000,
-                autoplayHoverPause: true,
-                smartSpeed: 600,
-                responsive: {
-                    0: { items: 1 },
-                    768: { items: 2 },
-                    1200: { items: 3 }
-                }
-            });
+
+            // Initialize Prize Carousel
+            if (jQuery().owlCarousel) {
+                $('#prizeCarousel').owlCarousel({
+                    loop: true,
+                    margin: 10,
+                    nav: false,
+                    dots: false,
+                    autoplay: true,
+                    autoplayTimeout: 3000,
+                    responsive: {
+                        0: { items: 1 },
+                        600: { items: 2 },
+                        1000: { items: 3 }
+                    }
+                });
+            }
+
         });
     </script>
 

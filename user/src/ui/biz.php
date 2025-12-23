@@ -712,7 +712,7 @@ function sendReferralEmails($programme, $client_name, $client_phone, $client_ema
             z-index: 10000;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 10px;
         }
         
         .create-modal.show { display: flex; }
@@ -721,18 +721,20 @@ function sendReferralEmails($programme, $client_name, $client_phone, $client_ema
             background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
             border-radius: 16px;
             width: 100%;
-            max-width: 600px;
-            max-height: 90vh;
+            max-width: 450px;
+            padding: 1px;
+            max-height: 80vh;
             overflow-y: auto;
             border: 1px solid rgba(233, 67, 122, 0.3);
             display: block !important;
             position: relative;
             z-index: 10001;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            margin: 0 auto;
         }
         
         .modal-header {
-            padding: 12px 20px;
+            padding: 15px 20px;
             border-bottom: 1px solid rgba(255,255,255,0.1);
             display: flex;
             justify-content: space-between;
@@ -755,7 +757,7 @@ function sendReferralEmails($programme, $client_name, $client_phone, $client_ema
             cursor: pointer;
         }
         
-        .modal-body { padding: 15px 20px; }
+        .modal-body { padding: 20px; }
         .collab-form-group { margin-bottom: 12px; }
         
         .collab-form-group label {
@@ -805,7 +807,7 @@ function sendReferralEmails($programme, $client_name, $client_phone, $client_ema
         .photo-upload-box img { position: absolute; width: 100%; height: 100%; object-fit: cover; }
         
         .modal-footer-btns {
-            padding: 20px 25px;
+            padding: 15px 20px;
             border-top: 1px solid rgba(255,255,255,0.1);
             display: flex;
             gap: 12px;
@@ -875,6 +877,87 @@ function sendReferralEmails($programme, $client_name, $client_phone, $client_ema
         }
         
         .collab-delete-btn:hover { background: #ef4444; color: white; }
+
+        /* Prize Carousel Styles */
+        .prize-carousel-section {
+            margin: 20px auto;
+            position: relative;
+            width: 100%;
+        }
+
+        .prize-banner-item {
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            margin: 0 5px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .banner-1 { background: linear-gradient(135deg, #FFD700 0%, #FDB931 100%); }
+        .banner-2 { background: linear-gradient(135deg, #E0E0E0 0%, #BDBDBD 100%); }
+        .banner-3 { background: linear-gradient(135deg, #cd7f32 0%, #a0522d 100%); }
+
+        .banner-content h3 {
+            color: #000;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .banner-content p {
+            color: rgba(0,0,0,0.7);
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .banner-icon {
+            position: absolute;
+            right: 20px;
+            font-size: 4rem;
+            opacity: 0.2;
+            color: #000;
+            transform: rotate(-15deg);
+        }
+
+        @media (max-width: 768px) {
+            .prize-banner-item {
+                height: 110px;
+                padding: 0 15px;
+            }
+            .banner-content h3 { font-size: 1.2rem; }
+            .banner-content p { font-size: 0.8rem; }
+            .banner-icon { font-size: 3rem; right: 10px; }
+            
+            .polls-nav-bar {
+                flex-direction: column !important;
+                gap: 15px !important;
+                padding: 15px !important;
+                max-width: 100% !important;
+                margin: 0 10px 30px !important;
+            }
+            .polls-tabs-group {
+                width: 100% !important;
+                justify-content: center !important;
+                flex-wrap: wrap !important;
+            }
+            .poll-tab-item {
+                flex: 1 1 auto !important;
+                min-width: 80px !important;
+                padding: 10px 12px !important;
+                font-size: 0.8rem !important;
+                white-space: nowrap !important;
+            }
+            .create-poll-btn-premium {
+                width: 100% !important;
+                justify-content: center !important;
+            }
+        }
     </style>
 </head>
 <body class="dark-scheme de-grey">
@@ -883,42 +966,58 @@ function sendReferralEmails($programme, $client_name, $client_phone, $client_ema
         
         <div class="no-bottom no-top" id="content">
             <div class="page-container" style="margin-top:10%;">
-                <!-- Hero Section -->
-                <div class="hero-section">
-                    <div class="hero-badge">
-                        <i class="fas fa-briefcase"></i> Partner Programme
-                    </div>
-                    <h1 class="hero-title">
-                        <i class="fas fa-handshake"></i> Biz - Earn with Referrals
-                    </h1>
-                    <p class="hero-subtitle">
-                        Partner with top companies and earn commissions by referring clients. 
-                        Simple, transparent, and rewarding!
-                    </p>
-                    <!-- Debug: User Type = <?php echo $user_type; ?>, Is Biz = <?php echo $is_biz_user ? 'true' : 'false'; ?> -->
-                    <?php if ($is_biz_user): ?>
-                    <button class="create-collab-btn" onclick="openCreateModal()">
-                        <i class="fas fa-plus"></i> Create Partner Programme
-                    </button>
-                    <?php endif; ?>
-                </div>
-                
-                <!-- Tabs -->
-                <div class="tabs-container">
-                    <button class="tab-btn active" onclick="showTab('programmes')">
-                        <i class="fas fa-briefcase"></i>
-                        Programmes
-                    </button>
-                    <button class="tab-btn" onclick="showTab('my_referrals')">
-                        <i class="fas fa-list"></i>
-                        My Referrals
-                    </button>
-                    <?php if ($is_biz_user): ?>
-                    <button class="tab-btn" onclick="showTab('my_collabs')">
-                        <i class="fas fa-layer-group"></i>
-                        My Programmes
-                    </button>
+                <!-- Hero Section (Polls-Style) -->
+                <section class="polls-hero" style="text-align: center; padding: 30px 0 20px;">
+                    <h1 class="polls-title" style="font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.5rem;">Partner Programme</h1>
 
+                    <!-- Prize Carousel -->
+                    <div class="prize-carousel-section container" style="max-width: 900px; margin: 20px auto;">
+                        <div class="owl-carousel owl-theme" id="prizeCarousel">
+                            <div class="item">
+                                <div class="prize-banner-item banner-1">
+                                    <div class="banner-content">
+                                        <h3>Partner Up</h3>
+                                        <p>Team with top companies and grow together!</p>
+                                    </div>
+                                    <i class="fas fa-handshake banner-icon"></i>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="prize-banner-item banner-2">
+                                    <div class="banner-content">
+                                        <h3>Earn Commission</h3>
+                                        <p>Get rewarded for every successful referral.</p>
+                                    </div>
+                                    <i class="fas fa-coins banner-icon"></i>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="prize-banner-item banner-3">
+                                    <div class="banner-content">
+                                        <h3>Simple & Transparent</h3>
+                                        <p>Track your earnings in real-time.</p>
+                                    </div>
+                                    <i class="fas fa-chart-line banner-icon"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Premium Nav Bar (Polls-Style) -->
+                <div class="polls-nav-bar" style="display: flex; flex-direction: column; gap: 15px; background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 15px; margin: 0 auto 30px; max-width: 800px;">
+                    <div class="polls-tabs-group" style="display: flex; gap: 4px; background: rgba(0,0,0,0.3); padding: 6px; border-radius: 12px; width: 100%;">
+                        <button class="poll-tab-item active" onclick="showTab('programmes')" style="flex: 1; background: rgba(255, 255, 255, 0.15); color: #fff; padding: 12px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border: none; text-align: center;">All</button>
+                        <button class="poll-tab-item" onclick="showTab('my_referrals')" style="flex: 1; background: transparent; color: #94a3b8; padding: 12px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 500; cursor: pointer; border: none; text-align: center;">Referrals</button>
+                        <?php if ($is_biz_user): ?>
+                        <button class="poll-tab-item" onclick="showTab('my_collabs')" style="flex: 1; background: transparent; color: #94a3b8; padding: 12px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 500; cursor: pointer; border: none; text-align: center;">Created</button>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <?php if ($is_biz_user): ?>
+                    <button class="create-poll-btn-premium" onclick="openCreateModal()" style="width: 100%; background: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%); color: white; padding: 14px 20px; border-radius: 10px; border: none; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
+                        <i class="fas fa-plus"></i> Create Programme
+                    </button>
                     <?php endif; ?>
                 </div>
                 
@@ -977,36 +1076,36 @@ function sendReferralEmails($programme, $client_name, $client_phone, $client_ema
     
     <!-- Refer Modal (Outside wrapper for proper z-index) -->
     <div class="modal-overlay" id="referModal" style="z-index: 99999 !important;">
-        <div class="modal" style="background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important; color: #e2e8f0 !important; border: 1px solid rgba(233, 67, 122, 0.3) !important; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important; display: block !important; z-index: 100000 !important;">
-            <h3 class="modal-title">
-                <i class="fas fa-user-plus"></i> Submit Referral
+        <div class="modal" style="background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important; color: #e2e8f0 !important; border: 1px solid rgba(233, 67, 122, 0.3) !important; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5) !important; display: block !important; z-index: 100000 !important; max-width: 400px !important; width: 90% !important; padding: 20px !important; border-radius: 16px !important;">
+            <h3 class="modal-title" style="margin: 0 0 20px 0; font-size: 1.3rem; background: linear-gradient(135deg, #E9437A, #E2AD2A); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
+                <i class="fas fa-user-plus" style="-webkit-text-fill-color: #E9437A;"></i> Submit Referral
             </h3>
             <form id="referForm">
                 <input type="hidden" id="programme-id">
                 
-                <div class="form-group">
-                    <label class="form-label">Client Name *</label>
-                    <input type="text" class="form-input" id="client-name" required placeholder="Enter client's full name">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label class="form-label" style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px;">Client Name *</label>
+                    <input type="text" class="form-input" id="client-name" required placeholder="Enter client's full name" style="width: 100%; padding: 12px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #e2e8f0; font-size: 14px;">
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label">Client Phone *</label>
-                    <input type="tel" class="form-input" id="client-phone" required placeholder="Enter client's phone number">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label class="form-label" style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px;">Client Phone *</label>
+                    <input type="tel" class="form-input" id="client-phone" required placeholder="Enter client's phone number" style="width: 100%; padding: 12px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #e2e8f0; font-size: 14px;">
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label">Client Email *</label>
-                    <input type="email" class="form-input" id="client-email" required placeholder="client@example.com">
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label class="form-label" style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px;">Client Email *</label>
+                    <input type="email" class="form-input" id="client-email" required placeholder="client@example.com" style="width: 100%; padding: 12px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #e2e8f0; font-size: 14px;">
                 </div>
                 
-                <div class="form-group">
-                    <label class="form-label">Product Required *</label>
-                    <input type="text" class="form-input" id="product-name" required placeholder="Which product is client interested in?">
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label class="form-label" style="display: block; font-size: 0.85rem; color: #94a3b8; margin-bottom: 6px;">Product Required *</label>
+                    <input type="text" class="form-input" id="product-name" required placeholder="Which product is client interested in?" style="width: 100%; padding: 12px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #e2e8f0; font-size: 14px;">
                 </div>
                 
-                <div class="modal-actions">
-                    <button type="button" class="btn secondary" onclick="closeModal()">Cancel</button>
-                    <button type="submit" class="btn primary"><i class="fas fa-paper-plane"></i> Submit Referral</button>
+                <div class="modal-actions" style="display: flex; gap: 12px;">
+                    <button type="button" class="btn secondary" onclick="closeModal()" style="flex: 1; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; color: #94a3b8; font-size: 15px; cursor: pointer;">Cancel</button>
+                    <button type="submit" class="btn primary" style="flex: 2; padding: 12px; background: linear-gradient(135deg, #E9437A, #E2AD2A); border: none; border-radius: 10px; color: white; font-size: 15px; font-weight: 600; cursor: pointer;"><i class="fas fa-paper-plane"></i> Submit Referral</button>
                 </div>
             </form>
         </div>
@@ -1060,7 +1159,7 @@ function sendReferralEmails($programme, $client_name, $client_phone, $client_ema
     
     <div class="toast" id="toast"></div>
     
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <?php include('../components/jslinks.php') ?>
     <script>
         let currentTab = 'programmes';
         let currentProgramme = null;
@@ -1071,18 +1170,47 @@ function sendReferralEmails($programme, $client_name, $client_phone, $client_ema
             <?php if ($is_biz_user): ?>
             loadMyProgrammes();
             <?php endif; ?>
+            
+            // Initialize Prize Carousel
+            if (jQuery().owlCarousel) {
+                jQuery('#prizeCarousel').owlCarousel({
+                    loop: true,
+                    margin: 10,
+                    nav: false,
+                    dots: false,
+                    autoplay: true,
+                    autoplayTimeout: 3000,
+                    responsive: {
+                        0: { items: 1 },
+                        600: { items: 2 },
+                        1000: { items: 3 }
+                    }
+                });
+            }
         });
         
         function showTab(tab) {
             currentTab = tab;
             
-            $('.tab-btn').removeClass('active');
-            $(`.tab-btn`).each(function() {
+            // Update button styles
+            $('.poll-tab-item').each(function() {
+                $(this).css({
+                    'background': 'transparent',
+                    'color': '#94a3b8'
+                }).removeClass('active');
+            });
+            
+            // Find and activate the correct tab
+            $('.poll-tab-item').each(function() {
                 const text = $(this).text().trim().toLowerCase();
-                if ((tab === 'programmes' && text.includes('programmes')) ||
-                    (tab === 'my_referrals' && text.includes('referrals')) ||
-                    (tab === 'my_collabs' && text.includes('collabs'))) {
-                    $(this).addClass('active');
+                if ((tab === 'programmes' && text === 'all') ||
+                    (tab === 'my_referrals' && text === 'referrals') ||
+                    (tab === 'my_collabs' && text === 'created')) {
+                    $(this).css({
+                        'background': 'rgba(255, 255, 255, 0.15)',
+                        'color': '#fff',
+                        'font-weight': '600'
+                    }).addClass('active');
                 }
             });
             

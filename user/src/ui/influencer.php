@@ -1046,6 +1046,77 @@ function sendCollabAcceptanceEmails($conn, $collab, $influencer_id, $influencer_
             background: #ef4444;
             color: white;
         }
+
+        /* Prize Carousel Styles */
+        .prize-carousel-section {
+            margin: 20px auto;
+            position: relative;
+            width: 100%;
+        }
+
+        .prize-banner-item {
+            border-radius: 15px;
+            overflow: hidden;
+            position: relative;
+            height: 140px;
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            margin: 0 5px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+
+        .banner-1 { background: linear-gradient(135deg, #FFD700 0%, #FDB931 100%); }
+        .banner-2 { background: linear-gradient(135deg, #E0E0E0 0%, #BDBDBD 100%); }
+        .banner-3 { background: linear-gradient(135deg, #cd7f32 0%, #a0522d 100%); }
+
+        .banner-content h3 {
+            color: #000;
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+        }
+
+        .banner-content p {
+            color: rgba(0,0,0,0.7);
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .banner-icon {
+            position: absolute;
+            right: 20px;
+            font-size: 4rem;
+            opacity: 0.2;
+            color: #000;
+            transform: rotate(-15deg);
+        }
+
+        @media (max-width: 768px) {
+            .prize-banner-item {
+                height: 110px;
+                padding: 0 15px;
+            }
+            .banner-content h3 { font-size: 1.2rem; }
+            .banner-content p { font-size: 0.8rem; }
+            .banner-icon { font-size: 3rem; right: 10px; }
+            
+            .polls-nav-bar {
+                flex-direction: column !important;
+                gap: 15px !important;
+                padding: 15px !important;
+            }
+            .polls-tabs-group {
+                width: 100% !important;
+                justify-content: center !important;
+            }
+            .create-poll-btn-premium {
+                width: 100% !important;
+                justify-content: center !important;
+            }
+        }
     </style>
 </head>
 <body class="dark-scheme de-grey">
@@ -1056,61 +1127,57 @@ function sendCollabAcceptanceEmails($conn, $collab, $influencer_id, $influencer_
         <!-- Content -->
         <div class="no-bottom no-top" id="content">
             <div class="page-container" style="margin-top:10%;">
-                <!-- Hero Section -->
-                <div class="hero-section">
-                    <div class="hero-badge">
-                        <i class="fas fa-star"></i> Exclusive Opportunities
+                <!-- Hero Section (Polls-Style) -->
+                <section class="polls-hero" style="text-align: center; padding: 30px 0 20px;">
+                    <h1 class="polls-title" style="font-size: 2.5rem; font-weight: 800; background: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 0.5rem;">Influencer Program</h1>
+
+                    <!-- Prize Carousel -->
+                    <div class="prize-carousel-section container" style="max-width: 900px; margin: 20px auto;">
+                        <div class="owl-carousel owl-theme" id="prizeCarousel">
+                            <div class="item">
+                                <div class="prize-banner-item banner-1">
+                                    <div class="banner-content">
+                                        <h3>Brand Collabs</h3>
+                                        <p>Partner with top brands and create amazing content!</p>
+                                    </div>
+                                    <i class="fas fa-star banner-icon"></i>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="prize-banner-item banner-2">
+                                    <div class="banner-content">
+                                        <h3>Get Rewarded</h3>
+                                        <p>Earn for your influence and creativity.</p>
+                                    </div>
+                                    <i class="fas fa-gift banner-icon"></i>
+                                </div>
+                            </div>
+                            <div class="item">
+                                <div class="prize-banner-item banner-3">
+                                    <div class="banner-content">
+                                        <h3>Build Your Brand</h3>
+                                        <p>Join thousands of influencers growing with Zokli.</p>
+                                    </div>
+                                    <i class="fas fa-rocket banner-icon"></i>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <h1 class="hero-title">
-                        <i class="fas fa-handshake"></i> Influencer Program
-                    </h1>
-                    <p class="hero-subtitle">
-                        Partner with top brands, create amazing content, and get rewarded for your influence. 
-                        Join thousands of influencers who are building their personal brand with Zokli.
-                    </p>
-                    <!-- Debug: User Type = <?php echo $user_type; ?>, Is Biz = <?php echo $is_biz_user ? 'true' : 'false'; ?> -->
-                    <?php if ($is_biz_user): ?>
-                    <button class="create-collab-btn" onclick="openCreateModal()">
-                        <i class="fas fa-plus"></i> Create Collaboration
-                    </button>
-                    <?php endif; ?>
-                    <div class="hero-stats">
-                        <div class="stat-item">
-                            <span class="stat-number" id="total-collabs">0</span>
-                            <span class="stat-label">Available Collaborations</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number" id="your-collabs">0</span>
-                            <span class="stat-label">Your Active Collabs</span>
-                        </div>
+                </section>
+
+                <!-- Premium Nav Bar (Polls-Style) -->
+                <div class="polls-nav-bar" style="display: flex; flex-direction: column; gap: 15px; background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 15px; margin: 0 auto 30px; max-width: 800px;">
+                    <div class="polls-tabs-group" style="display: flex; gap: 4px; background: rgba(0,0,0,0.3); padding: 6px; border-radius: 12px; width: 100%;">
+                        <button class="poll-tab-item active" onclick="showTab('available')" style="flex: 1; background: rgba(255, 255, 255, 0.15); color: #fff; padding: 12px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; border: none; text-align: center;">Available</button>
+                        <button class="poll-tab-item" onclick="showTab('my_collabs')" style="flex: 1; background: transparent; color: #94a3b8; padding: 12px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 500; cursor: pointer; border: none; text-align: center;">My Accepted</button>
                         <?php if ($is_biz_user): ?>
-                        <div class="stat-item">
-                            <span class="stat-number" id="created-collabs">0</span>
-                            <span class="stat-label">Your Created Collabs</span>
-                        </div>
-                        <?php else: ?>
-                        <div class="stat-item">
-                            <span class="stat-number">₹50K+</span>
-                            <span class="stat-label">Potential Earnings</span>
-                        </div>
+                        <button class="poll-tab-item" onclick="showTab('my_created')" style="flex: 1; background: transparent; color: #94a3b8; padding: 12px 16px; border-radius: 8px; font-size: 0.9rem; font-weight: 500; cursor: pointer; border: none; text-align: center;">My Created</button>
                         <?php endif; ?>
                     </div>
-                </div>
-                
-                <!-- Tabs -->
-                <div class="tabs-container">
-                    <button class="tab-btn active" onclick="showTab('available')">
-                        <i class="fas fa-store"></i>
-                        Available
-                    </button>
-                    <button class="tab-btn" onclick="showTab('my_collabs')">
-                        <i class="fas fa-briefcase"></i>
-                        My Accepted
-                    </button>
+                    
                     <?php if ($is_biz_user): ?>
-                    <button class="tab-btn" onclick="showTab('my_created')">
-                        <i class="fas fa-edit"></i>
-                        My Created
+                    <button class="create-poll-btn-premium" onclick="openCreateModal()" style="width: 100%; background: linear-gradient(135deg, #E9437A 0%, #e67753 50%, #E2AD2A 100%); color: white; padding: 14px 20px; border-radius: 10px; border: none; font-weight: 600; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer;">
+                        <i class="fas fa-plus"></i> Create Collab
                     </button>
                     <?php endif; ?>
                 </div>
@@ -1249,7 +1316,7 @@ function sendCollabAcceptanceEmails($conn, $collab, $influencer_id, $influencer_
     
     <div class="toast" id="toast"></div>
     
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <?php include('../components/jslinks.php') ?>
     <script>
         let currentTab = 'available';
         const userId = <?php echo $user_id; ?>;
@@ -1314,20 +1381,48 @@ function sendCollabAcceptanceEmails($conn, $collab, $influencer_id, $influencer_
             <?php if ($is_biz_user): ?>
             loadMyCreated();
             <?php endif; ?>
+            
+            // Initialize Prize Carousel
+            if (jQuery().owlCarousel) {
+                jQuery('#prizeCarousel').owlCarousel({
+                    loop: true,
+                    margin: 10,
+                    nav: false,
+                    dots: false,
+                    autoplay: true,
+                    autoplayTimeout: 3000,
+                    responsive: {
+                        0: { items: 1 },
+                        600: { items: 2 },
+                        1000: { items: 3 }
+                    }
+                });
+            }
         });
         
         // Tab Management
         function showTab(tab) {
             currentTab = tab;
             
-            // Update buttons
-            $('.tab-btn').removeClass('active');
-            $(`.tab-btn`).each(function() {
+            // Update button styles
+            $('.poll-tab-item').each(function() {
+                $(this).css({
+                    'background': 'transparent',
+                    'color': '#94a3b8'
+                }).removeClass('active');
+            });
+            
+            // Find and activate the correct tab
+            $('.poll-tab-item').each(function() {
                 const text = $(this).text().trim().toLowerCase();
                 if ((tab === 'available' && text.includes('available')) ||
                     (tab === 'my_collabs' && text.includes('accepted')) ||
                     (tab === 'my_created' && text.includes('created'))) {
-                    $(this).addClass('active');
+                    $(this).css({
+                        'background': 'rgba(255, 255, 255, 0.15)',
+                        'color': '#fff',
+                        'font-weight': '600'
+                    }).addClass('active');
                 }
             });
             

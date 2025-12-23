@@ -141,9 +141,9 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
     .poll-card {
         background: rgba(255, 255, 255, 0.05);
         border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 16px;
-        padding: 24px;
-        margin-bottom: 20px;
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 16px;
         transition: all 0.3s ease;
     }
 
@@ -155,21 +155,21 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
     .poll-header {
         display: flex;
         justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: 15px;
+        align-items: center;
+        margin-bottom: 10px;
     }
 
     .poll-creator {
         display: flex;
         align-items: center;
-        gap: 10px;
-        font-size: 0.85rem;
+        gap: 8px;
+        font-size: 0.8rem;
         color: #94a3b8;
     }
 
     .poll-creator-avatar {
-        width: 32px;
-        height: 32px;
+        width: 28px;
+        height: 28px;
         border-radius: 50%;
         background: var(--gradient-1);
         display: flex;
@@ -177,7 +177,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         justify-content: center;
         color: white;
         font-weight: 600;
-        font-size: 0.8rem;
+        font-size: 0.7rem;
     }
 
     .poll-status {
@@ -218,29 +218,43 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
     }
 
     .poll-title {
-        font-size: 1.25rem;
+        font-size: 1rem;
         font-weight: 700;
         color: #fff;
-        margin-bottom: 8px;
+        margin-bottom: 4px;
     }
 
     .poll-description {
         color: #94a3b8;
-        font-size: 0.9rem;
-        margin-bottom: 20px;
+        font-size: 0.85rem;
+        margin-bottom: 12px;
+        line-height: 1.4;
     }
 
     /* Poll Options */
     .poll-options {
         display: flex;
         flex-direction: column;
-        gap: 10px;
+        gap: 8px;
+    }
+
+    /* Grid layout for options with images */
+    .poll-options.has-images {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 8px;
+    }
+
+    @media (min-width: 500px) {
+        .poll-options.has-images {
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+        }
     }
 
     .poll-option {
         position: relative;
-        padding: 14px 18px;
-        border-radius: 10px;
+        padding: 10px 12px;
+        border-radius: 8px;
         border: 2px solid rgba(255, 255, 255, 0.1);
         background: rgba(255, 255, 255, 0.03);
         cursor: pointer;
@@ -260,6 +274,29 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
 
     .poll-option.voted {
         cursor: default;
+    }
+
+    /* Option with image styling */
+    .poll-option.has-image {
+        padding: 6px;
+        text-align: center;
+    }
+
+    .poll-option.has-image .poll-option-image {
+        width: 100%;
+        height: 80px;
+        border-radius: 6px;
+        overflow: hidden;
+        margin-bottom: 6px;
+        background-size: cover;
+        background-position: center;
+        border: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .poll-option.has-image .poll-option-text {
+        font-size: 0.75rem;
+        line-height: 1.2;
+        display: block;
     }
 
     .poll-option-content {
@@ -303,14 +340,14 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-top: 15px;
-        padding-top: 15px;
+        margin-top: 10px;
+        padding-top: 10px;
         border-top: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     .poll-votes {
         color: #64748b;
-        font-size: 0.85rem;
+        font-size: 0.8rem;
     }
 
     .poll-actions {
@@ -727,6 +764,63 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
             justify-content: center;
         }
     }
+
+    /* Prize Carousel Styles */
+    .prize-carousel-section {
+        margin: 20px auto;
+        position: relative;
+        width: 100%;
+    }
+
+    .prize-banner-item {
+        border-radius: 15px;
+        overflow: hidden;
+        position: relative;
+        height: 140px;
+        display: flex;
+        align-items: center;
+        padding: 0 30px;
+        margin: 0 5px;
+        box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    }
+
+    .banner-1 { background: linear-gradient(135deg, #FFD700 0%, #FDB931 100%); }
+    .banner-2 { background: linear-gradient(135deg, #E0E0E0 0%, #BDBDBD 100%); }
+    .banner-3 { background: linear-gradient(135deg, #cd7f32 0%, #a0522d 100%); }
+
+    .banner-content h3 {
+        color: #000;
+        font-size: 1.5rem;
+        font-weight: 800;
+        margin-bottom: 5px;
+        text-transform: uppercase;
+    }
+
+    .banner-content p {
+        color: rgba(0,0,0,0.7);
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+
+    .banner-icon {
+        position: absolute;
+        right: 20px;
+        font-size: 4rem;
+        opacity: 0.2;
+        color: #000;
+        transform: rotate(-15deg);
+    }
+
+    @media (max-width: 768px) {
+        .prize-banner-item {
+            height: 110px;
+            padding: 0 15px;
+        }
+        .banner-content h3 { font-size: 1.2rem; }
+        .banner-content p { font-size: 0.8rem; }
+        .banner-icon { font-size: 3rem; right: 10px; }
+    }
     </style>
 </head>
 
@@ -748,7 +842,40 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
             
             <section class="polls-hero">
                 <h1 class="polls-title">Community Polls</h1>
-                <p class="polls-subtitle">Vote on polls and share your opinion with the community!</p>
+                <!-- <p class="polls-subtitle">Vote on polls and share your opinion with the community!</p> -->
+
+                <!-- Prize Carousel -->
+                <div class="prize-carousel-section container" style="max-width: 900px; margin: 20px auto;">
+                    <div class="owl-carousel owl-theme" id="prizeCarousel">
+                        <div class="item">
+                            <div class="prize-banner-item banner-1">
+                                <div class="banner-content">
+                                    <h3>Create Polls</h3>
+                                    <p>Ask the community and get instant feedback!</p>
+                                </div>
+                                <i class="fas fa-poll banner-icon"></i>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="prize-banner-item banner-2">
+                                <div class="banner-content">
+                                    <h3>Vote & Engage</h3>
+                                    <p>Let your voice be heard on topics that matter.</p>
+                                </div>
+                                <i class="fas fa-check-circle banner-icon"></i>
+                            </div>
+                        </div>
+                        <div class="item">
+                            <div class="prize-banner-item banner-3">
+                                <div class="banner-content">
+                                    <h3>Community Driven</h3>
+                                    <p>Shape decisions through collective opinions.</p>
+                                </div>
+                                <i class="fas fa-users banner-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <div class="polls-nav-bar">
@@ -773,7 +900,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
 
             <?php endif; ?>
         </div>
-
+            </br>
         <?php include('../components/footer.php') ?>
     </div>
 
@@ -850,6 +977,23 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
             this.bindEvents();
             this.checkPaymentVerification();
             this.loadPolls();
+            
+            // Initialize Prize Carousel
+            if (jQuery().owlCarousel) {
+                jQuery('#prizeCarousel').owlCarousel({
+                    loop: true,
+                    margin: 10,
+                    nav: false,
+                    dots: false,
+                    autoplay: true,
+                    autoplayTimeout: 3000,
+                    responsive: {
+                        0: { items: 1 },
+                        600: { items: 2 },
+                        1000: { items: 3 }
+                    }
+                });
+            }
         },
 
         async checkPaymentVerification() {
@@ -1172,43 +1316,56 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
             const totalVotes = poll.total_votes || 0;
             const creatorInitial = poll.creator_name ? poll.creator_name.charAt(0).toUpperCase() : '?';
             
+            // Check if any option has an image
+            const hasImages = poll.options.some(opt => opt.image);
+            
             let optionsHtml = poll.options.map(opt => {
                 const percentage = totalVotes > 0 ? Math.round((opt.votes / totalVotes) * 100) : 0;
                 const isUserVoted = poll.user_voted_option === opt.id;
                 const votedClass = poll.user_voted ? 'voted' : '';
                 const userVotedClass = isUserVoted ? 'user-voted selected' : '';
+                const hasImageClass = opt.image ? 'has-image' : '';
                 
-                const imageHtml = opt.image ? 
-                    `<div class="poll-option-image" style="width: 100%; height: 150px; border-radius: 8px; overflow: hidden; margin-bottom: 8px; background-image: url('${opt.image}'); background-size: cover; background-position: center; border: 1px solid rgba(255,255,255,0.1);"></div>` 
-                    : '';
-
-                return `
-                    <div class="poll-option ${votedClass} ${userVotedClass}" 
-                         data-poll-id="${poll.id}" 
-                         data-option-id="${opt.id}"
-                         ${poll.user_voted || poll.status === 'closed' ? 'disabled' : ''}
-                         style="flex-direction: column; align-items: flex-start; padding: 12px;">
-                        <div class="poll-option-bar" style="width: ${poll.user_voted || poll.status === 'closed' ? percentage : 0}%"></div>
-                        <div class="poll-option-content" style="width: 100%; flex-direction: column; align-items: flex-start;">
-                            <div style="display:flex; flex-direction:column; width:100%;">
-                                ${imageHtml}
-                                <span class="poll-option-text" style="font-size: 1.1em; font-weight: 500;">${this.escapeHtml(opt.text)}</span>
-                            </div>
-                            <span class="poll-option-stats">
-                                ${poll.user_voted || poll.status === 'closed' ? `<span>${percentage}%</span>` : ''}
-                                ${isUserVoted ? '<i class="fas fa-check-circle" style="color: var(--primary)"></i>' : ''}
-                            </span>
+                if (opt.image) {
+                    // Compact image option
+                    return `
+                        <div class="poll-option ${votedClass} ${userVotedClass} ${hasImageClass}" 
+                             data-poll-id="${poll.id}" 
+                             data-option-id="${opt.id}"
+                             ${poll.user_voted || poll.status === 'closed' ? 'disabled' : ''}>
+                            <div class="poll-option-bar" style="width: ${poll.user_voted || poll.status === 'closed' ? percentage : 0}%"></div>
+                            <div class="poll-option-image" style="background-image: url('${opt.image}');"></div>
+                            <span class="poll-option-text">${this.escapeHtml(opt.text)}</span>
+                            ${poll.user_voted || poll.status === 'closed' ? `<span class="poll-option-stats" style="font-size: 0.7rem;">${percentage}%</span>` : ''}
+                            ${isUserVoted ? '<i class="fas fa-check-circle" style="color: var(--primary); position: absolute; top: 4px; right: 4px; font-size: 0.8rem;"></i>' : ''}
                         </div>
-                    </div>
-                `;
+                    `;
+                } else {
+                    // Text-only option (compact)
+                    return `
+                        <div class="poll-option ${votedClass} ${userVotedClass}" 
+                             data-poll-id="${poll.id}" 
+                             data-option-id="${opt.id}"
+                             ${poll.user_voted || poll.status === 'closed' ? 'disabled' : ''}>
+                            <div class="poll-option-bar" style="width: ${poll.user_voted || poll.status === 'closed' ? percentage : 0}%"></div>
+                            <div class="poll-option-content">
+                                <span class="poll-option-text">${this.escapeHtml(opt.text)}</span>
+                                <span class="poll-option-stats">
+                                    ${poll.user_voted || poll.status === 'closed' ? `<span>${percentage}%</span>` : ''}
+                                    ${isUserVoted ? '<i class="fas fa-check-circle" style="color: var(--primary)"></i>' : ''}
+                                </span>
+                            </div>
+                        </div>
+                    `;
+                }
             }).join('');
             
-            let actionsHtml = ''; // ... kept existing logic ...
+            let actionsHtml = '';
             if (poll.is_owner) {
                 actionsHtml = `
                     <div class="poll-actions">
                         <button class="poll-action-btn delete" data-poll-id="${poll.id}">
-                            <i class="fas fa-trash"></i> Delete
+                            <i class="fas fa-trash"></i>
                         </button>
                     </div>
                 `;
@@ -1220,16 +1377,16 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                         <div class="poll-creator">
                             <div class="poll-creator-avatar">${creatorInitial}</div>
                             <span>${this.escapeHtml(poll.creator_name)}</span>
-                            ${poll.is_admin_poll ? '<span style="color: var(--primary);"><i class="fas fa-shield-alt"></i> Admin</span>' : ''}
+                            ${poll.is_admin_poll ? '<span style="color: var(--primary);"><i class="fas fa-shield-alt"></i></span>' : ''}
                         </div>
                         <span class="poll-status ${poll.status}">
-                            ${poll.status === 'active' ? 'Active' : (poll.status === 'pending_payment' ? 'Pending Payment' : 'Closed')}
+                            ${poll.status === 'active' ? 'Active' : (poll.status === 'pending_payment' ? 'Pending' : 'Closed')}
                         </span>
                     </div>
                      ${poll.status === 'pending_payment' && poll.is_owner ? 
-                        `<div style="margin-bottom: 15px;">
-                            <button onclick="PollsApp.verifyPayment('${poll.payment_id}')" data-order="${poll.payment_id}" class="poll-action-btn edit" style="width:100%">
-                                <i class="fas fa-sync"></i> Check Payment Status
+                        `<div style="margin-bottom: 10px;">
+                            <button onclick="PollsApp.verifyPayment('${poll.payment_id}')" data-order="${poll.payment_id}" class="poll-action-btn edit" style="width:100%; padding: 8px;">
+                                <i class="fas fa-sync"></i> Check Payment
                             </button>
                          </div>` 
                     : ''}
@@ -1237,13 +1394,13 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                     <h3 class="poll-title">${this.escapeHtml(poll.title)}</h3>
                     ${poll.description ? `<p class="poll-description">${this.escapeHtml(poll.description)}</p>` : ''}
                     
-                    <div class="poll-options">
+                    <div class="poll-options ${hasImages ? 'has-images' : ''}">
                         ${optionsHtml}
                     </div>
                     
                     <div class="poll-footer">
                         <span class="poll-votes">
-                            <i class="fas fa-vote-yea"></i> ${totalVotes} vote${totalVotes !== 1 ? 's' : ''}
+                            <i class="fas fa-vote-yea"></i> ${totalVotes}
                         </span>
                         ${poll.is_owner && poll.status === 'active' ? this.getExpiryTimerHtml(poll.created_on) : ''}
                         ${actionsHtml}

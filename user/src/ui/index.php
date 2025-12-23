@@ -275,7 +275,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
 
     .enhanced-carousel {
         position: relative;
-        padding: 20px;
+        padding: 0; /* Removed padding to reduce gaps */
     }
 
     .carousel-item-enhanced {
@@ -292,10 +292,10 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
 
     .carousel-item-enhanced img {
         width: 100%;
-        height: 500px;
-        object-fit: contain;
-        background: #000;
+        height: auto;
+        display: block;
         border-radius: 20px;
+        /* Removed fixed height and black background */
     }
 
     .carousel-overlay {
@@ -469,7 +469,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         }
 
         .carousel-item-enhanced img {
-            height: 400px;
+            height: auto;
         }
 
         .section-title {
@@ -540,7 +540,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         }
 
         .carousel-item-enhanced img {
-            height: 300px;
+            height: auto;
         }
 
         .features-parallax {
@@ -609,35 +609,35 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                     <div class="enhanced-carousel">
                         <div id="feature-carousel" class="owl-carousel owl-theme">
                             <div class="carousel-item-enhanced">
-                                <img src="../banners/1.jpeg" alt="Banner 1">
+                                <img src="../banners/1.jpg" alt="Banner 1">
                             </div>
 
                             <div class="carousel-item-enhanced">
-                                <img src="../banners/2.jpeg" alt="Banner 2">
+                                <img src="../banners/2.jpg" alt="Banner 2">
                             </div>
 
                             <div class="carousel-item-enhanced">
-                                <img src="../banners/3.jpeg" alt="Banner 3">
+                                <img src="../banners/3.jpg" alt="Banner 3">
                             </div>
 
                             <div class="carousel-item-enhanced">
-                                <img src="../banners/4.jpeg" alt="Banner 4">
+                                <img src="../banners/4.jpg" alt="Banner 4">
                             </div>
 
                             <div class="carousel-item-enhanced">
-                                <img src="../banners/1.jpeg" alt="Banner 1">
+                                <img src="../banners/1.jpg" alt="Banner 1">
                             </div>
 
                             <div class="carousel-item-enhanced">
-                                <img src="../banners/2.jpeg" alt="Banner 2">
+                                <img src="../banners/2.jpg" alt="Banner 2">
                             </div>
 
                             <div class="carousel-item-enhanced">
-                                <img src="../banners/3.jpeg" alt="Banner 3">
+                                <img src="../banners/3.jpg" alt="Banner 3">
                             </div>
 
                             <div class="carousel-item-enhanced">
-                                <img src="../banners/4.jpeg" alt="Banner 4">
+                                <img src="../banners/4.jpg" alt="Banner 4">
                             </div>
                         </div>
                     </div>
