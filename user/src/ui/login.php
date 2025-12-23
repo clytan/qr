@@ -135,6 +135,33 @@
             box-shadow: 0 6px 20px rgba(230, 119, 83, 0.35);
         }
 
+        /* ==================== PASSWORD TOGGLE ==================== */
+        .password-toggle-container {
+            position: relative;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: #64748b;
+            z-index: 10;
+            padding: 4px;
+        }
+
+        .password-toggle-btn:hover {
+            color: #94a3b8;
+        }
+
+        .auth-input.with-toggle {
+            padding-right: 40px !important;
+        }
+
         /* ==================== MOBILE RESPONSIVE ==================== */
         @media (max-width: 480px) {
             .auth-box {
@@ -171,7 +198,10 @@
                     <input type="text" name="information" id="information" class="auth-input" placeholder="📧 Email or Phone number" required>
                 </div>
                 <div class="auth-field">
-                    <input type="password" name="password" id="password" class="auth-input" placeholder="🔒 Password" required>
+                    <div class="password-toggle-container">
+                        <input type="password" name="password" id="password" class="auth-input with-toggle" placeholder="🔒 Password" required>
+                        <button type="button" class="password-toggle-btn" id="password-toggle">👁️</button>
+                    </div>
                 </div>
                 <button type="submit" id="send_login" class="auth-btn">Sign In</button>
             </form>
@@ -182,6 +212,23 @@
     ================================================== -->
     <?php include('../components/jslinks.php'); ?>
     <script src="./custom_js/custom_login.js"></script>
+
+    <!-- Password Toggle Script -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const passwordToggle = document.getElementById('password-toggle');
+            const passwordInput = document.getElementById('password');
+
+            if (passwordToggle && passwordInput) {
+                passwordToggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const isPassword = passwordInput.type === 'password';
+                    passwordInput.type = isPassword ? 'text' : 'password';
+                    passwordToggle.textContent = isPassword ? '👁️‍🗨️' : '👁️';
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

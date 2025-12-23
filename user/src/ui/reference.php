@@ -263,10 +263,18 @@ if (!$is_logged_in) {
             });
         }
 
-        // Load leaderboard
-        function loadLeaderboard() {
+        // Load leaderboard with optional period filter
+        function loadLeaderboard(period = 'all') {
+            // Show loading state
+            $('#leaderboard-content').html(`
+                <div class="loading">
+                    <i class="fas fa-spinner"></i>
+                    <p>Loading leaderboard...</p>
+                </div>
+            `);
+            
             $.ajax({
-                url: '../backend/get_referral_stats.php?leaderboard=1',
+                url: '../backend/get_referral_stats.php?leaderboard=1&period=' + period,
                 type: 'GET',
                 dataType: 'json',
                 success: function (response) {
@@ -275,10 +283,11 @@ if (!$is_logged_in) {
                         let html = '';
 
                         if (leaderboard.length === 0) {
+                            let periodText = period === 'week' ? 'this week' : (period === 'month' ? 'this month' : '');
                             html = `
                                 <div class="empty-leaderboard">
                                     <i class="fas fa-trophy"></i>
-                                    <p>No referrals yet. Be the first to climb the leaderboard!</p>
+                                    <p>No referrals ${periodText ? periodText : 'yet'}. Be the first to climb the leaderboard!</p>
                                 </div>
                             `;
                         } else {
@@ -354,13 +363,12 @@ if (!$is_logged_in) {
             }
         });
 
-        // Tab switching (visual only - backend filtering can be added later)
+        // Tab switching with period filtering
         $('.leaderboard-tab').on('click', function() {
             $('.leaderboard-tab').removeClass('active');
             $(this).addClass('active');
-            // For now, just reload the same data
-            // You can add period parameter to the API later
-            loadLeaderboard();
+            const period = $(this).data('period');
+            loadLeaderboard(period);
         });
 
         // Load data on page load

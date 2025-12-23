@@ -85,6 +85,17 @@ try {
 
     // If leaderboard is requested
     if (isset($_GET['leaderboard'])) {
+        // Get period filter
+        $period = isset($_GET['period']) ? $_GET['period'] : 'all';
+        
+        // Build date filter based on period
+        $dateFilter = '';
+        if ($period === 'month') {
+            $dateFilter = 'AND r.created_on >= DATE_SUB(NOW(), INTERVAL 1 MONTH)';
+        } else if ($period === 'week') {
+            $dateFilter = 'AND r.created_on >= DATE_SUB(NOW(), INTERVAL 1 WEEK)';
+        }
+        
         // Get top referrers with their stats
         $sqlLeaderboard = "SELECT 
             u.id,
@@ -96,7 +107,7 @@ try {
             COALESCE(SUM(i.amount), 0) as total_amount,
             us.ref_commission
         FROM user_user u
-        LEFT JOIN user_user r ON r.referred_by_user_id = u.user_qr_id AND r.is_deleted = 0
+        LEFT JOIN user_user r ON r.referred_by_user_id = u.user_qr_id AND r.is_deleted = 0 $dateFilter
         LEFT JOIN user_invoice i ON r.id = i.user_id AND i.invoice_type = 'registration' AND i.status = 'Paid'
         LEFT JOIN user_slab us ON u.user_slab_id = us.id
         WHERE u.is_deleted = 0

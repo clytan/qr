@@ -499,7 +499,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
     /* Responsive - Mobile */
     @media (max-width: 768px) {
         .welcome-margin {
-            margin-top: 22% !important;
+            margin-top: 100px !important; /* Fixed value to clear header */
         }
 
         .hero-parallax {

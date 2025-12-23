@@ -338,40 +338,37 @@ body {
     gap: 0;
 }
 
-/* Individual Leaderboard Row */
+/* Individual Leaderboard Row - Ultra Thin */
 .leaderboard-row {
     display: flex;
     align-items: center;
-    gap: 15px;
-    padding: 16px 18px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 14px;
-    margin-bottom: 10px;
-    transition: all 0.3s ease;
+    gap: 8px;
+    padding: 4px 4px;
+    background: transparent !important;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 0;
+    margin-bottom: 0;
 }
 
 .leaderboard-row:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(102, 126, 234, 0.3);
-    transform: translateX(5px);
+    background: transparent !important;
 }
 
 .leaderboard-row:last-child {
-    margin-bottom: 0;
+    border-bottom: none;
 }
 
 /* Rank Styling */
 .rank {
-    min-width: 40px;
-    font-size: 1rem;
-    font-weight: 700;
+    min-width: 45px;
+    font-size: 0.75rem;
+    font-weight: 600;
     color: #64748b;
 }
 
 .rank-1 {
     color: #FFD700;
-    font-size: 1.1rem;
 }
 
 .rank-2 {
@@ -382,27 +379,20 @@ body {
     color: #CD7F32;
 }
 
-/* Top 3 rows have special background */
-.leaderboard-row.top-1 {
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.08) 0%, rgba(255, 165, 0, 0.04) 100%);
-    border-color: rgba(255, 215, 0, 0.2);
-}
-
-.leaderboard-row.top-2 {
-    background: linear-gradient(135deg, rgba(192, 192, 192, 0.08) 0%, rgba(128, 128, 128, 0.04) 100%);
-    border-color: rgba(192, 192, 192, 0.15);
-}
-
+/* No special background for top 3 */
+.leaderboard-row.top-1,
+.leaderboard-row.top-2,
 .leaderboard-row.top-3 {
-    background: linear-gradient(135deg, rgba(205, 127, 50, 0.08) 0%, rgba(139, 69, 19, 0.04) 100%);
-    border-color: rgba(205, 127, 50, 0.15);
+    background: transparent !important;
 }
 
 /* User Info */
 .user-info {
     display: flex;
     align-items: center;
-    gap: 12px;
+    justify-content: center;
+    /* Center the ZOK ID */
+    gap: 8px;
     flex: 1;
 }
 
@@ -435,38 +425,37 @@ body {
 }
 
 .user-name {
-    font-weight: 600;
-    font-size: 0.95rem;
+    font-weight: 500;
+    font-size: 0.75rem;
     color: #e2e8f0;
 }
 
-/* Referral Count Badge */
+/* Referral Count - Minimal */
 .referral-count {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 0.9rem;
+    gap: 3px;
+    font-size: 0.7rem;
     font-weight: 600;
     color: #94a3b8;
-    background: rgba(255, 255, 255, 0.06);
-    padding: 8px 14px;
-    border-radius: 10px;
+    background: transparent;
+    padding: 0;
 }
 
 .referral-count i {
     color: var(--primary);
-    font-size: 0.85rem;
+    font-size: 0.65rem;
 }
 
 .referral-count span {
     color: #fff;
-    font-weight: 700;
+    font-weight: 600;
 }
 
-/* Crown/Medal Icons for Top 3 */
+/* Crown/Medal Icons - Smaller */
 .rank-icon {
-    font-size: 1.1rem;
-    margin-right: 4px;
+    font-size: 0.75rem;
+    margin-right: 2px;
 }
 
 .rank-icon.gold {
@@ -651,36 +640,37 @@ body {
         font-size: 0.8rem;
     }
 
-    /* Rows mobile */
+    /* Rows mobile - ultra thin */
     .leaderboard-row {
-        padding: 12px 14px;
-        gap: 10px;
-        border-radius: 12px;
-        margin-bottom: 8px;
+        padding: 3px 2px;
+        gap: 5px;
     }
 
     .rank {
-        min-width: 32px;
-        font-size: 0.9rem;
+        min-width: 38px;
+        font-size: 0.7rem;
     }
 
     .user-avatar {
-        width: 36px;
-        height: 36px;
-        font-size: 0.9rem;
+        width: 24px;
+        height: 24px;
+        font-size: 0.65rem;
     }
 
     .user-name {
-        font-size: 0.85rem;
+        font-size: 0.7rem;
     }
 
     .referral-count {
-        padding: 6px 10px;
-        font-size: 0.8rem;
+        font-size: 0.65rem;
     }
 
     .referral-count i {
-        font-size: 0.75rem;
+        font-size: 0.6rem;
+    }
+
+    .rank-icon {
+        font-size: 0.65rem;
     }
 
     /* Stats mobile */

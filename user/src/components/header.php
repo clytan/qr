@@ -303,8 +303,8 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
                         }
 
                         #zokli-header {
-                            min-height: 50px;
-                            padding: 6px 0;
+                            min-height: 45px;
+                            padding: 4px 0;
                         }
 
                         .header-content {
