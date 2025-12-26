@@ -215,8 +215,13 @@ if (!$is_logged_in) {
                         const shareText = `Join Zokli community, using my referral code: ${data.referral_code}`;
                         const profileUrl = `https://www.zokli.in/profile?QR=${encodeURIComponent(data.referral_code)}`;
                         const registerUrl = `https://www.zokli.in/register?ref=${data.referral_code}`;
+
+                        // Display URLs (cleaner for text)
+                        const displayProfileUrl = `zokli.in/profile?QR=${encodeURIComponent(data.referral_code)}`;
+                        const displayRegisterUrl = `zokli.in/register?ref=${data.referral_code}`;
+
                         const tagline = `Be a part of this wonderful, digital social media community.`;
-                        const fullMessage = `${shareText}\nView Profile: ${profileUrl}\nRegister: ${registerUrl}\n${tagline}`;
+                        const fullMessage = `${shareText}\nView Profile: ${displayProfileUrl}\nRegister: ${displayRegisterUrl}\n${tagline}`;
 
                         $('#share-whatsapp').attr('href', `https://wa.me/?text=${encodeURIComponent(fullMessage)}`);
                         $('#share-telegram').attr('href', `https://t.me/share/url?url=${encodeURIComponent(registerUrl)}&text=${encodeURIComponent(shareText + '\n' + tagline)}`);
