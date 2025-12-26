@@ -305,15 +305,15 @@ if (!$is_logged_in) {
                                 if (rank === 1) {
                                     topClass = 'top-1';
                                     rankClass = 'rank-1';
-                                    rankIcon = '<i class="fas fa-crown rank-icon gold"></i>';
+                                    rankIcon = '<i class=""></i>';
                                 } else if (rank === 2) {
                                     topClass = 'top-2';
                                     rankClass = 'rank-2';
-                                    rankIcon = '<i class="fas fa-medal rank-icon silver"></i>';
+                                    rankIcon = '<i class=""></i>';
                                 } else if (rank === 3) {
                                     topClass = 'top-3';
                                     rankClass = 'rank-3';
-                                    rankIcon = '<i class="fas fa-medal rank-icon bronze"></i>';
+                                    rankIcon = '<i class=""></i>';
                                 }
                                 
                                 html += `
@@ -397,5 +397,6 @@ if (!$is_logged_in) {
     </script>
 
 </body>
+
 
 </html>
