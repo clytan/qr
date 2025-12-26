@@ -11,7 +11,9 @@ require_once('../components/auth_check.php');
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type">
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
             margin: 0;
@@ -274,6 +276,18 @@ require_once('../components/auth_check.php');
                 </div>
             </div>
 
+            <!-- Charts Section -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; margin-bottom: 30px;">
+                <div style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 25px;">
+                    <h3 style="color: #f1f5f9; font-size: 18px; margin-bottom: 20px;">User Growth (Last 30 Days)</h3>
+                    <canvas id="userChart" height="250"></canvas>
+                </div>
+                <div style="background: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 25px;">
+                    <h3 style="color: #f1f5f9; font-size: 18px; margin-bottom: 20px;">Community Activity</h3>
+                    <canvas id="communityChart" height="250"></canvas>
+                </div>
+            </div>
+
             <!-- Quick Actions -->
             <h3 class="section-title">Quick Actions</h3>
             <div class="quick-actions">
@@ -318,6 +332,73 @@ require_once('../components/auth_check.php');
                     $('.stat-value').text('-');
                 }
             });
+
+            // Fetch chart data
+            $.ajax({
+                url: '../backend/get_dashboard_chart_data.php',
+                type: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status) {
+                        renderCharts(response.data);
+                    }
+                }
+            });
+
+            function renderCharts(data) {
+                // Common chart options for dark theme
+                const chartOptions = {
+                    responsive: true,
+                    plugins: {
+                        legend: { labels: { color: '#94a3b8' } }
+                    },
+                    scales: {
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#94a3b8' },
+                            beginAtZero: true
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    }
+                };
+
+                // User Chart (Line)
+                new Chart(document.getElementById('userChart'), {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'New Users',
+                            data: data.users,
+                            borderColor: '#E9437A',
+                            backgroundColor: 'rgba(233, 67, 122, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 0
+                        }]
+                    },
+                    options: chartOptions
+                });
+
+                // Community Chart (Bar)
+                new Chart(document.getElementById('communityChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'New Communities',
+                            data: data.communities,
+                            backgroundColor: '#e67753',
+                            borderRadius: 4
+                        }]
+                    },
+                    options: chartOptions
+                });
+            }
         });
     </script>
 </body>

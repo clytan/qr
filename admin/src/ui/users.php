@@ -2,6 +2,9 @@
 // Include auth check
 require_once('../components/auth_check.php');
 require_once('../backend/dbconfig/connection.php');
+require_once('../backend/log_admin_action.php');
+
+$admin_id = isset($_SESSION['admin_id']) ? $_SESSION['admin_id'] : 0; // For logging
 
 // Handle AJAX requests
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -173,6 +176,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bind_param('isi', $userId, $reason, $admin_id);
             
             if ($stmt->execute()) {
+                // Log action
+                logAdminAction($admin_id, 'BAN_USER', "Banned user ID: $user_id. Reason: $reason", $conn);
+                
                 echo json_encode(['status' => true, 'message' => 'User banned successfully']);
             } else {
                 echo json_encode(['status' => false, 'message' => 'Failed to ban user']);
@@ -192,6 +198,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $stmt->bind_param('i', $userId);
             
             if ($stmt->execute()) {
+                // Log action
+                logAdminAction($admin_id, 'UNBAN_USER', "Unbanned user ID: $user_id", $conn);
+
                 echo json_encode(['status' => true, 'message' => 'User unbanned successfully']);
             } else {
                 echo json_encode(['status' => false, 'message' => 'Failed to unban user']);
@@ -281,6 +290,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             while ($row = $result->fetch_assoc()) {
                 $users[] = $row;
             }
+            
+            // 4. Add logging to 'export' case
+            logAdminAction($admin_id, 'EXPORT_USERS', "Exported " . count($users) . " users. Format: CSV/Txt", $conn);
             
             echo json_encode(['status' => true, 'data' => $users]);
             exit();

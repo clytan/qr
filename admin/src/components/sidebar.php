@@ -13,6 +13,7 @@ $menuItems = [
     ['url' => 'dashboard.php', 'name' => 'Dashboard', 'icon' => 'fas fa-home'],
     ['url' => 'admin_users.php', 'name' => 'Admin Users', 'icon' => 'fas fa-users-cog'],
     ['url' => 'admin_roles.php', 'name' => 'Roles', 'icon' => 'fas fa-user-tag'],
+    ['url' => 'audit_logs.php', 'name' => 'Audit Logs', 'icon' => 'fas fa-shield-alt'],
     ['url' => 'admin_urls.php', 'name' => 'URL Permissions', 'icon' => 'fas fa-link'],
     ['url' => 'db_explorer.php', 'name' => 'DB Explorer', 'icon' => 'fas fa-database'],
     ['url' => 'communities.php', 'name' => 'Communities', 'icon' => 'fas fa-comments'],
@@ -53,9 +54,9 @@ $isSuperAdmin = (isset($_SESSION['admin_role_id']) && $_SESSION['admin_role_id']
 }
 
 .sidebar-header {
-    padding: 20px 25px 30px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    margin-bottom: 0; /* Changed from 20px */
+    padding: 24px 25px; /* Increased padding */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08); /* Softer border */
+    margin-bottom: 15px;
     flex-shrink: 0;
     display: flex;
     justify-content: space-between;
@@ -82,6 +83,51 @@ $isSuperAdmin = (isset($_SESSION['admin_role_id']) && $_SESSION['admin_role_id']
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+}
+
+/* Search Box */
+.sidebar-search {
+    padding: 0 20px 20px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.search-input-wrapper {
+    position: relative;
+    background: rgba(15, 23, 42, 0.4);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.2s ease;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.search-input-wrapper:focus-within {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(230, 119, 83, 0.5);
+    box-shadow: 0 0 0 2px rgba(230, 119, 83, 0.2);
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+.search-input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    padding: 12px 12px 12px 38px;
+    color: #f1f5f9;
+    font-size: 14px;
+    outline: none;
+}
+
+.search-input::placeholder {
+    color: #64748b;
 }
 
 /* Close button for mobile */
@@ -164,7 +210,10 @@ $isSuperAdmin = (isset($_SESSION['admin_role_id']) && $_SESSION['admin_role_id']
     padding: 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     background: rgba(0, 0, 0, 0.2);
-    flex-shrink: 0; /* Don't shrink */
+    flex-shrink: 0;
+    background: rgba(15, 23, 42, 0.5); /* Darker footer background */
+    backdrop-filter: blur(10px);
+    z-index: 5;
 }
 
 .sidebar-user-info {
@@ -398,6 +447,16 @@ $isSuperAdmin = (isset($_SESSION['admin_role_id']) && $_SESSION['admin_role_id']
         </button>
     </div>
     
+    </div>
+
+    <!-- Global Search -->
+    <div class="sidebar-search">
+        <div class="search-input-wrapper">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" id="globalSearch" placeholder="Search users, communities...">
+        </div>
+    </div>
+    
     <ul class="sidebar-menu">
         <?php foreach ($menuItems as $item): ?>
             <?php 
@@ -453,4 +512,17 @@ document.querySelectorAll('.sidebar-menu-link').forEach(link => {
         }
     });
 });
+
+// Global Search Handler
+const searchInput = document.getElementById('globalSearch');
+if (searchInput) {
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const query = this.value.trim();
+            if (query.length >= 2) {
+                window.location.href = 'search.php?q=' + encodeURIComponent(query);
+            }
+        }
+    });
+}
 </script>
