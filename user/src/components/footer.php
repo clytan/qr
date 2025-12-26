@@ -174,11 +174,32 @@ document.addEventListener('DOMContentLoaded', function(){
                 <a href="/user/src/ui/biz.php" class="more-item">Sell & Earn</a>
                 <a href="/user/src/ui/polls.php" class="more-item">Vote now</a>
                 <a href="/user/src/ui/influencer.php" class="more-item">Influencer Program</a>
-                <a href="../backend/logout.php" class="more-item" style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 4px; padding-top: 8px;"><i class="fas fa-sign-out-alt" style="margin-right: 8px; color: #ef4444;"></i> Logout</a>
+                
+                <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 6px 0;"></div>
+                
+                <a href="/user/src/ui/privacy.php" class="more-item">Privacy Policy</a>
+                <a href="/user/src/ui/terms.php" class="more-item">Terms & Conditions</a>
+                <a href="/user/src/ui/refund.php" class="more-item">Refund Policy</a>
+                
+                <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 6px 0;"></div>
+                
+                <a href="../backend/logout.php" class="more-item"><i class="fas fa-sign-out-alt" style="width: 20px; color: #ef4444;"></i> Logout</a>
             </div>
         </div>
     </div>
 </footer>
+
+<!-- Mobile Footer Links (Static at bottom of content) -->
+<div class="mobile-legal-footer d-md-none" style="text-align: center; padding: 20px 0 80px; opacity: 0.7;">
+    <div style="margin-bottom: 10px;">
+        <a href="/user/src/ui/privacy.php" style="color: #94a3b8; font-size: 12px; margin: 0 8px; text-decoration: none;">Privacy</a>
+        <span style="color: #475569;">•</span>
+        <a href="/user/src/ui/terms.php" style="color: #94a3b8; font-size: 12px; margin: 0 8px; text-decoration: none;">Terms</a>
+        <span style="color: #475569;">•</span>
+        <a href="/user/src/ui/refund.php" style="color: #94a3b8; font-size: 12px; margin: 0 8px; text-decoration: none;">Refund</a>
+    </div>
+    <div style="font-size: 11px; color: #475569;">&copy; <?php echo date('Y'); ?> Zokli</div>
+</div>
 
 <!-- Desktop Footer -->
 <footer class="desktop-footer d-none d-md-block">
