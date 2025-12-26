@@ -57,20 +57,22 @@ try {
         $refCommission = $slabData['ref_commission'] ?? 0;
     }
 
-    // Get total amount from referred users' invoices
-    $sqlEarnings = "SELECT COALESCE(SUM(i.amount), 0) as total_amount 
-                    FROM user_user u 
-                    LEFT JOIN user_invoice i ON u.id = i.user_id AND i.invoice_type = 'registration' AND i.status = 'Paid'
-                    WHERE u.referred_by_user_id = ? AND u.is_deleted = 0";
+    // Get total earnings based on ACTUAL wallet credit transactions
+    // This fixes the issue where earnings were calculated as percentage of invoice amount (e.g. 93.22)
+    // instead of the actual credited amount (100 or 200)
+    
+    $sqlEarnings = "SELECT COALESCE(SUM(amount), 0) as total_earnings 
+                    FROM user_wallet_transaction 
+                    WHERE user_id = ? 
+                    AND transaction_type = 'Referral' 
+                    AND is_deleted = 0";
+                    
     $stmtEarnings = $conn->prepare($sqlEarnings);
-    $stmtEarnings->bind_param('s', $referral_code);
+    $stmtEarnings->bind_param('i', $user_id); // Use user_id (referrer's ID), not referral code
     $stmtEarnings->execute();
     $resultEarnings = $stmtEarnings->get_result();
     $earningsData = $resultEarnings->fetch_assoc();
-    $totalAmount = $earningsData['total_amount'];
-    
-    // Calculate commission earnings
-    $totalEarnings = ($totalAmount * $refCommission) / 100;
+    $totalEarnings = $earningsData['total_earnings'];
 
     $responseData = [
         'status' => true,

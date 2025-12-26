@@ -54,7 +54,9 @@ try {
     while ($row = $result->fetch_assoc()) {
         $notifications[] = [
             'id' => $row['id'],
+            'subject' => $row['subject'] ?? '',
             'message' => $row['message'],
+            'link' => $row['link'] ?? '',
             'is_read' => $row['is_read'],
             'created_on' => $row['created_on'],
             'sender_name' => $row['sender_name']

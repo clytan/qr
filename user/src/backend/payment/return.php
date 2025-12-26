@@ -184,7 +184,8 @@ function processReferral($conn, $referred_by_user_id, $new_user_id)
             $referrer_slab_id = $referrer['user_slab_id'];
 
             // Get commission percentage
-            $sqlSlab = "SELECT ref_commission FROM user_slab WHERE id = ?";
+            // Get commission details
+            $sqlSlab = "SELECT ref_commission, name FROM user_slab WHERE id = ?";
             $stmtSlab = $conn->prepare($sqlSlab);
             $stmtSlab->bind_param('i', $referrer_slab_id);
             $stmtSlab->execute();
@@ -192,20 +193,33 @@ function processReferral($conn, $referred_by_user_id, $new_user_id)
 
             if ($resultSlab->num_rows > 0) {
                 $rowSlab = $resultSlab->fetch_assoc();
-                // If slab defines a fixed-name based commission (quick rule):
-                $slabName = strtolower($rowSlab['name'] ?? $rowSlab['slab_name'] ?? '');
-                if (in_array($slabName, ['creator', 'gold', 'silver'])) {
+                
+                // Fixed commission rule based on Slab Name
+                // Rule: 100/- for individuals, 200/- for creator, student leader, gold & silver
+                $slabName = strtolower($rowSlab['name'] ?? '');
+                
+                // Check against keywords to match "student leader", "creator", etc.
+                if (
+                    strpos($slabName, 'creator') !== false || 
+                    strpos($slabName, 'student') !== false || 
+                    strpos($slabName, 'leader') !== false || 
+                    strpos($slabName, 'gold') !== false || 
+                    strpos($slabName, 'silver') !== false
+                ) {
                     $commission_amount = 200.0;
                 } else {
-                    // default flat for other referrers
+                    // Default for basic/individual users
                     $commission_amount = 100.0;
                 }
-                // Backwards-compatible: if a percentage is set, prefer percentage logic
+                
+                // PREVIOUS PERCENTAGE LOGIC REMOVED to enforce fixed 100/200 rates as per requirement
+                /*
                 if (!empty($rowSlab['ref_commission']) && is_numeric($rowSlab['ref_commission'])) {
                     $commission_percent = floatval($rowSlab['ref_commission']);
-                    $base_amount = 100;
+                    $base_amount = 100; // This was causing the 10/- issue (10% of 100)
                     $commission_amount = $base_amount * ($commission_percent / 100);
                 }
+                */
 
                 // Update or create wallet
                 $sqlWallet = "SELECT id, balance FROM user_wallet WHERE user_id = ? AND is_deleted = 0";

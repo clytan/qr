@@ -1,12 +1,12 @@
 <?php
 /**
  * Auto-Community Assignment Helper Functions
- * Automatically assigns users to communities (100 users per community)
+ * Automatically assigns users to communities (1,000,000 users per community)
  */
 
 /**
  * Get or create the appropriate community for a new user
- * Logic: Every 100 users = 1 community
+ * Logic: Every 1,000,000 users = 1 community
  * 
  * @param mysqli $conn Database connection
  * @param int $user_id The newly created user ID
@@ -24,9 +24,8 @@ function assignUserToCommunity($conn, $user_id)
         $totalUsers = $resultCount->fetch_assoc()['total'];
 
         // Calculate which community this user should be in
-        // Community 1: Users 1-100
-        // Community 2: Users 101-200
-        // Community 3: Users 201-300, etc.
+        // Community 1: Users 1-1,000,000
+        // Community 2: Users 1,000,001-2,000,000
         $communityNumber = ceil($totalUsers / 1000000);
         if ($communityNumber < 1)
             $communityNumber = 1;

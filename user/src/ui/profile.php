@@ -1503,6 +1503,76 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                 padding: 0.875rem 1.5rem;
             }
         }
+            .btn-boost {
+                font-size: 1rem;
+                padding: 0.875rem 1.5rem;
+            }
+        }
+
+        /* QR Action Menu Styles */
+        .qr-dropdown-menu {
+            position: relative;
+            top: auto;
+            left: auto;
+            width: 100%;
+            background: rgba(30, 41, 59, 0.95);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-top: none;
+            border-radius: 0 0 12px 12px;
+            margin-top: 0;
+            padding: 8px;
+            z-index: 10;
+            display: none;
+            animation: fadeIn 0.2s ease;
+        }
+
+        #qr-menu-btn {
+            transition: all 0.3s ease;
+            border-radius: 12px;
+        }
+
+        #qr-menu-btn.active {
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+            border-bottom-color: transparent;
+            background: rgba(255,255,255,0.1) !important;
+        }
+
+        .qr-dropdown-menu.show {
+            display: block;
+        }
+
+        .qr-menu-item {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 12px 16px;
+            border: none;
+            background: transparent;
+            color: var(--text-color);
+            text-align: left;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            text-decoration: none;
+        }
+
+        .qr-menu-item:hover {
+            background: rgba(255,255,255,0.05);
+            color: var(--primary-color);
+            padding-left: 20px;
+        }
+
+        .qr-menu-item i {
+            width: 24px;
+            margin-right: 10px;
+            color: var(--text-secondary);
+        }
+
+        .qr-menu-item:hover i {
+            color: var(--primary-color);
+        }
     </style>
 </head>
 
@@ -1634,42 +1704,92 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                                 <img src="../assets/images/frame.png" class="qr-frame-overlay" alt="Frame">
                             </div>
 
-                            <div class="qr-actions" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                                <button class="btn btn-secondary" id="download-qr-btn">
-                                    <i class="fas fa-download"></i> Download QR
+                            <!-- QR Actions Dropdown -->
+                            <div class="qr-action-menu-container" style="width: 100%; margin-top: 20px; position: relative;">
+                                <button class="btn btn-secondary" id="qr-menu-btn" style="width: 100%; justify-content: space-between; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 12px 16px;">
+                                    <span style="font-weight: 600; color: #fff;"><i class="fas fa-sliders-h" style="margin-right: 8px; color: var(--primary-color);"></i> Profile Actions</span>
+                                    <i class="fas fa-chevron-down"></i>
                                 </button>
-                                <button class="btn btn-secondary" id="share-profile-btn">
-                                    <i class="fas fa-share-alt"></i> Share Profile
-                                </button>
-                            </div>
-                            <?php if (!$viewing_qr): ?>
-                            <button class="btn btn-outline-primary mt-3" id="choose-frame-btn" style="width: 100%;">
-                                <i class="fas fa-image"></i> Choose Frame
-                            </button>
-                            <button class="btn btn-secondary mt-3" id="subscription-btn" style="width: 100%; display: none;">
-                                <i class="fas fa-credit-card"></i> <span id="subscription-btn-text">Subscription Status</span>
-                            </button>
-                            <?php else: ?>
-                            <a href="../backend/profile_new/generate_vcard.php?qr=<?php echo htmlspecialchars($viewed_qr); ?>" class="btn btn-primary mt-3" style="width: 100%; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                <i class="fas fa-address-book"></i> Save to Contacts
-                            </a>
-                            <?php endif; ?>
-
-                            <div id="qr-color-controls" class="hidden">
-                                <div class="color-picker-container">
-                                    <div class="color-picker-group">
-                                        <label>Foreground:</label>
-                                        <input type="color" id="qr-color-dark" class="color-picker" value="#000000">
-                                    </div>
-                                    <div class="color-picker-group">
-                                        <label>Background:</label>
-                                        <input type="color" id="qr-color-light" class="color-picker" value="#FFFFFF">
-                                    </div>
+                                <div class="qr-dropdown-menu" id="qr-dropdown" style="display: none;">
+                                    <button class="qr-menu-item" id="download-qr-btn">
+                                        <i class="fas fa-download"></i> Download QR
+                                    </button>
+                                    <button class="qr-menu-item" id="share-profile-btn">
+                                        <i class="fas fa-share-alt"></i> Share Profile
+                                    </button>
+                                    
+                                    <?php if (!$viewing_qr): ?>
+                                        <button class="qr-menu-item" id="choose-frame-btn">
+                                            <i class="fas fa-image"></i> Choose Frame
+                                        </button>
+                                        <button class="qr-menu-item" id="subscription-btn" style="display: none;">
+                                            <i class="fas fa-credit-card"></i> <span id="subscription-btn-text">Subscription Status</span>
+                                        </button>
+                                        <button class="qr-menu-item" id="toggle-colors-btn" onclick="document.getElementById('qr-color-controls').classList.toggle('d-none');">
+                                            <i class="fas fa-palette"></i> Customize Colors
+                                        </button>
+                                        
+                                        <!-- Color Controls Nested Inside Dropdown -->
+                                        <div id="qr-color-controls" class="d-none" style="padding: 15px; background: rgba(0,0,0,0.3); border-radius: 8px; margin-top: 5px; margin-bottom: 5px;">
+                                            <div class="color-picker-container">
+                                                <div class="color-picker-group">
+                                                    <label class="form-label text-muted small mb-1">FOREGROUND</label>
+                                                    <input type="color" id="qr-color-dark" class="color-picker" value="#000000" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; padding: 0;">
+                                                </div>
+                                                <div class="color-picker-group">
+                                                    <label class="form-label text-muted small mb-1">BACKGROUND</label>
+                                                    <input type="color" id="qr-color-light" class="color-picker" value="#FFFFFF" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; padding: 0;">
+                                                </div>
+                                            </div>
+                                            <button class="btn btn-primary mt-3 w-100" id="save-qr-color">
+                                                <i class="fas fa-save"></i> Save QR Colors
+                                            </button>
+                                        </div>
+                                    <?php else: ?>
+                                        <a href="../backend/profile_new/generate_vcard.php?qr=<?php echo htmlspecialchars($viewed_qr); ?>" class="qr-menu-item">
+                                            <i class="fas fa-address-book"></i> Save to Contacts
+                                        </a>
+                                    <?php endif; ?>
                                 </div>
-                                <button class="btn btn-primary mt-3" id="save-qr-color">
-                                    <i class="fas fa-save"></i> Save QR Colors
-                                </button>
-                        </div>
+                            </div>
+
+                            <script>
+                                document.getElementById('qr-menu-btn').addEventListener('click', function(e) {
+                                    e.stopPropagation();
+                                    const dropdown = document.getElementById('qr-dropdown');
+                                    const btn = this;
+                                    
+                                    // Toggle visibility using style to override CSS if needed, but class is better
+                                    if (dropdown.style.display === 'block' || dropdown.classList.contains('show')) {
+                                        dropdown.style.display = 'none';
+                                        dropdown.classList.remove('show');
+                                        btn.classList.remove('active');
+                                        btn.querySelector('.fa-chevron-down').style.transform = 'rotate(0deg)';
+                                    } else {
+                                        dropdown.style.display = 'block';
+                                        dropdown.classList.add('show');
+                                        btn.classList.add('active');
+                                        btn.querySelector('.fa-chevron-down').style.transform = 'rotate(180deg)';
+                                    }
+                                });
+
+                                // Prevent dropdown close when clicking inside color controls or menu items
+                                document.getElementById('qr-dropdown').addEventListener('click', function(e) {
+                                    e.stopPropagation();
+                                });
+                                
+                                // Close dropdown when clicking outside
+                                document.addEventListener('click', function(e) {
+                                    const dropdown = document.getElementById('qr-dropdown');
+                                    const btn = document.getElementById('qr-menu-btn');
+                                    if (!btn.contains(e.target) && !dropdown.contains(e.target)) {
+                                        dropdown.style.display = 'none';
+                                        dropdown.classList.remove('show');
+                                        btn.classList.remove('active');
+                                        btn.querySelector('.fa-chevron-down').style.transform = 'rotate(0deg)';
+                                    }
+                                });
+                            </script>
                     </div>
                 </div>
 

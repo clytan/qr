@@ -607,10 +607,19 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
                             notificationItem.className =
                                 `notification-item ${notification.is_read ? '' : 'unread'}`;
                             notificationItem.setAttribute('data-notification-id', notification.id);
+                            let contentHtml = '';
+                            if (notification.subject) {
+                                contentHtml += `<div class="notification-subject" style="font-weight: 600; margin-bottom: 4px; color: #1a1a1a; font-size: 14px;">${notification.subject}</div>`;
+                            }
+                            contentHtml += `<div class="message">${notification.message}</div>`;
+                            if (notification.link) {
+                                contentHtml += `<a href="${notification.link}" target="_blank" class="btn-notification-action" style="display: inline-block; margin-top: 8px; font-size: 11px; padding: 6px 12px; background: linear-gradient(135deg, #E9437A 0%, #e67753 100%); color: white; border-radius: 6px; text-decoration: none; font-weight: 500;">Open Link</a>`;
+                            }
+
                             notificationItem.innerHTML = `
                                 <div class="notification-content-wrapper">
                                     <div class="notification-main">
-                                        <div class="message">${notification.message}</div>
+                                        ${contentHtml}
                                     </div>
                                     <div class="notification-time">${formatTimeAgo(notification.created_on)}</div>
                                 </div>

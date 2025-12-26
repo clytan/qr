@@ -37,7 +37,22 @@ $hide_header_extras = true; // Hide notification/wallet buttons on this page
                     <div class="discord-chat-layout">
                         <!-- Chat Section -->
                         <div class="discord-chat-section">
-                            <div class="chat-messages" id="chatMessages">
+                            <!-- Collapsed Community Dropdown (Small) -->
+                            <div class="community-mini-header" style="padding: 10px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:space-between; height: 50px;">
+                                <div class="community-dropdown-wrapper" style="margin:0; width: auto;">
+                                    <button class="community-dropdown-btn" id="communityDropdownBtn" style="padding: 6px 12px; font-size: 13px; height: 32px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); box-shadow: none;">
+                                        <i class="fa fa-users" style="font-size: 12px;"></i>
+                                        <span id="selectedCommunityName" style="font-weight: 500;">Select Community</span>
+                                        <i class="fa fa-chevron-down dropdown-arrow" style="font-size: 10px;"></i>
+                                    </button>
+                                    <div class="community-dropdown-menu" id="communityDropdownMenu" style="width: 280px;">
+                                        <!-- Communities will be loaded here -->
+                                        <div class="text-center" style="padding: 15px; color: #94a3b8;">Loading communities...</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="chat-messages" id="chatMessages" style="padding-top: 10px;">
                                 <!-- Messages will be loaded here -->
                             </div>
                             <div class="chat-input-wrapper">
@@ -114,28 +129,7 @@ $hide_header_extras = true; // Hide notification/wallet buttons on this page
                             </div>
                         </div>
                     </div>
-                    <div class="row">
-                        <div class="col-lg-12">
-                            <div class="community-dropdown-wrapper">
-                                <button class="community-dropdown-btn" id="communityDropdownBtn">
-                                    <i class="fa fa-comments"></i>
-                                    <span id="selectedCommunityName">Select Community</span>
-                                    <i class="fa fa-chevron-down dropdown-arrow"></i>
-                                </button>
-                                <div class="community-dropdown-menu" id="communityDropdownMenu">
-                                    <!-- Communities will be loaded here -->
-                                    <div class="text-center" style="padding: 15px; color: #94a3b8;">Loading communities...</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Members Sidebar -->
-                    <div class="discord-members-section" style="display: none;">
-                        <div class="members-header">Community Members</div>
-                        <div class="members-list" id="membersList">
-                            <!-- Members will be loaded here -->
-                        </div>
-                    </div>
+
                 </div>
             </section>
         </div>

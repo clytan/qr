@@ -58,7 +58,9 @@ if (isset($_POST['action'])) {
         case 'send_notification':
             try {
                 $target_type = $_POST['target_type'] ?? '';
+                $subject = trim($_POST['subject'] ?? '');
                 $message = trim($_POST['message'] ?? '');
+                $link = trim($_POST['link'] ?? '');
                 $admin_id = $_SESSION['admin_id'] ?? 0;
 
                 if (empty($message)) {
@@ -66,12 +68,17 @@ if (isset($_POST['action'])) {
                     exit();
                 }
 
+                // Default subject if empty
+                if (empty($subject)) {
+                    $subject = 'New Notification';
+                }
+
                 $count = 0;
 
                 if ($target_type === 'all') {
-                    $stmt = $conn->prepare("INSERT INTO user_notifications (user_id, message, created_by, created_on, is_read, is_deleted) 
-                                          SELECT id, ?, ?, NOW(), 0, 0 FROM user_user WHERE is_deleted = 0");
-                    $stmt->bind_param('si', $message, $admin_id);
+                    $stmt = $conn->prepare("INSERT INTO user_notifications (user_id, subject, message, link, created_by, created_on, is_read, is_deleted) 
+                                          SELECT id, ?, ?, ?, ?, NOW(), 0, 0 FROM user_user WHERE is_deleted = 0");
+                    $stmt->bind_param('sssi', $subject, $message, $link, $admin_id);
                     $stmt->execute();
                     $count = $stmt->affected_rows;
                     
@@ -81,9 +88,9 @@ if (isset($_POST['action'])) {
                         echo json_encode(['status' => false, 'message' => 'Community ID required']);
                         exit();
                     }
-                    $stmt = $conn->prepare("INSERT INTO user_notifications (user_id, message, created_by, created_on, is_read, is_deleted) 
-                                          SELECT DISTINCT user_id, ?, ?, NOW(), 0, 0 FROM community_members WHERE community_id = ? AND is_deleted = 0");
-                    $stmt->bind_param('sii', $message, $admin_id, $target_id);
+                    $stmt = $conn->prepare("INSERT INTO user_notifications (user_id, subject, message, link, created_by, created_on, is_read, is_deleted) 
+                                          SELECT DISTINCT user_id, ?, ?, ?, ?, NOW(), 0, 0 FROM community_members WHERE community_id = ? AND is_deleted = 0");
+                    $stmt->bind_param('sssii', $subject, $message, $link, $admin_id, $target_id);
                     $stmt->execute();
                     $count = $stmt->affected_rows;
                     
@@ -97,11 +104,11 @@ if (isset($_POST['action'])) {
                     
                     if (!is_array($target_ids)) $target_ids = [$target_ids]; // Fallback
                     
-                    $stmt = $conn->prepare("INSERT INTO user_notifications (user_id, message, created_by, created_on, is_read, is_deleted) VALUES (?, ?, ?, NOW(), 0, 0)");
+                    $stmt = $conn->prepare("INSERT INTO user_notifications (user_id, subject, message, link, created_by, created_on, is_read, is_deleted) VALUES (?, ?, ?, ?, ?, NOW(), 0, 0)");
                     foreach ($target_ids as $uid) {
                         $uid = intval($uid);
                         if ($uid > 0) {
-                            $stmt->bind_param('isi', $uid, $message, $admin_id);
+                            $stmt->bind_param('isssi', $uid, $subject, $message, $link, $admin_id);
                             $stmt->execute();
                             $count++;
                         }
@@ -227,8 +234,19 @@ if (isset($_POST['action'])) {
                     </div>
 
                     <div class="form-group">
+                        <label class="form-label">Subject</label>
+                        <input type="text" class="form-input" id="notification-subject" placeholder="Enter notification subject..." maxlength="100">
+                    </div>
+
+                    <div class="form-group">
                         <label class="form-label">Message</label>
                         <textarea class="form-textarea" id="notification-message" placeholder="Type your message here..."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Link (Optional)</label>
+                        <input type="url" class="form-input" id="notification-link" placeholder="https://example.com/page">
+                        <p style="font-size: 12px; color: #64748b; margin-top: 5px;">Users can click this button to open the link directly</p>
                     </div>
 
                     <button class="btn btn-primary" id="send-btn" onclick="sendNotification()">
@@ -344,6 +362,8 @@ if (isset($_POST['action'])) {
         function sendNotification() {
             const type = $('#target-type').val();
             const message = $('#notification-message').val().trim();
+            const subject = $('#notification-subject').val().trim();
+            const link = $('#notification-link').val().trim();
             const btn = $('#send-btn');
             
             if (!message) {
@@ -351,7 +371,13 @@ if (isset($_POST['action'])) {
                 return;
             }
 
-            let data = { action: 'send_notification', target_type: type, message: message };
+            let data = { 
+                action: 'send_notification', 
+                target_type: type, 
+                message: message,
+                subject: subject,
+                link: link
+            };
 
             if (type === 'community') {
                 const targetId = $('#community-select').val();
@@ -374,6 +400,8 @@ if (isset($_POST['action'])) {
                 if (res.status) {
                     showToast(res.message, 'success');
                     $('#notification-message').val(''); // Clear message
+                    $('#notification-subject').val(''); // Clear subject
+                    $('#notification-link').val(''); // Clear link
                     // Reset selection
                     if (type === 'user') {
                         selectedUsers = [];

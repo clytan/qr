@@ -609,26 +609,6 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                     <div class="enhanced-carousel">
                         <div id="feature-carousel" class="owl-carousel owl-theme">
                             <div class="carousel-item-enhanced">
-                                <img src="../banners/3.jpg" alt="Banner 1">
-                            </div>
-
-                            <div class="carousel-item-enhanced">
-                                <img src="../banners/2.jpg" alt="Banner 2">
-                            </div>
-
-                            <div class="carousel-item-enhanced">
-                                <img src="../banners/5.jpg" alt="Banner 3">
-                            </div>
-
-                            <div class="carousel-item-enhanced">
-                                <img src="../banners/4.jpg" alt="Banner 4">
-                            </div>
-
-                            <div class="carousel-item-enhanced">
-                                <img src="../banners/5.jpg" alt="Banner 5">
-                            </div>
-
-                            <div class="carousel-item-enhanced">
                                 <img src="../banners/2.jpg" alt="Banner 2">
                             </div>
 
@@ -638,6 +618,28 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
 
                             <div class="carousel-item-enhanced">
                                 <img src="../banners/4.jpg" alt="Banner 4">
+                            </div>
+
+                            <div class="carousel-item-enhanced">
+                                <img src="../banners/5.jpg" alt="Banner 5">
+                            </div>
+                            <div class="carousel-item-enhanced">
+                                <img src="../banners/6.jpg" alt="Banner 6">
+                            </div>
+                            <!-- <div class="carousel-item-enhanced">
+                                <img src="../banners/7.jpeg" alt="Banner 7">
+                            </div>
+                            <div class="carousel-item-enhanced">
+                                <img src="../banners/8.jpeg" alt="Banner 8">
+                            </div>
+                            <div class="carousel-item-enhanced">
+                                <img src="../banners/9.jpeg" alt="Banner 9">
+                            </div> -->
+                            <div class="carousel-item-enhanced">
+                                <img src="../banners/10.jpeg" alt="Banner 10">
+                            </div>
+                            <div class="carousel-item-enhanced">
+                                <img src="../banners/11.jpeg" alt="Banner 11">
                             </div>
                         </div>
                     </div>

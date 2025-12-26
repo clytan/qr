@@ -57,8 +57,8 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
     /* Page Header */
     .polls-hero {
         text-align: center;
-        padding: 30px 0 20px;
-        margin-top:10%;
+        padding: 20px 0 10px;
+        margin-top: 10px;
     }
 
     .polls-title {
@@ -289,7 +289,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         overflow: hidden;
         margin-bottom: 6px;
         background-size: cover;
-        background-position: center;
+        background-position: top center;
         border: 1px solid rgba(255,255,255,0.08);
     }
 
@@ -384,7 +384,7 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         position: fixed;
         inset: 0;
         background: rgba(0, 0, 0, 0.8);
-        z-index: 2000;
+        z-index: 99999;
         justify-content: center;
         align-items: center;
         padding: 20px;
@@ -395,21 +395,28 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
     }
 
     .poll-modal-content {
-        background: #1a1f3e;
-        border-radius: 20px;
+        background: rgba(26, 31, 62, 0.85);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 24px;
         width: 100%;
         max-width: 500px;
         max-height: 90vh;
-        overflow-y: auto;
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
     }
 
     .poll-modal-header {
-        padding: 20px 24px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding: 16px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         display: flex;
         justify-content: space-between;
         align-items: center;
+        flex-shrink: 0;
+        background: linear-gradient(to right, rgba(255,255,255,0.02), transparent);
     }
 
     .poll-modal-title {
@@ -429,7 +436,28 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
     }
 
     .poll-modal-body {
+        padding: 0;
+        flex: 1;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .poll-form-scrollable {
+        flex: 1;
+        overflow-y: auto;
         padding: 24px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .poll-form-footer {
+        padding: 16px 20px;
+        border-top: 1px solid rgba(255, 255, 255, 0.05);
+        background: rgba(26, 31, 62, 0.95);
+        backdrop-filter: blur(10px);
+        flex-shrink: 0;
+        z-index: 10;
+        box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
     }
 
     .form-group {
@@ -445,19 +473,21 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
 
     .form-input, .form-textarea {
         width: 100%;
-        padding: 12px 16px;
-        border-radius: 10px;
-        border: 2px solid rgba(255, 255, 255, 0.1);
-        background: rgba(255, 255, 255, 0.05);
+        padding: 14px 18px;
+        border-radius: 14px;
+        border: 2px solid rgba(255, 255, 255, 0.05);
+        background: rgba(0, 0, 0, 0.2);
         color: #fff;
         font-size: 1rem;
-        transition: all 0.3s ease;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .form-input:focus, .form-textarea:focus {
         outline: none;
         border-color: var(--primary);
-        background: rgba(102, 126, 234, 0.1);
+        background: rgba(0, 0, 0, 0.3);
+        box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        transform: translateY(-1px);
     }
 
     .form-textarea {
@@ -948,51 +978,64 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                 <button class="poll-modal-close" id="closeModal">&times;</button>
             </div>
             <div class="poll-modal-body">
-                <form id="createPollForm">
-                    <div class="form-group">
-                        <label class="form-label">Question *</label>
-                        <input type="text" class="form-input" id="pollTitle" placeholder="What do you want to ask?" required maxlength="255">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Description (optional)</label>
-                        <textarea class="form-textarea" id="pollDescription" placeholder="Add more context..."></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label class="form-label">Options *</label>
-                        <div class="options-container" id="optionsContainer">
-                            <div class="option-input-wrapper">
-                                <input type="text" class="form-input option-input" placeholder="Option 1" required maxlength="255">
-                                <label class="option-image-upload" title="Upload Image (Optional)">
-                                    <i class="fas fa-image"></i>
-                                    <input type="file" class="option-image-file" accept="image/*" style="display:none" onchange="PollsApp.handleFileSelect(this)">
-                                </label>
-                            </div>
-                            <div class="option-input-wrapper">
-                                <input type="text" class="form-input option-input" placeholder="Option 2" required maxlength="255">
-                                <label class="option-image-upload" title="Upload Image (Optional)">
-                                    <i class="fas fa-image"></i>
-                                    <input type="file" class="option-image-file" accept="image/*" style="display:none" onchange="PollsApp.handleFileSelect(this)">
-                                </label>
-                            </div>
+                <form id="createPollForm" style="display: flex; flex-direction: column; height: 100%;">
+                    <div class="poll-form-scrollable">
+                        <div class="form-group">
+                            <label class="form-label">Question *</label>
+                            <input type="text" class="form-input" id="pollTitle" placeholder="What do you want to ask?" required maxlength="255">
                         </div>
-                        <button type="button" class="add-option-btn" id="addOptionBtn">
-                            <i class="fas fa-plus"></i> Add Option
-                        </button>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Description (optional)</label>
+                            <textarea class="form-textarea" id="pollDescription" placeholder="Add more context..."></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Options *</label>
+                            <div class="options-container" id="optionsContainer">
+                                <div class="option-input-wrapper">
+                                    <input type="text" class="form-input option-input" placeholder="Option 1" required maxlength="255">
+                                    <label class="option-image-upload" title="Upload Image (Optional)">
+                                        <i class="fas fa-image"></i>
+                                        <input type="file" class="option-image-file" accept="image/*" style="display:none" onchange="PollsApp.handleFileSelect(this)">
+                                    </label>
+                                </div>
+                                <div class="option-input-wrapper">
+                                    <input type="text" class="form-input option-input" placeholder="Option 2" required maxlength="255">
+                                    <label class="option-image-upload" title="Upload Image (Optional)">
+                                        <i class="fas fa-image"></i>
+                                        <input type="file" class="option-image-file" accept="image/*" style="display:none" onchange="PollsApp.handleFileSelect(this)">
+                                    </label>
+                                </div>
+                            </div>
+                            <button type="button" class="add-option-btn" id="addOptionBtn">
+                                <i class="fas fa-plus"></i> Add Option
+                            </button>
+                        </div>
                     </div>
 
-                    <div class="payment-info" style="background: rgba(16, 185, 129, 0.1); padding: 15px; border-radius: 10px; margin-top: 20px; border: 1px solid rgba(16, 185, 129, 0.3);">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="color: #e2e8f0; font-weight: 600;">Poll Creation Fee</span>
-                            <span style="color: #10b981; font-weight: 700; font-size: 1.2rem;">₹99</span>
+                    <div class="poll-form-footer">
+                        <div class="payment-info" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%); padding: 12px 16px; border-radius: 14px; border: 1px solid rgba(16, 185, 129, 0.2); margin-top: 0; display: flex; align-items: center; justify-content: space-between; position: relative; overflow: hidden;">
+                            <!-- Glow effect -->
+                            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: radial-gradient(circle at top right, rgba(16, 185, 129, 0.1), transparent 70%); pointer-events: none;"></div>
+                            
+                            <div>
+                                <div style="color: #e2e8f0; font-weight: 600; margin-bottom: 0;">Poll Creation Fee</div>
+                                <div style="color: #94a3b8; font-size: 0.75rem; display: flex; align-items: center; gap: 4px;">
+                                    <i class="fas fa-clock" style="font-size: 0.7rem;"></i> Active for 7 days
+                                </div>
+                            </div>
+                            <div style="text-align: right;">
+                                <span style="display: block; color: #10b981; font-weight: 800; font-size: 1.3rem; line-height: 1; text-shadow: 0 2px 10px rgba(16, 185, 129, 0.3);">₹99</span>
+                            </div>
                         </div>
-                        <p style="color: #94a3b8; font-size: 0.85rem; margin-top: 5px;">Polls are active for 7 days.</p>
+                        
+                        <button type="submit" class="submit-poll-btn" id="submitPollBtn" style="margin-top: 12px; padding: 12px 20px; box-shadow: 0 8px 20px -4px rgba(233, 67, 122, 0.5);">
+                            <span style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <i class="fas fa-bolt"></i> Pay ₹99 & Create Poll
+                            </span>
+                        </button>
                     </div>
-                    
-                    <button type="submit" class="submit-poll-btn" id="submitPollBtn">
-                        <i class="fas fa-bolt"></i> Pay ₹99 & Create Poll
-                    </button>
                 </form>
             </div>
         </div>

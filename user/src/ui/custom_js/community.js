@@ -170,7 +170,7 @@ function loadCommunities() {
                             ${community.is_moderator ? '<span class="mod-badge"><i class="fa fa-shield"></i></span>' : ''}
                         </div>
                         <div class="community-meta">
-                            <span class="member-count">${community.current_members}/100 members</span>
+                            <span class="member-count">${community.current_members}/1M members</span>
                         </div>
                     </div>
                 `).join('');
