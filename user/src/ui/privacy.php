@@ -36,6 +36,16 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
             color: #a5b4fc;
         }
         .policy-sub{color:#94a3b8;margin-bottom:20px}
+        
+        @media screen and (max-width: 768px) {
+            .policy-card {
+                margin-top: 100px;
+                padding: 20px;
+            }
+            .policy-container {
+                padding-top: 40px;
+            }
+        }
     </style>
 </head>
 

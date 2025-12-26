@@ -177,9 +177,9 @@ document.addEventListener('DOMContentLoaded', function(){
                 
                 <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 6px 0;"></div>
                 
-                <a href="/user/src/ui/privacy.php" class="more-item">Privacy Policy</a>
-                <a href="/user/src/ui/terms.php" class="more-item">Terms & Conditions</a>
-                <a href="/user/src/ui/refund.php" class="more-item">Refund Policy</a>
+                <a href="/user/src/ui/privacy.php" class="more-item" style="margin-top: 10px;">Privacy Policy</a>
+                <a href="/user/src/ui/terms.php" class="more-item" style="margin-top: 10px;">Terms & Conditions</a>
+                <a href="/user/src/ui/refund.php" class="more-item" style="margin-top: 10px;">Refund Policy</a>
                 
                 <div style="height: 1px; background: rgba(255,255,255,0.1); margin: 6px 0;"></div>
                 
@@ -190,15 +190,17 @@ document.addEventListener('DOMContentLoaded', function(){
 </footer>
 
 <!-- Mobile Footer Links (Static at bottom of content) -->
-<div class="mobile-legal-footer d-md-none" style="text-align: center; padding: 20px 0 80px; opacity: 0.7;">
-    <div style="margin-bottom: 10px;">
-        <a href="/user/src/ui/privacy.php" style="color: #94a3b8; font-size: 12px; margin: 0 8px; text-decoration: none;">Privacy</a>
-        <span style="color: #475569;">•</span>
-        <a href="/user/src/ui/terms.php" style="color: #94a3b8; font-size: 12px; margin: 0 8px; text-decoration: none;">Terms</a>
-        <span style="color: #475569;">•</span>
-        <a href="/user/src/ui/refund.php" style="color: #94a3b8; font-size: 12px; margin: 0 8px; text-decoration: none;">Refund</a>
+<div class="mobile-legal-footer d-md-none" style="text-align: center; padding: 30px 20px 100px;">
+    <div style="margin-bottom: 12px; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 8px;">
+        <a href="/user/src/ui/privacy.php" style="color: #cbd5e1; font-size: 13px; text-decoration: none;">Privacy</a>
+        <span style="color: #64748b; font-size: 10px;">●</span>
+        <a href="/user/src/ui/terms.php" style="color: #cbd5e1; font-size: 13px; text-decoration: none;">Terms</a>
+        <span style="color: #64748b; font-size: 10px;">●</span>
+        <a href="/user/src/ui/refund.php" style="color: #cbd5e1; font-size: 13px; text-decoration: none;">Refund</a>
     </div>
-    <div style="font-size: 11px; color: #475569;">&copy; <?php echo date('Y'); ?> Zokli</div>
+    <div style="font-size: 11px; color: #64748b; line-height: 1.5; padding: 0 10px;">
+        &copy; <?php echo date('Y'); ?> BLRLEAF TECHNOLOGY (OPC) PRIVATE LIMITED.<br>All rights reserved.
+    </div>
 </div>
 
 <!-- Desktop Footer -->
@@ -227,7 +229,7 @@ document.addEventListener('DOMContentLoaded', function(){
                 <a href="/user/src/ui/refund.php">Refund Policy</a>
             </div>
             <div class="footer-bottom">
-                <p>&copy; <?php echo date('Y'); ?> Zokli. All rights reserved.</p>
+                <p>&copy; <?php echo date('Y'); ?> BLRLEAF TECHNOLOGY (OPC) PRIVATE LIMITED. All rights reserved.</p>
             </div>
         </div>
     </div>
