@@ -51,7 +51,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             
             // Get users
             $sql = "SELECT id, user_full_name, user_email, user_phone, user_qr_id, user_user_type, 
-                           user_tag, community_id, user_image_path, user_email_verified,
+                           user_tag, community_id, user_image_path, user_email_verified, 
+                           user_address, user_pincode, user_landmark,
                            created_on, updated_on
                     FROM user_user 
                     $where 
@@ -218,6 +219,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         case 'export':
             $search = isset($_POST['search']) ? trim($_POST['search']) : '';
             $tier_filter = isset($_POST['tier_filter']) ? trim($_POST['tier_filter']) : '';
+            $columns = isset($_POST['columns']) ? $_POST['columns'] : [];
             
             $where = "WHERE is_deleted = 0";
             $params = [];
@@ -235,8 +237,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $params[] = $tier_filter;
                 $types .= 's';
             }
+
+            // Map frontend column keys to DB columns
+            $fieldMap = [
+                'name' => 'user_full_name',
+                'email' => 'user_email',
+                'phone' => 'user_phone',
+                'address' => 'user_address',
+                'pincode' => 'user_pincode',
+                'landmark' => 'user_landmark',
+                'qr_id' => 'user_qr_id',
+                'type' => 'user_user_type',
+                'tier' => 'user_tag',
+                'joined' => 'created_on'
+            ];
+
+            $selectFields = [];
+            if (!empty($columns)) {
+                foreach ($columns as $col) {
+                    if (isset($fieldMap[$col])) {
+                        $selectFields[] = $fieldMap[$col];
+                    }
+                }
+            }
+
+            // Fallback if no valid columns selected
+            if (empty($selectFields)) {
+                $selectFields = ['user_full_name', 'user_phone', 'user_address'];
+            }
             
-            $sql = "SELECT user_full_name, user_email, user_phone, user_qr_id, user_tag, user_user_type, user_email_verified, created_on FROM user_user $where ORDER BY created_on DESC";
+            $sql = "SELECT " . implode(', ', $selectFields) . " FROM user_user $where ORDER BY created_on DESC";
             
             if (!empty($params)) {
                 $stmt = $conn->prepare($sql);
@@ -553,8 +583,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <option value="normal">Normal</option>
                     <option value="student">Student</option>
                 </select>
-                <button class="btn-export" onclick="exportUsers()">
-                    <i class="fas fa-download"></i> Export CSV
+                <button class="btn-export" onclick="openExportModal()">
+                    <i class="fas fa-download"></i> Export
                 </button>
             </div>
             
@@ -586,6 +616,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </main>
+    
+    <!-- Export Modal -->
+    <div class="modal-overlay" id="exportModal">
+        <div class="modal" style="max-width: 450px;">
+            <div class="modal-header">
+                <h3 class="modal-title">Export Users</h3>
+                <button class="modal-close" onclick="closeExportModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p style="color: #94a3b8; margin-bottom: 15px;">Select the columns you want to include in the CSV export.</p>
+                
+                <div style="margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px;">
+                    <label style="color: #94a3b8; font-size: 13px; display: block; margin-bottom: 10px;">Export Format</label>
+                    <div style="display: flex; gap: 20px;">
+                        <label style="display: flex; align-items: center; gap: 8px; color: #e2e8f0; cursor: pointer;">
+                            <input type="radio" name="exportFormat" value="csv" checked> CSV (Excel)
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; color: #e2e8f0; cursor: pointer;">
+                            <input type="radio" name="exportFormat" value="txt"> Text File (Print Friendly)
+                        </label>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 20px;">
+                    <label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; cursor: pointer;">
+                        <input type="checkbox" class="export-col" value="name" checked> Name
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; cursor: pointer;">
+                        <input type="checkbox" class="export-col" value="address" checked> Address
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; cursor: pointer;">
+                        <input type="checkbox" class="export-col" value="pincode" checked> Pincode
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; cursor: pointer;">
+                        <input type="checkbox" class="export-col" value="landmark" checked> Landmark
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; cursor: pointer;">
+                        <input type="checkbox" class="export-col" value="phone" checked> Phone
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; cursor: pointer;">
+                        <input type="checkbox" class="export-col" value="email"> Email
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; cursor: pointer;">
+                        <input type="checkbox" class="export-col" value="qr_id" checked> QR ID
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; cursor: pointer;">
+                        <input type="checkbox" class="export-col" value="type"> Type
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; cursor: pointer;">
+                        <input type="checkbox" class="export-col" value="tier"> Tier
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 10px; color: #e2e8f0; cursor: pointer;">
+                        <input type="checkbox" class="export-col" value="joined"> Joined Date
+                    </label>
+                </div>
+
+                <div class="action-buttons" style="border: none; padding-top: 5px;">
+                    <button class="btn-action" style="background: rgba(255,255,255,0.05); color: #94a3b8;" onclick="closeExportModal()">Cancel</button>
+                    <button class="btn-action btn-primary-action" onclick="confirmExport()"><i class="fas fa-file-export"></i> Download</button>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <!-- User Detail Modal -->
     <div class="modal-overlay" id="userModal">
@@ -669,7 +762,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     let html = '';
                     response.data.forEach(user => {
                         const avatar = user.user_image_path 
-                            ? `<img src="../../../user/src/${user.user_image_path}" alt="">` 
+                            ? `<img src="../../..${user.user_image_path}" alt="">` 
                             : (user.user_full_name ? user.user_full_name.charAt(0).toUpperCase() : '?');
                         const name = user.user_full_name || 'No Name';
                         const email = user.user_email || '-';
@@ -750,7 +843,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     const penalties = response.data.penalties;
                     
                     const avatar = user.user_image_path 
-                        ? `<img src="../../../user/src/${user.user_image_path}" alt="">` 
+                        ? `<img src="../../..${user.user_image_path}" alt="">` 
                         : (user.user_full_name ? user.user_full_name.charAt(0).toUpperCase() : '?');
                     
                     let penaltiesHtml = '';
@@ -800,9 +893,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <div class="detail-label">Community ID</div>
                                 <div class="detail-value">${user.community_id || 'None'}</div>
                             </div>
+                            </div>
                             <div class="detail-item">
                                 <div class="detail-label">Joined</div>
                                 <div class="detail-value">${formatDate(user.created_on)}</div>
+                            </div>
+                            <div class="detail-item" style="grid-column: span 2;">
+                                <div class="detail-label">Address</div>
+                                <div class="detail-value">
+                                    ${escapeHtml(user.user_address || '')}
+                                    ${user.user_landmark ? '<br><small>Landmark: ' + escapeHtml(user.user_landmark) + '</small>' : ''}
+                                    ${user.user_pincode ? '<br><small>Pincode: ' + escapeHtml(user.user_pincode) + '</small>' : ''}
+                                    ${!user.user_address && !user.user_landmark && !user.user_pincode ? '<span style="color: #64748b; font-style: italic;">No address details</span>' : ''}
+                                </div>
                             </div>
                         </div>
                         
@@ -897,37 +1000,124 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
         }
         
-        function exportUsers() {
+        function openExportModal() {
+            $('#exportModal').addClass('show');
+        }
+
+        function closeExportModal() {
+            $('#exportModal').removeClass('show');
+        }
+
+        function confirmExport() {
             const search = $('#searchInput').val().trim();
             const tierFilter = $('#tierFilter').val();
+            const format = $('input[name="exportFormat"]:checked').val();
             
+            // Get selected columns
+            const columns = [];
+            $('.export-col:checked').each(function() {
+                columns.push($(this).val());
+            });
+
+            if (columns.length === 0) {
+                showToast('Please select at least one column', 'error');
+                return;
+            }
+
             showToast('Preparing export...', 'success');
             
-            $.post('', { action: 'export', search: search, tier_filter: tierFilter }, function(response) {
+            $.post('', { action: 'export', search: search, tier_filter: tierFilter, columns: columns }, function(response) {
                 if (response.status && response.data.length > 0) {
-                    // Convert to CSV
-                    const headers = ['Name', 'Email', 'Phone', 'QR ID', 'Tier', 'Type', 'Verified', 'Joined'];
-                    let csv = headers.join(',') + '\n';
+                    closeExportModal();
                     
-                    response.data.forEach(row => {
-                        csv += [
-                            '"' + (row.user_full_name || '').replace(/"/g, '""') + '"',
-                            '"' + (row.user_email || '').replace(/"/g, '""') + '"',
-                            '"' + (row.user_phone || '').replace(/"/g, '""') + '"',
-                            '"' + (row.user_qr_id || '').replace(/"/g, '""') + '"',
-                            '"' + (row.user_tag || '').replace(/"/g, '""') + '"',
-                            '"' + (row.user_user_type || '').replace(/"/g, '""') + '"',
-                            row.user_email_verified ? 'Yes' : 'No',
-                            '"' + (row.created_on || '').replace(/"/g, '""') + '"'
-                        ].join(',') + '\n';
-                    });
-                    
-                    // Download
-                    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-                    const link = document.createElement('a');
-                    link.href = URL.createObjectURL(blob);
-                    link.download = 'users_export_' + new Date().toISOString().slice(0,10) + '.csv';
-                    link.click();
+                    if (format === 'txt') {
+                        // Text File Export
+                        let txtContent = '';
+                        
+                        response.data.forEach(row => {
+                            // Construct address block if address components are selected
+                            let fullAddress = [];
+                            if (row.user_address) fullAddress.push(row.user_address);
+                            if (row.user_landmark) fullAddress.push(row.user_landmark);
+                            if (row.user_pincode) fullAddress.push(row.user_pincode);
+                            
+                            // Build the block based on selected columns
+                            if (columns.includes('name')) txtContent += (row.user_full_name || 'No Name') + '\r\n';
+                            if (columns.includes('qr_id')) txtContent += (row.user_qr_id || '-') + '\r\n';
+                            if (columns.includes('phone')) txtContent += (row.user_phone || '-') + '\r\n';
+                            if (columns.includes('email')) txtContent += (row.user_email || '-') + '\r\n';
+                            
+                            // Combine address fields if any are selected
+                            if (columns.includes('address') || columns.includes('pincode') || columns.includes('landmark')) {
+                                if (fullAddress.length > 0) {
+                                    txtContent += fullAddress.join(', ') + '\r\n';
+                                } else {
+                                    txtContent += 'No Address\r\n';
+                                }
+                            }
+                            
+                            if (columns.includes('type')) txtContent += 'Type: ' + (row.user_user_type || '-') + '\r\n';
+                            if (columns.includes('tier')) txtContent += 'Tier: ' + (row.user_tag || '-') + '\r\n';
+                            if (columns.includes('joined')) txtContent += 'Joined: ' + (row.created_on || '-') + '\r\n';
+                            
+                            txtContent += '----------------------------------------\r\n';
+                        });
+
+                        const blob = new Blob([txtContent], { type: 'text/plain;charset=utf-8;' });
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = 'users_export_' + new Date().toISOString().slice(0,10) + '.txt';
+                        link.click();
+                        
+                    } else {
+                        // CSV Export (Existing logic)
+                        const headerMap = {
+                            'name': 'Name',
+                            'email': 'Email',
+                            'phone': 'Phone',
+                            'address': 'Address',
+                            'pincode': 'Pincode',
+                            'landmark': 'Landmark',
+                            'qr_id': 'QR ID',
+                            'type': 'Type',
+                            'tier': 'Tier',
+                            'joined': 'Joined'
+                        };
+
+                        const dbKeyMap = {
+                            'name': 'user_full_name',
+                            'email': 'user_email',
+                            'phone': 'user_phone',
+                            'address': 'user_address',
+                            'pincode': 'user_pincode',
+                            'landmark': 'user_landmark',
+                            'qr_id': 'user_qr_id',
+                            'type': 'user_user_type',
+                            'tier': 'user_tag',
+                            'joined': 'created_on'
+                        };
+
+                        // Build headers
+                        const selectedHeaders = columns.map(col => headerMap[col] || col);
+                        let csv = selectedHeaders.join(',') + '\n';
+                        
+                        // Build rows
+                        response.data.forEach(row => {
+                            const csvRow = columns.map(col => {
+                                const dbKey = dbKeyMap[col];
+                                let val = row[dbKey] || '';
+                                val = String(val).replace(/"/g, '""');
+                                return '"' + val + '"';
+                            });
+                            csv += csvRow.join(',') + '\n';
+                        });
+                        
+                        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = 'users_export_' + new Date().toISOString().slice(0,10) + '.csv';
+                        link.click();
+                    }
                     
                     showToast('Export complete! ' + response.data.length + ' users', 'success');
                 } else {
