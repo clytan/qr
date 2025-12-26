@@ -171,8 +171,8 @@ document.addEventListener('DOMContentLoaded', function(){
                 <span>More</span>
             </a>
             <div class="more-popover" role="menu" aria-hidden="true">
-                <a href="/user/src/ui/biz.php" class="more-item">Biz</a>
-                <a href="/user/src/ui/polls.php" class="more-item">Poll</a>
+                <a href="/user/src/ui/biz.php" class="more-item">Sell & Earn</a>
+                <a href="/user/src/ui/polls.php" class="more-item">Vote now</a>
                 <a href="/user/src/ui/influencer.php" class="more-item">Influencer Program</a>
                 <a href="../backend/logout.php" class="more-item" style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 4px; padding-top: 8px;"><i class="fas fa-sign-out-alt" style="margin-right: 8px; color: #ef4444;"></i> Logout</a>
             </div>
@@ -193,8 +193,8 @@ document.addEventListener('DOMContentLoaded', function(){
                 <div class="more-desktop-wrapper">
                     <a href="#" class="desktop-more-toggle">More</a>
                     <div class="more-desktop" aria-hidden="true">
-                        <a href="/user/src/ui/biz.php">Biz</a>
-                        <a href="/user/src/ui/polls.php">Poll</a>
+                        <a href="/user/src/ui/biz.php">Sell & Earn</a>
+                        <a href="/user/src/ui/polls.php">Vote now</a>
                         <a href="/user/src/ui/influencer.php">Influencer Program</a>
                         <a href="../backend/logout.php" style="border-top: 1px solid rgba(255,255,255,0.1); margin-top: 4px; padding-top: 8px;"><i class="fas fa-sign-out-alt" style="margin-right: 5px; color: #ef4444;"></i> Logout</a>
                     </div>

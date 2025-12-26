@@ -103,7 +103,7 @@ $header_is_logged_in = isset($_SESSION['user_id']) && !empty($_SESSION['user_id'
                     .right-section {
                         display: flex;
                         align-items: center;
-                        gap: 10px;
+                        gap: 20px;
                         flex: 0 0 auto;
                     }
                     
