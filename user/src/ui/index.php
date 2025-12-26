@@ -995,10 +995,10 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
                     items: 1
                 },
                 768: {
-                    items: 2
+                    items: 1
                 },
                 1200: {
-                    items: 3
+                    items: 1
                 }
             }
         });
