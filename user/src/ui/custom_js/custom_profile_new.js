@@ -114,6 +114,7 @@ const profileFunction = {
         // QR Color changes (only in edit mode)
         if (!window.PUBLIC_PROFILE) {
             $('#qr-color-dark, #qr-color-light').on('input', this.handleQRColorChange);
+            $('#qr-color-dark, #qr-color-light').on('change', this.handleSaveQRColor);
             $('#save-qr-color').on('click', this.handleSaveQRColor);
         }
 

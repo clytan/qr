@@ -1741,7 +1741,7 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
                                                     <input type="color" id="qr-color-light" class="color-picker" value="#FFFFFF" style="width: 50px; height: 50px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.2); cursor: pointer; padding: 0;">
                                                 </div>
                                             </div>
-                                            <button class="btn btn-primary mt-3 w-100" id="save-qr-color">
+                                            <button class="btn btn-primary mt-3 w-100 d-none" id="save-qr-color">
                                                 <i class="fas fa-save"></i> Save QR Colors
                                             </button>
                                         </div>

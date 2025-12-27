@@ -38,7 +38,7 @@ $hide_header_extras = true; // Hide notification/wallet buttons on this page
                         <!-- Chat Section -->
                         <div class="discord-chat-section">
                             <!-- Collapsed Community Dropdown (Small) -->
-                            <div class="community-mini-header" style="padding: 10px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:space-between; height: 50px;">
+                            <div class="community-mini-header" style="padding: 10px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:space-between; height: 50px;margin-top:-8px">
                                 <div class="community-dropdown-wrapper" style="margin:0; width: auto;">
                                     <button class="community-dropdown-btn" id="communityDropdownBtn" style="padding: 6px 12px; font-size: 13px; height: 32px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); box-shadow: none;">
                                         <i class="fa fa-users" style="font-size: 12px;"></i>
