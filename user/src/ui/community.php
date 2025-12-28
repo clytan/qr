@@ -34,6 +34,27 @@ $hide_header_extras = true; // Hide notification/wallet buttons on this page
                 padding-top: 0 !important;
             }
         }
+        
+        /* Admin Message Styling */
+        .admin-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ec4899, #f59e0b);
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .admin-avatar i {
+            margin: 0;
+        }
+        .admin-message {
+            background: rgba(236, 72, 153, 0.08) !important;
+            border-left: 3px solid #ec4899;
+        }
     </style>
 </head>
 
