@@ -257,8 +257,9 @@ function renderMessage(msg) {
     const renderAttachment = () => {
         if (!msg.attachment_path) return '';
 
-        // Use the correct path - attachment_path is stored as 'uploads/community/...'
-        const attachmentUrl = '../' + msg.attachment_path;
+        // Use absolute path from site root for production compatibility
+        // attachment_path is stored as 'uploads/community/...'
+        const attachmentUrl = '/user/src/' + msg.attachment_path;
         
         if (isImageFile(msg.attachment_name || msg.attachment_path)) {
             return `

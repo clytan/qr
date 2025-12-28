@@ -51,10 +51,10 @@ $hide_header_extras = true; // Hide notification/wallet buttons on this page
         .admin-avatar i {
             margin: 0;
         }
-        .admin-message {
+        /* .admin-message {
             background: rgba(236, 72, 153, 0.08) !important;
             border-left: 3px solid #ec4899;
-        }
+        } */
     </style>
 </head>
 
