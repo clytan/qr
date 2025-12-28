@@ -293,6 +293,12 @@ function renderMessage(msg) {
     const formatMessageContent = (message) => {
         if (!message) return '';
 
+        // Check for [GIF] prefix (from admin panel)
+        if (message.startsWith('[GIF]')) {
+            const gifUrl = message.replace('[GIF]', '').trim();
+            return `<div class="message-gif"><img src="${gifUrl}" alt="GIF" class="gif-content" onclick="openLightbox('${gifUrl}')"></div>`;
+        }
+
         // Check if message contains HTML img tag (from GIF picker)
         if (message.includes('<img') && message.includes('class="gif-message"')) {
             // Extract the src URL
@@ -302,8 +308,8 @@ function renderMessage(msg) {
             }
         }
 
-        // Check if message is a direct GIF URL (from Giphy/Tenor)
-        const gifUrlPattern = /^https?:\/\/(media\d*\.giphy\.com|media\.tenor\.com|i\.giphy\.com)\/.*\.(gif|mp4|webp)/i;
+        // Check if message is a direct GIF URL (from Giphy/Tenor) - with or without file extension
+        const gifUrlPattern = /^https?:\/\/(media\d*\.giphy\.com|media\.tenor\.com|i\.giphy\.com|c\.tenor\.com)\/.*/i;
         if (gifUrlPattern.test(message.trim())) {
             return `<div class="message-gif"><img src="${message.trim()}" alt="GIF" class="gif-content" onclick="openLightbox('${message.trim()}')"></div>`;
         }
@@ -551,6 +557,7 @@ function loadMembers() {
         .then(data => {
             if (data.status) {
                 const membersList = document.getElementById('membersList');
+                if (!membersList) return; // Element not found, skip
                 membersList.innerHTML = data.members.map(member => {
                     const memberAvatar = member.user_image_path ? resolveImagePath(member.user_image_path) : generateInitialsAvatar(member.user_full_name || member.user_qr_id, 48);
                     return `<div class="member-item" title="${member.user_full_name || member.user_qr_id}">

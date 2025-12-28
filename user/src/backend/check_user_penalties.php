@@ -10,6 +10,7 @@ function checkUserPenalties($user_id, $community_id, $conn)
             AND community_id = ? 
             AND (penalty_type = 'timeout' OR penalty_type = 'ban')
             AND (end_time > ? OR penalty_type = 'ban')
+            AND is_deleted = 0
             ORDER BY created_on DESC 
             LIMIT 1";
 

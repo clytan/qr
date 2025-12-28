@@ -367,6 +367,80 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 echo json_encode(['status' => false, 'message' => $e->getMessage()]);
             }
             exit();
+            
+        case 'send_message':
+            try {
+                $community_id = intval($_POST['community_id'] ?? 0);
+                $message = trim($_POST['message'] ?? '');
+                $admin_id = $_SESSION['admin_id'] ?? 0;
+                
+                // Handle file upload
+                $attachment_path = null;
+                $attachment_name = null;
+                
+                if (isset($_FILES['attachment']) && $_FILES['attachment']['error'] === UPLOAD_ERR_OK) {
+                    $upload_dir = '../../../user/src/uploads/community/';
+                    if (!file_exists($upload_dir)) {
+                        mkdir($upload_dir, 0777, true);
+                    }
+                    
+                    $file = $_FILES['attachment'];
+                    $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+                    $allowed_types = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+                    
+                    if (!in_array($ext, $allowed_types)) {
+                        echo json_encode(['status' => false, 'message' => 'Invalid file type. Allowed: jpg, png, gif, webp']);
+                        exit();
+                    }
+                    
+                    $attachment_name = $file['name'];
+                    $unique_name = 'admin_' . uniqid() . '_' . bin2hex(random_bytes(8)) . '.' . $ext;
+                    $attachment_path = 'uploads/community/' . $unique_name;
+                    
+                    if (!move_uploaded_file($file['tmp_name'], $upload_dir . $unique_name)) {
+                        echo json_encode(['status' => false, 'message' => 'Failed to upload file']);
+                        exit();
+                    }
+                }
+                
+                if ($community_id <= 0 || (empty($message) && empty($attachment_path))) {
+                    echo json_encode(['status' => false, 'message' => 'Community ID and message/image required']);
+                    exit();
+                }
+                
+                // Find a valid user_id to satisfy foreign key
+                $user_result = $conn->query("SELECT id FROM user_user WHERE is_deleted = 0 ORDER BY id ASC LIMIT 1");
+                $system_user_id = 1;
+                if ($user_result && $row = $user_result->fetch_assoc()) {
+                    $system_user_id = $row['id'];
+                }
+                
+                // Insert message with admin_sent = 1 flag
+                $sql = "INSERT INTO community_chat (community_id, user_id, message, attachment_path, attachment_name, admin_sent, created_by, updated_by, created_on) VALUES (?, ?, ?, ?, ?, 1, ?, ?, NOW())";
+                $stmt = $conn->prepare($sql);
+                
+                if (!$stmt) {
+                    // Try without admin_sent column
+                    $sql = "INSERT INTO community_chat (community_id, user_id, message, attachment_path, attachment_name, created_by, updated_by, created_on) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())";
+                    $stmt = $conn->prepare($sql);
+                    if (!$stmt) {
+                        echo json_encode(['status' => false, 'message' => 'Prepare failed: ' . $conn->error]);
+                        exit();
+                    }
+                    $stmt->bind_param('iisssii', $community_id, $system_user_id, $message, $attachment_path, $attachment_name, $system_user_id, $system_user_id);
+                } else {
+                    $stmt->bind_param('iisssii', $community_id, $system_user_id, $message, $attachment_path, $attachment_name, $system_user_id, $system_user_id);
+                }
+                
+                if ($stmt->execute()) {
+                    echo json_encode(['status' => true, 'message' => 'Message sent']);
+                } else {
+                    echo json_encode(['status' => false, 'message' => 'Failed to send: ' . $stmt->error]);
+                }
+            } catch (Exception $e) {
+                echo json_encode(['status' => false, 'message' => $e->getMessage()]);
+            }
+            exit();
     }
 }
 ?>
@@ -500,6 +574,60 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             .community-panel { width: 100%; max-height: 300px; }
             .main-panel { min-height: 500px; }
         }
+        
+        /* Chat Input Styles */
+        .chat-input-wrapper { padding: 15px; background: rgba(30, 41, 59, 0.8); border-radius: 0 0 12px 12px; position: relative; }
+        .chat-input { display: flex; align-items: center; gap: 10px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 8px 12px; }
+        .chat-input input { flex: 1; background: transparent; border: none; color: #e2e8f0; font-size: 14px; outline: none; }
+        .chat-input input::placeholder { color: #64748b; }
+        .input-btn { width: 36px; height: 36px; border: none; background: rgba(255,255,255,0.05); border-radius: 8px; color: #94a3b8; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+        .input-btn:hover { background: rgba(255,255,255,0.1); color: #e2e8f0; }
+        .input-btn.send-btn { background: linear-gradient(135deg, #E9437A, #E2AD2A); color: white; }
+        .input-btn.send-btn:hover { opacity: 0.9; }
+        
+        /* Emoji Picker */
+        .emoji-picker { position: absolute; bottom: 70px; left: 15px; background: #1e293b; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 12px; z-index: 100; }
+        .emoji-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+        .emoji-grid span { font-size: 22px; cursor: pointer; padding: 4px; border-radius: 6px; text-align: center; transition: background 0.2s; }
+        .emoji-grid span:hover { background: rgba(255,255,255,0.1); }
+        
+        /* Message Moderation Actions */
+        .msg-btn.timeout { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+        .msg-btn.timeout:hover { background: rgba(245, 158, 11, 0.25); }
+        .msg-btn.ban { background: rgba(239, 68, 68, 0.15); color: #f87171; }
+        .msg-btn.ban:hover { background: rgba(239, 68, 68, 0.25); }
+        .msg-btn.mod { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
+        .msg-btn.mod:hover { background: rgba(168, 85, 247, 0.25); }
+        
+        /* Admin message styling */
+        .message.admin-msg { border-left: 3px solid #E9437A; background: rgba(233, 67, 122, 0.08); }
+        .message.admin-msg .message-user { color: #E9437A; }
+        .admin-badge { font-size: 9px; background: linear-gradient(135deg, #E9437A, #E2AD2A); color: white; padding: 2px 6px; border-radius: 4px; margin-left: 6px; font-weight: 600; }
+        
+        /* GIF Picker */
+        .gif-picker { position: absolute; bottom: 70px; left: 60px; background: #1e293b; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; width: 320px; max-height: 400px; z-index: 100; overflow: hidden; }
+        .picker-header { display: flex; justify-content: space-between; align-items: center; padding: 10px 15px; border-bottom: 1px solid rgba(255,255,255,0.1); font-weight: 600; font-size: 13px; }
+        .picker-close { background: none; border: none; color: #94a3b8; font-size: 20px; cursor: pointer; }
+        .picker-close:hover { color: #e2e8f0; }
+        .gif-search { padding: 10px; }
+        .gif-search input { width: 100%; padding: 10px 12px; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color: #e2e8f0; font-size: 13px; }
+        .gif-search input:focus { outline: none; border-color: #E9437A; }
+        .gif-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; padding: 10px; max-height: 280px; overflow-y: auto; }
+        .gif-grid img { width: 100%; height: 100px; object-fit: cover; border-radius: 8px; cursor: pointer; transition: transform 0.2s; }
+        .gif-grid img:hover { transform: scale(1.05); }
+        .gif-loading { grid-column: 1 / -1; text-align: center; padding: 40px 20px; color: #64748b; font-size: 13px; }
+        
+        /* Attachment Preview */
+        .attachment-preview { padding: 10px 15px; background: rgba(30, 41, 59, 0.8); border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .preview-content { display: flex; align-items: center; gap: 10px; }
+        .preview-content span { font-size: 12px; color: #94a3b8; flex: 1; }
+        .btn-remove { background: rgba(239, 68, 68, 0.2); border: none; color: #f87171; width: 24px; height: 24px; border-radius: 6px; cursor: pointer; font-size: 16px; }
+        .btn-remove:hover { background: rgba(239, 68, 68, 0.3); }
+        
+        /* Message GIF/Image Display */
+        .message-gif { margin-top: 8px; }
+        .message-gif img, .gif-content { max-width: 300px; max-height: 200px; border-radius: 8px; object-fit: contain; cursor: pointer; }
+        .gif-content:hover { opacity: 0.9; }
     </style>
 </head>
 <body>
@@ -537,6 +665,78 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
                     <div class="chat-messages" id="chat-messages">
                         <div class="empty-state"><i class="fas fa-comments"></i><br>Select a community to view chat</div>
+                    </div>
+                    
+                    <!-- Chat Input for Admin -->
+                    <div class="chat-input-wrapper">
+                        <!-- Attachment Preview -->
+                        <div id="attachmentPreview" class="attachment-preview" style="display: none;">
+                            <div class="preview-content">
+                                <img id="attachmentPreviewImg" src="" alt="" style="max-height: 60px; border-radius: 8px;">
+                                <span id="attachmentName"></span>
+                                <button class="btn-remove" onclick="removeAttachment()">×</button>
+                            </div>
+                        </div>
+                        
+                        <div class="chat-input">
+                            <button class="input-btn emoji-btn" onclick="toggleEmojiPicker()" title="Add Emoji">
+                                <i class="fas fa-smile"></i>
+                            </button>
+                            <button class="input-btn gif-btn" onclick="toggleGifPicker()" title="Add GIF">
+                                <i class="fas fa-image"></i>
+                            </button>
+                            <label for="adminAttachment" class="input-btn attach-btn" title="Attach Image">
+                                <i class="fas fa-paperclip"></i>
+                            </label>
+                            <input type="file" id="adminAttachment" accept="image/*" style="display: none;" onchange="handleAttachment(this)">
+                            
+                            <input type="text" id="adminMessageInput" placeholder="Send a message as Admin..." onkeypress="if(event.key==='Enter')sendAdminMessage()">
+                            <button class="input-btn send-btn" onclick="sendAdminMessage()" title="Send">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        
+                        <!-- Emoji Picker -->
+                        <div id="emojiPicker" class="emoji-picker" style="display: none;">
+                            <div class="picker-header">
+                                <span>Emojis</span>
+                                <button class="picker-close" onclick="toggleEmojiPicker()">×</button>
+                            </div>
+                            <div class="emoji-grid">
+                                <span onclick="addEmoji('😀')">😀</span>
+                                <span onclick="addEmoji('😂')">😂</span>
+                                <span onclick="addEmoji('😍')">😍</span>
+                                <span onclick="addEmoji('🤔')">🤔</span>
+                                <span onclick="addEmoji('😎')">😎</span>
+                                <span onclick="addEmoji('🔥')">🔥</span>
+                                <span onclick="addEmoji('👍')">👍</span>
+                                <span onclick="addEmoji('👎')">👎</span>
+                                <span onclick="addEmoji('❤️')">❤️</span>
+                                <span onclick="addEmoji('💯')">💯</span>
+                                <span onclick="addEmoji('⚠️')">⚠️</span>
+                                <span onclick="addEmoji('🚫')">🚫</span>
+                                <span onclick="addEmoji('📢')">📢</span>
+                                <span onclick="addEmoji('👋')">👋</span>
+                                <span onclick="addEmoji('🎉')">🎉</span>
+                                <span onclick="addEmoji('✅')">✅</span>
+                                <span onclick="addEmoji('❌')">❌</span>
+                                <span onclick="addEmoji('🙏')">🙏</span>
+                            </div>
+                        </div>
+                        
+                        <!-- GIF Picker -->
+                        <div id="gifPicker" class="gif-picker" style="display: none;">
+                            <div class="picker-header">
+                                <span>GIFs</span>
+                                <button class="picker-close" onclick="toggleGifPicker()">×</button>
+                            </div>
+                            <div class="gif-search">
+                                <input type="text" id="gifSearchInput" placeholder="Search GIFs..." onkeyup="searchGifs(this.value)">
+                            </div>
+                            <div class="gif-grid" id="gifGrid">
+                                <div class="gif-loading">Type to search GIFs...</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 
@@ -655,26 +855,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (response.status && response.data.length > 0) {
                     let html = '';
                     response.data.forEach(msg => {
-                        const avatar = msg.user_image_path 
-                            ? `<img src="../../../user/src/${msg.user_image_path}" alt="">` 
-                            : (msg.user_full_name ? msg.user_full_name.charAt(0).toUpperCase() : '?');
+                        const isAdmin = msg.user_id == 0 || msg.admin_sent == 1;
+                        const avatar = isAdmin 
+                            ? '<i class="fas fa-shield-alt"></i>'
+                            : (msg.user_image_path 
+                                ? `<img src="../../../user/src/${msg.user_image_path}" alt="">` 
+                                : (msg.user_full_name ? msg.user_full_name.charAt(0).toUpperCase() : '?'));
+                        const userName = isAdmin ? 'Admin' : escapeHtml(msg.user_full_name);
+                        const adminBadge = isAdmin ? '<span class="admin-badge">ADMIN</span>' : '';
+                        const qrId = isAdmin ? '' : `<span class="message-qr">${escapeHtml(msg.user_qr_id || '')}</span>`;
+                        
+                        // Moderation buttons - only show for non-admin messages
+                        const modActions = isAdmin ? '' : `
+                            <button class="msg-btn timeout" onclick="showTimeoutModal(${msg.user_id})" title="Timeout"><i class="fas fa-clock"></i></button>
+                            <button class="msg-btn ban" onclick="showBanModal(${msg.user_id})" title="Ban"><i class="fas fa-ban"></i></button>
+                            <button class="msg-btn mod" onclick="toggleMod(${msg.user_id}, true)" title="Make Mod"><i class="fas fa-user-shield"></i></button>
+                        `;
                         
                         html += `
-                            <div class="message ${msg.is_reported ? 'reported' : ''}">
+                            <div class="message ${msg.is_reported ? 'reported' : ''} ${isAdmin ? 'admin-msg' : ''}">
                                 <div class="message-avatar">${avatar}</div>
                                 <div class="message-content">
                                     <div class="message-header">
-                                        <span class="message-user">${escapeHtml(msg.user_full_name)}</span>
-                                        <span class="message-qr">${escapeHtml(msg.user_qr_id)}</span>
+                                        <span class="message-user">${userName}${adminBadge}</span>
+                                        ${qrId}
                                         <span class="message-time">${formatTime(msg.created_on)}</span>
                                     </div>
-                                    <div class="message-text">${escapeHtml(msg.message)}</div>
+                                    <div class="message-text">${formatMessageContent(msg.message)}</div>
+                                    ${msg.attachment_path ? `<div class="message-gif"><img src="../../../user/src/${msg.attachment_path}" alt="${msg.attachment_name || 'Image'}" class="gif-content"></div>` : ''}
                                     <div class="message-reactions">
                                         <span><i class="fas fa-thumbs-up"></i> ${msg.likes || 0}</span>
                                         <span><i class="fas fa-thumbs-down"></i> ${msg.dislikes || 0}</span>
                                     </div>
                                     <div class="message-actions">
                                         <button class="msg-btn delete" onclick="deleteMessage(${msg.id})"><i class="fas fa-trash"></i> Delete</button>
+                                        ${modActions}
                                     </div>
                                 </div>
                             </div>
@@ -945,6 +1160,192 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             const date = new Date(dateStr);
             return date.toLocaleString('en-IN', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
         }
+        
+        // Admin Chat Functions
+        function sendAdminMessage() {
+            const message = $('#adminMessageInput').val().trim();
+            const fileInput = document.getElementById('adminAttachment');
+            const hasFile = fileInput && fileInput.files && fileInput.files[0];
+            
+            if ((!message && !hasFile) || !currentCommunityId) {
+                if (!currentCommunityId) showToast('Please select a community first', 'error');
+                return;
+            }
+            
+            // Use FormData for file upload support
+            const formData = new FormData();
+            formData.append('action', 'send_message');
+            formData.append('community_id', currentCommunityId);
+            formData.append('message', message);
+            
+            if (hasFile) {
+                formData.append('attachment', fileInput.files[0]);
+            }
+            
+            $.ajax({
+                url: '',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(response) {
+                    if (response.status) {
+                        $('#adminMessageInput').val('');
+                        removeAttachment();
+                        loadChat();
+                        showToast('Message sent', 'success');
+                    } else {
+                        showToast(response.message || 'Failed to send message', 'error');
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Send message error:', xhr.responseText);
+                    showToast('Error sending message', 'error');
+                }
+            });
+        }
+        
+        // Format message content - detect GIF URLs and render as images
+        function formatMessageContent(message) {
+            if (!message) return '';
+            
+            // Check for [GIF] prefix (legacy)
+            if (message.startsWith('[GIF]')) {
+                const gifUrl = message.replace('[GIF]', '').trim();
+                return `<div class="message-gif"><img src="${gifUrl}" alt="GIF" class="gif-content"></div>`;
+            }
+            
+            // Check if message contains HTML img tag (from user GIF picker)
+            if (message.includes('<img') && message.includes('gif-message')) {
+                const srcMatch = message.match(/src="([^"]+)"/);
+                if (srcMatch && srcMatch[1]) {
+                    return `<div class="message-gif"><img src="${srcMatch[1]}" alt="GIF" class="gif-content"></div>`;
+                }
+            }
+            
+            // Check if message is a direct GIF URL (from Giphy/Tenor)
+            const gifUrlPattern = /^https?:\/\/(media\d*\.giphy\.com|media\.tenor\.com|i\.giphy\.com|c\.tenor\.com)\/.*/i;
+            if (gifUrlPattern.test(message.trim())) {
+                return `<div class="message-gif"><img src="${message.trim()}" alt="GIF" class="gif-content"></div>`;
+            }
+            
+            // Check if message contains image attachment path
+            if (message.match(/\.(gif|png|jpg|jpeg|webp)$/i) && message.startsWith('uploads/')) {
+                return `<div class="message-gif"><img src="../../../user/src/${message}" alt="Image" class="gif-content"></div>`;
+            }
+            
+            // Regular text message - escape HTML
+            return escapeHtml(message);
+        }
+        
+        function toggleEmojiPicker() {
+            $('#gifPicker').hide();
+            $('#emojiPicker').toggle();
+        }
+        
+        function addEmoji(emoji) {
+            const input = $('#adminMessageInput');
+            input.val(input.val() + emoji);
+            input.focus();
+            $('#emojiPicker').hide();
+        }
+        
+        // GIF Picker Functions
+        let gifSearchTimeout = null;
+        
+        function toggleGifPicker() {
+            $('#emojiPicker').hide();
+            $('#gifPicker').toggle();
+        }
+        
+        function searchGifs(query) {
+            clearTimeout(gifSearchTimeout);
+            if (!query || query.length < 2) {
+                $('#gifGrid').html('<div class="gif-loading">Type to search GIFs...</div>');
+                return;
+            }
+            
+            gifSearchTimeout = setTimeout(function() {
+                $('#gifGrid').html('<div class="gif-loading">Searching...</div>');
+                
+                // Using Tenor API (free tier)
+                const apiKey = 'AIzaSyAyimkuYQYF_FXVALexPuGQctUWRURdCYQ'; // Google's public Tenor key
+                const url = `https://tenor.googleapis.com/v2/search?q=${encodeURIComponent(query)}&key=${apiKey}&limit=20&media_filter=tinygif`;
+                
+                $.getJSON(url, function(data) {
+                    if (data.results && data.results.length > 0) {
+                        let html = '';
+                        data.results.forEach(gif => {
+                            const url = gif.media_formats.tinygif.url;
+                            html += `<img src="${url}" onclick="selectGif('${url}')" alt="GIF">`;
+                        });
+                        $('#gifGrid').html(html);
+                    } else {
+                        $('#gifGrid').html('<div class="gif-loading">No GIFs found</div>');
+                    }
+                }).fail(function() {
+                    $('#gifGrid').html('<div class="gif-loading">Error loading GIFs</div>');
+                });
+            }, 500);
+        }
+        
+        function selectGif(gifUrl) {
+            // Send GIF as message
+            if (!currentCommunityId) {
+                showToast('Please select a community first', 'error');
+                return;
+            }
+            
+            $.post('', { 
+                action: 'send_message', 
+                community_id: currentCommunityId, 
+                message: gifUrl
+            }, function(response) {
+                if (response.status) {
+                    $('#gifPicker').hide();
+                    loadChat();
+                    showToast('GIF sent', 'success');
+                } else {
+                    showToast(response.message || 'Failed to send GIF', 'error');
+                }
+            }, 'json');
+        }
+        
+        // Attachment Functions
+        let selectedAttachment = null;
+        
+        function handleAttachment(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                selectedAttachment = file;
+                
+                // Show preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#attachmentPreviewImg').attr('src', e.target.result);
+                    $('#attachmentName').text(file.name);
+                    $('#attachmentPreview').show();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function removeAttachment() {
+            selectedAttachment = null;
+            $('#adminAttachment').val('');
+            $('#attachmentPreview').hide();
+        }
+        
+        // Close pickers when clicking outside
+        $(document).on('click', function(e) {
+            if (!$(e.target).closest('.emoji-picker, .emoji-btn').length) {
+                $('#emojiPicker').hide();
+            }
+            if (!$(e.target).closest('.gif-picker, .gif-btn').length) {
+                $('#gifPicker').hide();
+            }
+        });
     </script>
 </body>
 </html>
