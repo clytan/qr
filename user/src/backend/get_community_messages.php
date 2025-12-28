@@ -106,9 +106,9 @@ while ($row = $result->fetch_assoc()) {
     $messages[] = [
         'id' => $row['id'],
         'message' => $row['message'],
-        'user_name' => $row['user_full_name'],
-        'user_qr_id' => $row['user_qr_id'],
-        'user_image_path' => $row['user_image_path'],
+        'user_name' => $row['admin_sent'] ? 'Admin' : $row['user_full_name'],
+        'user_qr_id' => $row['admin_sent'] ? 'ADMIN' : $row['user_qr_id'],
+        'user_image_path' => $row['admin_sent'] ? null : $row['user_image_path'],
         'created_on' => $row['created_on'],
         'is_own' => $row['user_id'] == $user_id,
         'user_reaction' => $row['user_reaction'],
@@ -121,7 +121,8 @@ while ($row = $result->fetch_assoc()) {
         'is_current_user_moderator' => (bool) $row['is_current_user_moderator'],
         'user_id' => $row['user_id'],
         'is_timed_out' => $is_timed_out,
-        'is_banned' => $is_banned
+        'is_banned' => $is_banned,
+        'admin_sent' => (bool) $row['admin_sent']
     ];
 }
 

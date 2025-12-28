@@ -318,17 +318,25 @@ function renderMessage(msg) {
         return message.replace(/</g, '&lt;').replace(/>/g, '&gt;');
     };
 
-    const avatarSrc = msg.user_image_path ? resolveImagePath(msg.user_image_path) : generateInitialsAvatar(msg.user_name, 56);
+    // Handle admin messages differently
+    const isAdminMessage = msg.admin_sent || msg.user_qr_id === 'ADMIN';
+    const avatarSrc = isAdminMessage 
+        ? null 
+        : (msg.user_image_path ? resolveImagePath(msg.user_image_path) : generateInitialsAvatar(msg.user_name, 56));
+    const avatarHtml = isAdminMessage
+        ? `<div class="message-avatar admin-avatar"><i class="fa fa-shield"></i></div>`
+        : `<img src="${avatarSrc}" alt="${msg.user_qr_id}" class="message-avatar" onerror="this.onerror=null;this.src='${generateInitialsAvatar(msg.user_name, 56)}'">`;
+    const adminBadge = isAdminMessage ? '<span class="admin-badge" style="background: linear-gradient(135deg, #ec4899, #f59e0b); color: white; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 6px;">ADMIN</span>' : '';
+    
     return `
-        <div class="message" data-message-id="${msg.id}">
-            <img src="${avatarSrc}" 
-                 alt="${msg.user_qr_id}" 
-                 class="message-avatar"
-                 onerror="this.onerror=null;this.src='${generateInitialsAvatar(msg.user_name, 56)}'">
+        <div class="message ${isAdminMessage ? 'admin-message' : ''}" data-message-id="${msg.id}">
+            ${avatarHtml}
             <div class="message-content">
                 <div class="message-header">
-                    <a href="profile.php?qr=${msg.user_qr_id}" class="message-username">@${msg.user_qr_id}</a>
-                    ${msg.is_moderator ? `
+                    ${isAdminMessage 
+                        ? `<span class="message-username" style="color: #ec4899; font-weight: 600;">Admin</span>${adminBadge}`
+                        : `<a href="profile.php?qr=${msg.user_qr_id}" class="message-username">@${msg.user_qr_id}</a>`}
+                    ${msg.is_moderator && !isAdminMessage ? `
                         <span class="moderator-badge"><i class="fa fa-shield"></i></span>
                     ` : ''}
                     <span class="message-timestamp">${formatTime(msg.created_on)}</span>
