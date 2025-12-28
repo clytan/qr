@@ -1,0 +1,11 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.example.zokli_webview",
+      "sha256_cert_fingerprints":
+      ["13:AA:C2:AE:B5:F2:67:3D:F0:C4:DA:B8:86:69:0F:1F:2E:72:26:5E:68:41:37:C2:79:E1:FD:67:74:FD:9E:25"]
+    }
+  }
+]
