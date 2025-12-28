@@ -145,6 +145,7 @@ function getWelcomeEmailContent($name = '', $hasAttachments = false) {
         '<div class="footer">' .
         '<p><strong>Best Regards from,</strong><br/>Zokli India</p>' .
         '<div class="footer-note">If you did not register for Zokli, please ignore this email or contact support at Zokli.india@gmail.com</div>' .
+        '<p style="font-size:11px;color:#95a5a6;margin-top:10px;font-style:italic">*Zokli Technologies LLP, terms & conditions apply*</p>' .
         '</div>' .
         '</div></body></html>';
 

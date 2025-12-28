@@ -1,6 +1,7 @@
 Options +FollowSymLinks -MultiViews
 RewriteEngine On
 RewriteBase /
+# IMPORTANT: If your project is in a subfolder (e.g., localhost/dev/), change above line to: RewriteBase /dev/
 
 # 1. API & Backend Mapping (CRITICAL - Must be at top)
 
@@ -24,6 +25,8 @@ RewriteRule ^custom_js/(.*)$ user/src/ui/custom_js/$1 [L,NC]
 RewriteRule ^ui/(.*)$ user/src/ui/$1 [L,NC]
 RewriteRule ^frames/(.*)$ user/src/frames/$1 [L,NC]
 RewriteRule ^btnimg/(.*)$ user/src/btnimg/$1 [L,NC]
+RewriteRule ^css/(.*)$ user/src/css/$1 [L,NC]
+RewriteRule ^js/(.*)$ user/src/js/$1 [L,NC]
 
 # 3. Clean URLs (Redirects from .php and long paths)
 # Redirect user/src/ui/page.php -> /page

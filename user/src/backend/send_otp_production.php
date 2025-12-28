@@ -154,7 +154,7 @@ try {
                     <div class="text">Your OTP for email verification:</div>
                     <div class="otp">' . $otp . '</div>
                     <div class="text">This OTP is valid for 10 minutes.</div>
-                    <div class="text" style="font-size: 12px; color: #666; margin-top: 20px;">Zokli &copy; 2025</div>
+                    <div class="text" style="font-size: 12px; color: #666; margin-top: 20px;">Zokli &copy; 2025<br><br><i>*Zokli Technologies LLP, terms & conditions apply*</i></div>
                 </div>
             </body>
             </html>';

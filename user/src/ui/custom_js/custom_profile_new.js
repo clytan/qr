@@ -484,10 +484,47 @@ const profileFunction = {
         this.value = '';
     },
 
+    checkColorContrast: function (hexFg, hexBg) {
+        // Helper to get brightness
+        const getBrightness = (hex) => {
+            const rgb = parseInt(hex.slice(1), 16);
+            const r = (rgb >> 16) & 0xff;
+            const g = (rgb >> 8) & 0xff;
+            const b = (rgb >> 0) & 0xff;
+            return (r * 299 + g * 587 + b * 114) / 1000;
+        };
+
+        const bFg = getBrightness(hexFg);
+        const bBg = getBrightness(hexBg);
+
+        // 1. Check if Background is darker than Foreground (Inverted)
+        if (bBg < bFg) {
+            return { valid: false, message: 'Bad Contrast: Background must be lighter than the QR dots.' };
+        }
+
+        // 2. Check difference (Threshold 100 is a safe bet for scanners)
+        if ((bBg - bFg) < 100) {
+            return { valid: false, message: 'Low Contrast: Please choose lighter background or darker dots.' };
+        }
+
+        return { valid: true };
+    },
+
     handleQRColorChange: function () {
         const colorDark = $('#qr-color-dark').val();
         const colorLight = $('#qr-color-light').val();
         const userQr = $('#user_qr').val();
+
+        // Check contrast live
+        const check = profileFunction.checkColorContrast(colorDark, colorLight);
+        if (!check.valid) {
+            // Show toast only if it's a manual change (to avoid spamming on load if needed, but here it's fine)
+            // But we don't want to stop the preview entirely, OR we might want to warn
+            // Let's show a toast and MAYBE revert? Reverting live is annoying.
+            // Let's just warn for now.
+            showToast(check.message, 'error');
+            // return; // Uncomment to freeze preview on bad colors
+        }
 
         profileFunction.generateQRCode(userQr, colorDark, colorLight);
     },
@@ -497,6 +534,18 @@ const profileFunction = {
         const userQr = $('#user_qr').val();
         const colorDark = $('#qr-color-dark').val();
         const colorLight = $('#qr-color-light').val();
+
+        // Validate Contrast before saving
+        const check = profileFunction.checkColorContrast(colorDark, colorLight);
+        if (!check.valid) {
+            showToast(check.message, 'error');
+            // Reset to previous valid colors (optional, but good UX: reload from server)
+            // For now, just stop saving. 
+            // Better: Trigger init to fetch last saved valid colors? 
+            // profileFunction.initQRCode(); 
+            // Actually, simply returning prevents the bad save.
+            return;
+        }
 
         $.ajax({
             url: '../backend/profile_new/save_qr_color.php',
@@ -764,14 +813,19 @@ const profileFunction = {
             'instagram_username',
             'youtube_username',
             'linkedin_username',
-            'snapchat_username'
+            'snapchat_username',
+            'google_maps_link'
         ];
 
         fields.forEach(field => {
             formData.fields.push(field);
+            // Google Maps link uses the address public toggle, not its own
+            const isPublic = field === 'google_maps_link' 
+                ? ($('#public_address').is(':checked') ? 1 : 0)
+                : ($(`#public_${field}`).is(':checked') ? 1 : 0);
             formData.links[field] = {
                 value: $(`#${field}`).val(),
-                is_public: $(`#public_${field}`).is(':checked') ? 1 : 0
+                is_public: isPublic
             };
         });
 
@@ -850,6 +904,20 @@ const profileFunction = {
                     // Set public toggle for address
                     if (!window.PUBLIC_PROFILE) {
                         $('#public_address').prop('checked', user.is_public_address == 1);
+                    }
+
+                    // Show Google Maps field for business users (type 3)
+                    // In public view, only show if address is public
+                    if (user.user_user_type == 3) {
+                        if (window.PUBLIC_PROFILE) {
+                            // Public view: only show if address is public
+                            if (user.is_public_address == 1) {
+                                $('#google-maps-field').show();
+                            }
+                        } else {
+                            // Own profile: always show for business users
+                            $('#google-maps-field').show();
+                        }
                     }
 
                     // Update the profile image with correct initials based on loaded name

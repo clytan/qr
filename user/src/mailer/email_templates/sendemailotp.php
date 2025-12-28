@@ -131,7 +131,7 @@ $content = '<!DOCTYPE html>
         <div class="info">Your One Time Password (OTP) for email verification is:</div>
         <div class="otp-box">' . $otp . '</div>
         <div class="info">This OTP is valid for 10 minutes. Please do not share it with anyone.</div>
-        <div class="footer">If you did not request this, please ignore this email.<br>Zokli &copy; 2025</div>
+        <div class="footer">If you did not request this, please ignore this email.<br>Zokli &copy; 2025<br><br><i>*Zokli Technologies LLP, terms & conditions apply*</i></div>
     </div>
 </body>
 </html>';

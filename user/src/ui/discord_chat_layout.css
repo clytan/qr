@@ -39,9 +39,15 @@ footer {
     border-top: 1px solid #2B2D31;
 }
 
-footer * {
-    background: transparent !important;
+/* Restore background for footer popups */
+footer .more-popover {
+    background: #1A1A1B !important;
+    border: 1px solid #2B2D31;
 }
+
+/* footer * {
+    background: transparent !important;
+} */
 
 /* Remove white backgrounds from all elements */
 div,
@@ -1483,18 +1489,25 @@ nav {
 
     /* Chat Layout - Fix for mobile */
     .discord-chat-layout {
-        min-height: calc(100vh - 200px);
-        max-height: calc(100vh - 200px);
+        min-height: calc(100vh - 130px);
+        max-height: calc(100vh - 130px);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
     }
 
     .chat-messages {
         padding: 12px 10px;
+        flex: 1;
+        overflow-y: auto;
+        overflow-x: hidden;
     }
 
     /* Chat Input - Ensure it's visible and contained */
     .chat-input-wrapper {
         padding: 12px;
         position: relative;
+        flex-shrink: 0;
         /* background: #313338; */
     }
 

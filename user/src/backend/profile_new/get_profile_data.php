@@ -64,7 +64,8 @@ $typeMap = [
     'SnapChat' => 'snapchat_username',
     'Snapchat' => 'snapchat_username',
     'WhatsApp' => 'whatsapp_link',
-    'Telegram' => 'telegram_link'
+    'Telegram' => 'telegram_link',
+    'GoogleMaps' => 'google_maps_link',
 ];
 
 // Check if this is a public view (QR parameter exists)

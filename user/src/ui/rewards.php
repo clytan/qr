@@ -42,7 +42,27 @@ if ($stmt_conf) {
 }
 
 // Determine number of spinner slots
-$spinner_count = min($max_winners, max(1, $member_count));
+// Check if a completed draw exists for today - if so, use its winner count
+$today = date('Y-m-d');
+$completed_draw_winners = 0;
+if ($community_id) {
+    $stmt_draw = $conn->prepare("SELECT total_winners FROM reward_draws WHERE community_id = ? AND draw_date = ? AND is_completed = 1");
+    if ($stmt_draw) {
+        $stmt_draw->bind_param('is', $community_id, $today);
+        $stmt_draw->execute();
+        $res_draw = $stmt_draw->get_result();
+        if ($row_draw = $res_draw->fetch_assoc()) {
+            $completed_draw_winners = (int)$row_draw['total_winners'];
+        }
+    }
+}
+
+// Use completed draw's winner count if available, otherwise use current member count
+if ($completed_draw_winners > 0) {
+    $spinner_count = $completed_draw_winners;
+} else {
+    $spinner_count = min($max_winners, max(1, $member_count));
+}
 ?>
 
 <head>
@@ -329,6 +349,8 @@ $spinner_count = min($max_winners, max(1, $member_count));
 
     .spinner-reel {
         position: absolute;
+        top: 0; /* Anchor to top */
+        left: 0;
         width: 100%;
         display: flex;
         flex-direction: column;
@@ -342,11 +364,13 @@ $spinner_count = min($max_winners, max(1, $member_count));
 
     .spinner-item {
         height: 130px;
+        min-height: 130px; /* Enforce height */
         display: flex;
         align-items: center;
         justify-content: center;
         padding: 10px;
         width: 100%;
+        flex-shrink: 0; /* Prevent collapsing in flex column */
     }
 
     .spinner-item .qr-wrapper {
@@ -592,6 +616,7 @@ $spinner_count = min($max_winners, max(1, $member_count));
         }
         .spinner-item {
             height: 80px;
+            min-height: 80px;
         }
         .spinner-item .qr-code {
             width: 50px;
@@ -631,6 +656,7 @@ $spinner_count = min($max_winners, max(1, $member_count));
         }
         .spinner-item {
             height: 100px;
+            min-height: 100px;
         }
         .spinner-item .qr-code {
             width: 65px;
@@ -862,6 +888,7 @@ $spinner_count = min($max_winners, max(1, $member_count));
                 if (!reel) continue;
                 
                 reel.innerHTML = '';
+                reel.style.transform = 'translateY(0px)';
                 
                 const shuffled = [...this.members].sort(() => Math.random() - 0.5);
                 
@@ -891,13 +918,16 @@ $spinner_count = min($max_winners, max(1, $member_count));
                 
                 for (let j = 0; j < maxRender; j++) {
                     const member = renderList[j];
-                    const item = this.createSpinnerItem(member);
+                    // Only render REAL QR for the first item (visible static one)
+                    // Use placeholder for the rest to save massive performance
+                    const type = (j === 0) ? 'real' : 'placeholder';
+                    const item = this.createSpinnerItem(member, type);
                     reel.appendChild(item);
                 }
             }
         },
         
-        createSpinnerItem: function(member) {
+        createSpinnerItem: function(member, renderType = 'real') {
             const item = document.createElement('div');
             item.className = 'spinner-item';
             item.dataset.userId = member.user_id;
@@ -910,16 +940,27 @@ $spinner_count = min($max_winners, max(1, $member_count));
             const qrDiv = document.createElement('div');
             qrDiv.className = 'qr-code';
             
-            const qrUrl = window.location.origin + '/user/src/ui/profile.php?qr=' + encodeURIComponent(member.user_qr_id);
-            
-            new QRCode(qrDiv, {
-                text: qrUrl,
-                width: 90,
-                height: 90,
-                colorDark: member.qr_color_dark || '#000000',
-                colorLight: member.qr_color_light || '#ffffff',
-                correctLevel: QRCode.CorrectLevel.L
-            });
+            if (renderType === 'placeholder') {
+                // Lightweight placeholder for spinning elements
+                qrDiv.innerHTML = '<i class="fas fa-qrcode" style="font-size: 50px; opacity: 0.3; color: #888;"></i>';
+            } else {
+                // Real QR Code for static/winner elements
+                const qrUrl = window.location.origin + '/user/src/ui/profile.php?qr=' + encodeURIComponent(member.user_qr_id);
+                
+                try {
+                    new QRCode(qrDiv, {
+                        text: qrUrl,
+                        width: 90,
+                        height: 90,
+                        colorDark: member.qr_color_dark || '#000000',
+                        colorLight: member.qr_color_light || '#ffffff',
+                        correctLevel: QRCode.CorrectLevel.L
+                    });
+                } catch (e) {
+                    console.error('QR Gen Error', e);
+                    qrDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i>';
+                }
+            }
             
             wrapper.appendChild(qrDiv);
             item.appendChild(wrapper);
@@ -1009,7 +1050,20 @@ $spinner_count = min($max_winners, max(1, $member_count));
                 document.getElementById('spinnersGrid').classList.remove('spinning-active', 'state-ended');
                 document.getElementById('spinnersGrid').classList.add('state-waiting');
                 
-                timerDisplay.textContent = this.config?.spin_end_time || '--:--:--';
+                let displayTime = '--:--:--';
+                if (this.config?.spin_end_time) {
+                    try {
+                        // Convert 24h string "HH:MM:SS" to 12h "HH:MM:SS AM/PM"
+                        const [hours, mins, secs] = this.config.spin_end_time.split(':');
+                        const date = new Date();
+                        date.setHours(hours, mins, secs || 0);
+                        displayTime = date.toLocaleTimeString('en-US', { hour12: true, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                    } catch (e) {
+                        displayTime = this.config.spin_end_time;
+                    }
+                }
+                
+                timerDisplay.textContent = displayTime;
                 timerDisplay.className = 'timer-display';
                 timerLabel.textContent = 'Next draw at';
                 statusBadge.innerHTML = '<i class="fas fa-clock"></i> Waiting for draw...';
@@ -1064,7 +1118,7 @@ $spinner_count = min($max_winners, max(1, $member_count));
                     // Add more items before winner for longer deceleration
                     const shuffled = [...this.members].sort(() => Math.random() - 0.5).slice(0, 20); 
                     shuffled.forEach(m => {
-                        const item = this.createSpinnerItem(m);
+                        const item = this.createSpinnerItem(m, 'placeholder');
                         reel.appendChild(item);
                     });
                     
@@ -1075,7 +1129,7 @@ $spinner_count = min($max_winners, max(1, $member_count));
                         user_full_name: winner.user_full_name,
                         qr_color_dark: winner.qr_color_dark,
                         qr_color_light: winner.qr_color_light
-                    });
+                    }, 'real');
                     reel.appendChild(winnerItem);
                     
                     // FORCE RESET TRANSFORM FIRST (Important for transition to work)
@@ -1135,7 +1189,7 @@ $spinner_count = min($max_winners, max(1, $member_count));
                     user_full_name: winner.user_full_name,
                     qr_color_dark: winner.qr_color_dark,
                     qr_color_light: winner.qr_color_light
-                });
+                }, 'real');
                 reel.appendChild(winnerItem);
                 
                 const nameEl = document.getElementById(`winner-name-${slotNum}`);

@@ -30,6 +30,7 @@ $upi_id = isset($data['upi_id']) ? trim($data['upi_id']) : null;
 
 // Bank details
 $bank_name = isset($data['bank_name']) ? trim($data['bank_name']) : null;
+$branch_name = isset($data['branch_name']) ? trim($data['branch_name']) : null;
 $account_number = isset($data['account_number']) ? trim($data['account_number']) : null;
 $ifsc_code = isset($data['ifsc_code']) ? trim($data['ifsc_code']) : null;
 $account_holder_name = isset($data['account_holder_name']) ? trim($data['account_holder_name']) : null;
@@ -68,6 +69,10 @@ if ($payment_method === 'upi') {
         echo json_encode(['status' => false, 'message' => 'Please enter bank name']);
         exit;
     }
+    if (empty($branch_name)) {
+        echo json_encode(['status' => false, 'message' => 'Please enter branch name']);
+        exit;
+    }
     if (empty($account_number)) {
         echo json_encode(['status' => false, 'message' => 'Please enter account number']);
         exit;
@@ -92,19 +97,16 @@ try {
     $conn->begin_transaction();
     
     // Check wallet balance
-    $sqlBalance = "SELECT balance FROM user_wallet WHERE user_id = ? AND is_deleted = 0";
+    // Check wallet balance (Sum of all active wallets)
+    $sqlBalance = "SELECT SUM(balance) as total_balance FROM user_wallet WHERE user_id = ? AND is_deleted = 0";
     $stmtBalance = $conn->prepare($sqlBalance);
     $stmtBalance->bind_param('i', $user_id);
     $stmtBalance->execute();
     $resultBalance = $stmtBalance->get_result();
-    
-    if ($resultBalance->num_rows === 0) {
-        throw new Exception('Wallet not found. Please contact support.');
-    }
-    
     $walletData = $resultBalance->fetch_assoc();
-    $current_balance = floatval($walletData['balance']);
-    $stmtBalance->close();
+    
+    // If null (no rows), treat as 0
+    $current_balance = $walletData['total_balance'] === null ? 0.00 : floatval($walletData['total_balance']);
     
     if ($current_balance < $amount) {
         throw new Exception('Insufficient wallet balance. Available: ₹' . number_format($current_balance, 2));
@@ -125,15 +127,16 @@ try {
     
     // Create withdrawal request
     $sqlInsert = "INSERT INTO user_wallet_withdrawals 
-                  (user_id, amount, payment_method, upi_id, bank_name, account_number, ifsc_code, account_holder_name, status, created_on) 
-                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())";
+                  (user_id, amount, payment_method, upi_id, bank_name, branch_name, account_number, ifsc_code, account_holder_name, status, created_on) 
+                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())";
     $stmtInsert = $conn->prepare($sqlInsert);
-    $stmtInsert->bind_param('idssssss', 
+    $stmtInsert->bind_param('idsssssss', 
         $user_id, 
         $amount, 
         $payment_method, 
         $upi_id, 
         $bank_name, 
+        $branch_name,
         $account_number, 
         strtoupper($ifsc_code), 
         $account_holder_name

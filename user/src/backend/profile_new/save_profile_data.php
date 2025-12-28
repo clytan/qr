@@ -44,6 +44,7 @@ $typeMap = [
     'snapchat_username' => 'Snapchat',
     'whatsapp_link' => 'WhatsApp',
     'telegram_link' => 'Telegram',
+    'google_maps_link' => 'GoogleMaps',
 ];
 
 foreach ($fields as $type) {

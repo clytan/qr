@@ -166,7 +166,7 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
+            z-index: 99999; /* Higher than footer */
             align-items: center;
             justify-content: center;
         }
@@ -390,7 +390,7 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
                             <button onclick="showRedeemModal()">
                                 <i class="fas fa-money-bill-wave"></i>
                             </button>
-                            <span>Redeem</span>
+                            <span>Withdraw</span>
                         </div>
                         <div class="action-btn">
                             <button onclick="showHistory()">
@@ -431,7 +431,11 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
                 </div>
             </section>
         </div>
-
+<div class="d-md-none" style="text-align: center; padding: 8px 10px 70px;">
+                <div style="font-size: 11px; color: #64748b; line-height: 1.5;">
+                    &copy; <?php echo date('Y'); ?> BLRLEAF TECHNOLOGY (OPC) PRIVATE LIMITED.<br>All rights reserved.
+                </div>
+            </div>
         <a href="#" id="back-to-top"></a>
         <?php include('../components/footer.php'); ?>
     </div>
@@ -479,6 +483,10 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
                     <div class="form-group">
                         <label>Bank Name</label>
                         <input type="text" class="form-control" id="bank-name" placeholder="e.g., HDFC Bank">
+                    </div>
+                    <div class="form-group">
+                        <label>Branch Name</label>
+                        <input type="text" class="form-control" id="branch-name" placeholder="e.g., MG Road Branch">
                     </div>
                     <div class="form-group">
                         <label>Account Number</label>
@@ -636,6 +644,7 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
             $('#redeem-amount').val('');
             $('#upi-id').val('');
             $('#bank-name').val('');
+            $('#branch-name').val('');
             $('#account-number').val('');
             $('#ifsc-code').val('');
             $('#account-holder').val('');
@@ -691,12 +700,13 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
                 }
             } else {
                 data.bank_name = $('#bank-name').val().trim();
+                data.branch_name = $('#branch-name').val().trim();
                 data.account_number = $('#account-number').val().trim();
                 data.ifsc_code = $('#ifsc-code').val().trim().toUpperCase();
                 data.account_holder_name = $('#account-holder').val().trim();
 
-                if (!data.bank_name || !data.account_number || !data.ifsc_code || !data.account_holder_name) {
-                    alert('Please fill all bank details');
+                if (!data.bank_name || !data.branch_name || !data.account_number || !data.ifsc_code || !data.account_holder_name) {
+                    alert('Please fill all bank details including branch name');
                     return;
                 }
             }

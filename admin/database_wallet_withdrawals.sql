@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS user_wallet_withdrawals (
     
     -- Bank details
     bank_name VARCHAR(100),
+    branch_name VARCHAR(100),
     account_number VARCHAR(50),
     ifsc_code VARCHAR(20),
     account_holder_name VARCHAR(100),
@@ -40,4 +41,7 @@ CREATE TABLE IF NOT EXISTS user_wallet_withdrawals (
 
 -- Note: Foreign key constraint removed to avoid data type issues
 -- The user_id column references user_user.id
+
+-- Run this if the table already exists (to add branch_name column):
+ALTER TABLE user_wallet_withdrawals ADD COLUMN branch_name VARCHAR(100) AFTER bank_name;
 

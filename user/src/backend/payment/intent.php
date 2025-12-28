@@ -16,6 +16,7 @@ if (!$orderId || !$sessionId) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
     <title>Complete Payment</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
 </head>
 
 <body class="bg-gray-100">
@@ -31,20 +32,18 @@ if (!$orderId || !$sessionId) {
                 </div>
                 <h2 class="font-bold text-xl text-center mb-3">Complete your payment</h2>
                 <p class="text-sm text-center text-gray-600 px-4 mb-6">
-                    Select your payment method and complete the payment. After payment, you'll automatically be
-                    registered.
+                    Click the button below to open the payment page. After payment, you'll automatically be registered.
                 </p>
             </div>
         </div>
 
-        <div id="intent" class="w-full max-w-md px-6"></div>
         <div id="status" class="mx-6 text-center text-sm text-gray-600 mt-4 mb-4 max-w-md">
-            <p id="status-text">Initializing payment...</p>
+            <p id="status-text">Ready to pay</p>
         </div>
         <div id="Cerror" class="mx-6 text-white p-3 bg-red-500 rounded-md mt-4 hidden text-center max-w-md"></div>
 
         <button id="payNowBtn"
-            class="mx-6 bg-green-600 text-white px-6 py-3 rounded-md mt-4 hover:bg-green-700 max-w-md font-bold text-lg">
+            class="mx-6 bg-green-600 text-white px-8 py-4 rounded-lg mt-4 hover:bg-green-700 max-w-md font-bold text-lg shadow-lg">
             💳 Pay Now
         </button>
 
@@ -58,31 +57,16 @@ if (!$orderId || !$sessionId) {
         </button>
     </div>
 
-    <script src="https://sdk.cashfree.com/js/v3/cashfree.js"></script>
     <script>
         const orderId = '<?php echo $orderId; ?>';
         const sessionId = '<?php echo $sessionId; ?>';
         let pollInterval = null;
         let registrationCompleted = false;
 
-        // Prevent accidental reuse of old intent.php pages
-        // Store current attempt in sessionStorage
-        const currentAttempt = Date.now() + '_' + Math.random();
-        sessionStorage.setItem('current_payment_attempt', currentAttempt);
+        console.log('intent.php loaded - orderId:', orderId);
 
-        console.log('intent.php loaded - orderId:', orderId, 'sessionId:', sessionId.substring(0, 50) + '...');
-        console.log('Payment attempt ID:', currentAttempt);
-
-        const cashfree = Cashfree({
-            mode: "production",
-        });
-
-        const upiApp = cashfree.create("upiApp", {
-            values: {
-                upiApp: "web",
-                buttonIcon: false,
-            },
-        });
+        // Initialize Cashfree with checkout mode (works on both desktop and mobile)
+        const cashfree = new Cashfree({ mode: "production" });
 
         function updateStatus(msg) {
             document.getElementById("status-text").textContent = msg;
@@ -96,97 +80,70 @@ if (!$orderId || !$sessionId) {
             document.getElementById("backBtn").classList.remove("hidden");
         }
 
-        upiApp.on("loaderror", function (data) {
-            console.error("Load error:", data);
-            showError("Payment load error: " + (data.error?.message || "Unknown"));
-        });
-
-        upiApp.mount("#intent");
-
-        upiApp.on("ready", function () {
-            console.log("Payment ready");
-            updateStatus("Payment form ready. Click 'Pay Now' to continue...");
-            // Don't auto-start on mobile - let user click the button
-        });
-
         function startPayment() {
-            console.log("Starting payment...");
-            updateStatus("Opening payment app...");
+            console.log("Starting payment via checkout...");
+            updateStatus("Opening payment page...");
+            
+            const payBtn = document.getElementById("payNowBtn");
+            payBtn.disabled = true;
+            payBtn.style.opacity = '0.5';
+            payBtn.innerHTML = '⏳ Processing...';
 
-            cashfree.pay({
-                paymentMethod: upiApp,
+            // Use checkout method - works on all devices (desktop + mobile)
+            cashfree.checkout({
                 paymentSessionId: sessionId,
-            })
-                .then(function (result) {
-                    console.log("Payment initiated:", result);
-                    updateStatus("Payment app opened. Please complete payment...");
-                    // Start polling IMMEDIATELY after payment is initiated
-                    startPollingForPayment();
-                })
-                .catch(function (error) {
-                    console.error("Payment error:", error);
-                    showError("Error: " + (error.message || "Unknown"));
-                });
-        }
-
-        // Listen for success callback (works if browser stays active)
-        upiApp.on("payment_success", function (data) {
-            console.log("✓ Payment success callback:", data);
-            updateStatus("✓ Payment successful!");
-            completeRegistration();
-        });
-
-        upiApp.on("payment_failed", function (data) {
-            console.error("✗ Payment failed:", data);
-            showError("Payment failed: " + (data.message || "Unknown"));
-            stopPolling();
-        });
-
-        // AGGRESSIVE POLLING - keeps checking even if user left the tab
-        function startPollingForPayment() {
-            console.log('Starting payment status polling...');
-            let pollCount = 0;
-            const maxPolls = 300; // 5 minutes
-
-            pollInterval = setInterval(function () {
-                pollCount++;
-
-                fetch('../backend/payment/check_payment_status.php?orderId=' + encodeURIComponent(orderId) + '&t=' + Date.now(), {
-                    method: 'GET',
-                    headers: { 'Content-Type': 'application/json' }
-                })
-                    .then(r => r.json())
-                    .then(data => {
-                        console.log('Poll #' + pollCount + ' - Status:', data.status);
-
-                        if (data.status === 'PAID') {
-                            console.log('✓ Payment confirmed via polling!');
-                            stopPolling();
-                            completeRegistration();
-                        } else if (data.status === 'FAILED') {
-                            console.log('✗ Payment failed');
-                            stopPolling();
-                            showError("Payment was declined. Please try again.");
-                        } else if (pollCount % 30 === 0) {
-                            // Update status every 30 seconds
-                            updateStatus("Checking payment status... (" + Math.floor(pollCount / 60) + "m)");
-                        }
-                    })
-                    .catch(e => console.log('Poll error:', e));
-
-                if (pollCount >= maxPolls) {
-                    console.log('Max polling reached');
-                    stopPolling();
-                    showError("Payment check timed out. Click button below to verify manually.");
+                returnUrl: window.location.origin + "/user/src/backend/payment/return.php?orderId=" + orderId
+            }).then(function(result) {
+                console.log("Checkout result:", result);
+                // User completed or cancelled - check status
+                if (result.error) {
+                    console.error("Payment error:", result.error);
+                    showError("Payment error: " + (result.error.message || "Unknown error"));
+                    payBtn.disabled = false;
+                    payBtn.style.opacity = '1';
+                    payBtn.innerHTML = '💳 Try Again';
+                } else if (result.paymentDetails) {
+                    // Payment was attempted
+                    updateStatus("Checking payment status...");
+                    checkPaymentStatus();
                 }
-            }, 1000); // Poll every second
+            }).catch(function(error) {
+                console.error("Checkout error:", error);
+                showError("Error: " + (error.message || "Payment failed"));
+                payBtn.disabled = false;
+                payBtn.style.opacity = '1';
+                payBtn.innerHTML = '💳 Try Again';
+            });
         }
 
-        function stopPolling() {
-            if (pollInterval) {
-                clearInterval(pollInterval);
-                pollInterval = null;
-            }
+        function checkPaymentStatus() {
+            fetch('../backend/payment/check_payment_status.php?orderId=' + encodeURIComponent(orderId) + '&t=' + Date.now(), {
+                method: 'GET',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(r => r.json())
+            .then(data => {
+                console.log('Payment status:', data.status);
+                if (data.status === 'PAID') {
+                    completeRegistration();
+                } else if (data.status === 'FAILED') {
+                    showError("Payment was declined. Please try again.");
+                } else {
+                    // Still pending - show check button
+                    updateStatus("Payment status: " + data.status + ". Click below to verify.");
+                    document.getElementById("checkPaymentBtn").classList.remove("hidden");
+                    document.getElementById("backBtn").classList.remove("hidden");
+                    
+                    const payBtn = document.getElementById("payNowBtn");
+                    payBtn.disabled = false;
+                    payBtn.style.opacity = '1';
+                    payBtn.innerHTML = '💳 Try Again';
+                }
+            })
+            .catch(e => {
+                console.error('Status check error:', e);
+                showError("Error checking payment status");
+            });
         }
 
         function completeRegistration() {
@@ -196,8 +153,7 @@ if (!$orderId || !$sessionId) {
             }
             registrationCompleted = true;
 
-            stopPolling();
-            updateStatus("✓ Completing registration...");
+            updateStatus("✓ Payment successful! Completing registration...");
             console.log('Calling verify_and_complete.php with orderId:', orderId);
 
             fetch('../backend/payment/verify_and_complete.php?orderId=' + encodeURIComponent(orderId), {
@@ -208,18 +164,18 @@ if (!$orderId || !$sessionId) {
                 .then(data => {
                     console.log('Verify response:', data);
                     if (data.success) {
-                        updateStatus("✓ Registration complete!");
+                        updateStatus("✓ Registration complete! Redirecting...");
                         setTimeout(function () {
                             window.location.href = data.redirect || '/user/src/ui/login.php';
                         }, 1500);
                     } else {
-                        registrationCompleted = false; // Allow retry on error
+                        registrationCompleted = false;
                         showError("Registration failed: " + (data.message || 'Please try again'));
                     }
                 })
                 .catch(err => {
                     console.error('Error:', err);
-                    registrationCompleted = false; // Allow retry on error
+                    registrationCompleted = false;
                     showError("Error completing registration. Please refresh.");
                 });
         }
@@ -228,60 +184,18 @@ if (!$orderId || !$sessionId) {
         document.getElementById("checkPaymentBtn").addEventListener("click", function () {
             console.log('Manual check clicked');
             updateStatus("Checking payment status...");
-
-            fetch('../backend/payment/check_payment_status.php?orderId=' + encodeURIComponent(orderId) + '&t=' + Date.now(), {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' }
-            })
-                .then(r => r.json())
-                .then(data => {
-                    console.log('Manual check result:', data);
-                    if (data.status === 'PAID') {
-                        updateStatus("✓ Payment confirmed!");
-                        completeRegistration();
-                    } else {
-                        showError("Status: " + data.status + ". Try again in a moment.");
-                    }
-                })
-                .catch(e => {
-                    console.error('Check error:', e);
-                    showError("Error checking payment.");
-                });
+            checkPaymentStatus();
         });
 
-        // Pay Now button - user clicks this to start payment
+        // Pay Now button
         document.getElementById("payNowBtn").addEventListener("click", function () {
             console.log('Pay Now button clicked');
-            this.disabled = true;
-            this.style.opacity = '0.5';
             startPayment();
         });
 
         // Back button
         document.getElementById("backBtn").addEventListener("click", function () {
-            // Clear all payment-related session data when going back
-            sessionStorage.removeItem('current_payment_attempt');
-            sessionStorage.removeItem('payment_orderId');
-            sessionStorage.removeItem('payment_sessionId');
             window.location.href = '../ui/register.php';
-        });
-
-        // IMPORTANT: Check payment status every 10 seconds even if user is not looking
-        // This ensures registration happens even if user switches to payment app
-        window.addEventListener('visibilitychange', function () {
-            if (document.hidden) {
-                console.log('Page hidden - continuing to poll for payment');
-            } else {
-                console.log('Page visible - polling continues');
-            }
-        });
-
-        // Check on page load/focus
-        window.addEventListener('focus', function () {
-            console.log('Page focused - checking payment status');
-            if (pollInterval === null) {
-                startPollingForPayment();
-            }
         });
     </script>
 </body>

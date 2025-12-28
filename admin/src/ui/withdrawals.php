@@ -19,6 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         w.payment_method,
                         w.upi_id,
                         w.bank_name,
+                        w.branch_name,
                         w.account_number,
                         w.ifsc_code,
                         w.account_holder_name,
@@ -643,7 +644,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 const date = new Date(w.created_on).toLocaleString('en-IN');
                 const paymentDetails = w.payment_method === 'upi' 
                     ? w.upi_id 
-                    : `${w.bank_name}<br>${w.account_number}<br>IFSC: ${w.ifsc_code}`;
+                    : `${w.bank_name}<br>${w.branch_name ? w.branch_name + '<br>' : ''}${w.account_number}<br>IFSC: ${w.ifsc_code}`;
                 
                 let actions = '';
                 if (w.status === 'pending') {
@@ -712,6 +713,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 paymentInfo += `
                     <p><strong>Account Holder:</strong> ${data.account_holder_name}</p>
                     <p><strong>Bank:</strong> ${data.bank_name}</p>
+                    <p><strong>Branch:</strong> ${data.branch_name || 'N/A'}</p>
                     <p><strong>Account:</strong> ${data.account_number}</p>
                     <p><strong>IFSC:</strong> ${data.ifsc_code}</p>
                 `;

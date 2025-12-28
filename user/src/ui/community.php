@@ -23,6 +23,18 @@ $hide_header_extras = true; // Hide notification/wallet buttons on this page
     <link href="community_mod_styles.css?v=<?php echo time(); ?>" rel="stylesheet" type="text/css" />
     <link href="timeout_styles.css?v=<?php echo time(); ?>" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Fix for huge gap on desktop */
+        @media (min-width: 992px) {
+            #section-community {
+                padding-top: 20px !important;
+                padding-bottom: 0 !important;
+            }
+            #content {
+                padding-top: 0 !important;
+            }
+        }
+    </style>
 </head>
 
 <body class="dark-scheme de-grey">
@@ -30,7 +42,7 @@ $hide_header_extras = true; // Hide notification/wallet buttons on this page
         <?php // Header hidden for full chat experience - include('../components/header.php') ?>
         <div class="no-bottom no-top" id="content" style="padding-top: 0 !important;">
             <div id="top"></div>
-            <section id="section-community" aria-label="section">
+            <section id="section-community" aria-label="section" style="padding-bottom: 0 !important;">
                 <div class="container">
 
                     <!-- Discord-Style Chat Layout -->
@@ -133,6 +145,7 @@ $hide_header_extras = true; // Hide notification/wallet buttons on this page
                 </div>
             </section>
         </div>
+        
         <?php include('../components/footer.php'); ?>
 
     </div>

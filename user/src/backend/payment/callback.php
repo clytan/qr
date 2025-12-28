@@ -259,7 +259,7 @@ function processReferral($conn, $referred_by_user_id, $new_user_id)
     try {
         // Get referrer details - check both by numeric id and by user_qr_id
         // since referred_by_user_id might be stored as either
-        $sqlReferrer = "SELECT id, user_slab_id FROM user_user WHERE (id = ? OR user_qr_id = ?) AND is_deleted = 0 LIMIT 1";
+        $sqlReferrer = "SELECT id, user_slab_id, user_tag, user_user_type, college_name FROM user_user WHERE (id = ? OR user_qr_id = ?) AND is_deleted = 0 LIMIT 1";
         $stmtReferrer = $conn->prepare($sqlReferrer);
         $stmtReferrer->bind_param('ss', $referred_by_user_id, $referred_by_user_id);
         $stmtReferrer->execute();
@@ -270,43 +270,47 @@ function processReferral($conn, $referred_by_user_id, $new_user_id)
             $referrer_id = $referrer['id'];
             $referrer_slab_id = $referrer['user_slab_id'];
 
-            // Get commission percentage
-            // Get commission details
-            $sqlSlab = "SELECT ref_commission, name FROM user_slab WHERE id = ?";
-            $stmtSlab = $conn->prepare($sqlSlab);
-            $stmtSlab->bind_param('i', $referrer_slab_id);
-            $stmtSlab->execute();
-            $resultSlab = $stmtSlab->get_result();
+            // Get referrer's details directly to determine commission
+            // We use user_tag (gold/silver) and user_user_type (2=Creator, 3=Business)
+            // Logic: Gold, Silver, Creator, Business, Student Leader -> ₹200, Others -> ₹100
+            
+            $referrer_tag = strtolower(trim($referrer['user_tag'] ?? ''));
+            $referrer_type = (string)$referrer['user_user_type'];
+            
+            error_log("Processing Referral - Referrer ID: $referrer_id, Type: '$referrer_type', Tag: '$referrer_tag', College: '{$referrer['college_name']}'");
 
-            if ($resultSlab->num_rows > 0) {
-                $rowSlab = $resultSlab->fetch_assoc();
-                
-                // Fixed commission rule based on Slab Name
-                // Rule: 100/- for individuals, 200/- for creator, student leader, gold & silver
-                $slabName = strtolower($rowSlab['name'] ?? '');
-                
-                // Check against keywords to match "student leader", "creator", etc.
-                if (
-                    strpos($slabName, 'creator') !== false || 
-                    strpos($slabName, 'student') !== false || 
-                    strpos($slabName, 'leader') !== false || 
-                    strpos($slabName, 'gold') !== false || 
-                    strpos($slabName, 'silver') !== false
-                ) {
-                    $commission_amount = 200.0;
-                } else {
-                    // Default for basic/individual users
-                    $commission_amount = 100.0;
+            $is_privileged = false;
+            $privileged_reason = "";
+
+            // Check Tags (substring match)
+            $privileged_tags = ['gold', 'silver', 'creator', 'student leader', 'business'];
+            foreach ($privileged_tags as $tag) {
+                if (strpos($referrer_tag, $tag) !== false) {
+                    $is_privileged = true;
+                    $privileged_reason = "Tag match: $tag";
+                    break;
                 }
-                
-                // PREVIOUS PERCENTAGE LOGIC REMOVED to enforce fixed 100/200 rates as per requirement
-                /*
-                if (!empty($rowSlab['ref_commission']) && is_numeric($rowSlab['ref_commission'])) {
-                    $commission_percent = floatval($rowSlab['ref_commission']);
-                    $base_amount = 100;
-                    $commission_amount = $base_amount * ($commission_percent / 100);
-                }
-                */
+            }
+
+            // Check Type (2=Creator, 3=Business)
+            if (!$is_privileged && ($referrer_type === '2' || $referrer_type === '3')) {
+                $is_privileged = true;
+                $privileged_reason = "User Type: $referrer_type";
+            }
+
+            // Check College (Student Leader indicator)
+            if (!$is_privileged && !empty($referrer['college_name']) && $referrer['college_name'] !== '[NULL]') {
+                $is_privileged = true;
+                $privileged_reason = "Has College Name";
+            }
+
+            if ($is_privileged) {
+                $commission_amount = 200.0;
+                error_log(">> Awarding ₹200 (Reason: $privileged_reason)");
+            } else {
+                $commission_amount = 100.0;
+                error_log(">> Awarding ₹100 (Standard User)");
+            }
 
                 // Update or create wallet
                 $sqlWallet = "SELECT id, balance FROM user_wallet WHERE user_id = ? AND is_deleted = 0";
@@ -340,7 +344,7 @@ function processReferral($conn, $referred_by_user_id, $new_user_id)
                 
                 error_log("Referral commission of {$commission_amount} processed for referrer ID: {$referrer_id}");
             }
-        }
+        
     } catch (Exception $e) {
         error_log("Error processing referral: " . $e->getMessage());
         // Don't throw - we don't want to fail the registration if referral processing fails

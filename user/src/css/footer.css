@@ -1,0 +1,425 @@
+/* Global Dark Theme for All Pages */
+body {
+    background: #1A1A1B !important;
+    overflow-x: hidden;
+}
+
+#content {
+    background: #1A1A1B !important;
+}
+
+section {
+    background: transparent !important;
+}
+
+.container {
+    background: transparent !important;
+}
+
+.no-bottom.no-top {
+    background: #1A1A1B !important;
+}
+
+#wrapper {
+    background: #1A1A1B !important;
+}
+
+/* Remove white backgrounds from all elements */
+div,
+section,
+article,
+aside,
+header,
+nav {
+    background-color: transparent;
+}
+
+/* Mobile Footer Styles - Jeeto Daily Inspired */
+.mobile-footer {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    background: #0a0e1a !important;
+    /* Fully opaque solid dark background */
+    background-color: #0a0e1a !important;
+    border-top: 1px solid rgba(102, 126, 234, 0.3);
+    padding: 8px 0 8px;
+    z-index: 9500 !important;
+    /* High z-index to stay above other elements */
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.6);
+    opacity: 1 !important;
+}
+
+.mobile-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: flex-end;
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 0 10px;
+    background: #0a0e1a;
+    /* Ensure solid background */
+    position: relative;
+    z-index: 1;
+}
+
+.mobile-nav .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 8px 10px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    flex: 1;
+    max-width: 80px;
+}
+
+.more-container {
+    position: relative;
+}
+
+.nav-item-more {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: #94a3b8;
+    text-decoration: none;
+}
+
+.more-popover {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #0a0e1a;
+    /* Fully opaque */
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    padding: 6px;
+    display: none;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
+    min-width: 120px;
+    z-index: 1200;
+}
+
+.more-popover .more-item {
+    display: block;
+    padding: 8px 10px;
+    color: #e2e8f0;
+    text-decoration: none;
+    font-size: 0.85rem;
+    border-radius: 6px;
+}
+
+.more-popover .more-item:not(:last-child) {
+    margin-bottom: 6px;
+}
+
+.more-popover .more-item:hover {
+    background: rgba(255, 255, 255, 0.03);
+    color: #e67753
+}
+
+.nav-icon-wrapper {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    margin-bottom: 4px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: #1e293b;
+    /* Fully opaque */
+    border: 1px solid #334155;
+}
+
+.nav-icon-wrapper i {
+    font-size: 1.4rem;
+    transition: all 0.3s ease;
+}
+
+/* Center Item - Featured (Rewards) */
+.nav-item-center {
+    transform: translateY(-10px);
+}
+
+.nav-icon-center {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4), 0 0 20px rgba(102, 126, 234, 0.3);
+    border: 3px solid rgba(10, 14, 39, 0.8);
+    position: relative;
+}
+
+.nav-icon-center::before {
+    content: '';
+    position: absolute;
+    inset: -3px;
+    border-radius: 50%;
+    padding: 3px;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: glow 2s ease-in-out infinite;
+}
+
+@keyframes glow {
+
+    0%,
+    100% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+.nav-icon-center i {
+    font-size: 1.8rem;
+    color: white;
+}
+
+/* Hover and Active States */
+.mobile-nav .nav-item:hover .nav-icon-wrapper,
+.mobile-nav .nav-item.active .nav-icon-wrapper {
+    background: #2d3548;
+    /* Fully opaque hover */
+    border-color: #e67753;
+    transform: translateY(-2px);
+}
+
+.mobile-nav .nav-item:hover,
+.mobile-nav .nav-item.active {
+    color: #e67753;
+}
+
+.mobile-nav .nav-item:hover .nav-icon-wrapper i,
+.mobile-nav .nav-item.active .nav-icon-wrapper i {
+    color: #e67753;
+    transform: scale(1.1);
+}
+
+.mobile-nav .nav-item-center:hover .nav-icon-center,
+.mobile-nav .nav-item-center.active .nav-icon-center {
+    transform: scale(1.1);
+    box-shadow: 0 10px 30px rgba(230, 119, 83, 0.6), 0 0 30px rgba(230, 119, 83, 0.4);
+}
+
+.mobile-nav .nav-item span {
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.footer-logo img {
+    width: 40px;
+    height: auto;
+}
+
+/* Desktop Footer Styles */
+.desktop-footer {
+    background: linear-gradient(180deg, #0a0e27 0%, #0f172a 100%);
+    padding: 1rem 0 1.5rem;
+    border-top: 2px solid rgba(102, 126, 234, 0.2);
+    margin-top: 0;
+}
+
+.footer-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+}
+
+.desktop-footer .footer-logo img {
+    width: 120px;
+    height: auto;
+    margin-bottom: 1rem;
+}
+
+.footer-nav {
+    display: flex;
+    gap: 2.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Desktop 'More' control */
+.more-desktop-wrapper {
+    position: relative;
+}
+
+.desktop-more-toggle {
+    color: #e2e8f0;
+    text-decoration: none;
+    cursor: pointer
+}
+
+.more-desktop {
+    position: absolute;
+    top: 36px;
+    left: 0;
+    background: rgba(6, 10, 20, 0.95);
+    padding: 8px;
+    border-radius: 8px;
+    display: none;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.more-desktop a {
+    display: block;
+    padding: 6px 10px;
+    color: #e2e8f0;
+    text-decoration: none
+}
+
+.more-desktop a:hover {
+    color: #e67753
+}
+
+.footer-nav a {
+    color: #e2e8f0;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 1rem;
+    position: relative;
+}
+
+.footer-nav a::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #E9437A, #e67753, #E2AD2A);
+    transition: width 0.3s ease;
+}
+
+.footer-nav a:hover {
+    color: #e67753;
+}
+
+.footer-nav a:hover::after {
+    width: 100%;
+}
+
+.footer-links {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-links a {
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+    color: #e67753;
+}
+
+.footer-bottom {
+    text-align: center;
+    color: #64748b;
+    font-size: 0.9rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    margin-top: 1.5rem;
+}
+
+/* Add margin to main content to prevent footer overlap */
+#content {
+    margin-bottom: 70px;
+}
+
+@media (min-width: 768px) {
+    #content {
+        margin-bottom: 0;
+    }
+}
+
+/* Hide back-to-top button on mobile */
+/* Mobile-specific size overrides to make footer icons/text smaller */
+@media (max-width: 767px) {
+
+    /* Slightly smaller nav text and tighter padding */
+    .mobile-nav .nav-item {
+        font-size: 0.56rem;
+        /* further reduced */
+        padding: 4px 6px;
+        max-width: 64px;
+    }
+
+    /* Smaller icon wrapper */
+    .nav-icon-wrapper {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        margin-bottom: 2px;
+    }
+
+    .nav-icon-wrapper i {
+        font-size: 1.05rem;
+        /* reduced from 1.4rem */
+    }
+
+    /* Center featured icon smaller and less offset */
+    .nav-item-center {
+        transform: translateY(-6px);
+    }
+
+    .nav-icon-center {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        border: 2px solid rgba(10, 14, 39, 0.8);
+    }
+
+    .nav-icon-center i {
+        font-size: 1.4rem;
+        /* reduced from 1.8rem */
+    }
+
+    /* show popover full width on very small screens */
+    .more-popover {
+        left: 4%;
+        bottom: 72px;
+        transform: translateX(-50%);
+    }
+
+    /* Keep the back-to-top hidden on mobile */
+    #back-to-top {
+        display: none !important;
+    }
+
+    /* reduce bottom margin so content isn't pushed too far on small screens */
+    #content {
+        margin-bottom: 64px;
+    }
+}
+
+
+/* Mobile Legal Footer */
+.mobile-legal-footer {
+    text-align: center;
+    padding: 20px 20px 80px;
+    /* Reduced from 100px to 80px and top from 30px to 20px */
+}

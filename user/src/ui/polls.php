@@ -401,12 +401,12 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         border-radius: 24px;
         width: 100%;
         max-width: 500px;
-        max-height: 90vh;
+        max-height: 85vh; /* Reduce slightly to fit better with bars */
         overflow: hidden;
         border: 1px solid rgba(255, 255, 255, 0.08);
-        display: flex;
-        flex-direction: column;
         box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        display: block; /* switched to block for simple scrolling */
+        overflow-y: auto; /* Scroll the whole modal content */
     }
 
     .poll-modal-header {
@@ -415,8 +415,12 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
         display: flex;
         justify-content: space-between;
         align-items: center;
-        flex-shrink: 0;
+        align-items: center;
         background: linear-gradient(to right, rgba(255,255,255,0.02), transparent);
+        position: sticky; /* Optional: keep header top if desired, or let it scroll. Wallet lets it scroll. I'll let it scroll for now or sticky top */
+        top: 0;
+        background: rgba(26, 31, 62, 0.95); /* Opaque bg for sticky */
+        z-index: 20;
     }
 
     .poll-modal-title {
@@ -437,27 +441,46 @@ $user_name = isset($_SESSION['user_name']) ? $_SESSION['user_name'] : '';
 
     .poll-modal-body {
         padding: 0;
-        flex: 1;
-        overflow: hidden;
-        display: flex;
-        flex-direction: column;
     }
     
     .poll-form-scrollable {
-        flex: 1;
-        overflow-y: auto;
         padding: 24px;
-        -webkit-overflow-scrolling: touch;
+        /* Removed flex/overflow properties to allow natural height */
+    }
+
+    @media (max-width: 600px) {
+        .poll-modal {
+            padding: 20px;
+            align-items: center;
+        }
+        
+        .poll-modal-content {
+            width: 95%;
+            height: auto;
+            max-height: 85vh;
+            max-width: none;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            margin: 0 auto;
+            overflow-y: auto;
+        }
+
+        .poll-form-scrollable {
+            padding: 16px; 
+            /* padding-bottom: 100px; Extra padding for keyboard/scroll overlap */
+        }
+        
+        .poll-form-footer {
+            padding: 12px 16px;
+            background: rgba(26, 31, 62, 1); /* Solid background to hide scroll content behind */
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
     }
 
     .poll-form-footer {
         padding: 16px 20px;
         border-top: 1px solid rgba(255, 255, 255, 0.05);
         background: rgba(26, 31, 62, 0.95);
-        backdrop-filter: blur(10px);
-        flex-shrink: 0;
-        z-index: 10;
-        box-shadow: 0 -10px 40px rgba(0,0,0,0.2);
     }
 
     .form-group {

@@ -72,9 +72,9 @@ try {
     // Pricing: Individual=449, Creator/Business=999, Gold=9999, Silver=5555
     // Student Leader = same as their user type base price
     $BASE_PRICES = [
-        '1' => 449,   // Individual
-        '2' => 999,   // Creator
-        '3' => 999    // Business
+        '1' => 299,   // Individual
+        '2' => 299,   // Creator
+        '3' => 299    // Business
     ];
     
     $TIER_PRICES = [
@@ -91,7 +91,7 @@ try {
     
     // Determine the correct price
     // Start with base price based on user type
-    $basePrice = isset($BASE_PRICES[$userType]) ? $BASE_PRICES[$userType] : 449;
+    $basePrice = isset($BASE_PRICES[$userType]) ? $BASE_PRICES[$userType] : 299;
     
     // Check for Gold/Silver tier (overrides base price unless student leader)
     if (!$isStudentLeader && isset($TIER_PRICES[$userTag])) {
