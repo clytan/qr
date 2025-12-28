@@ -246,6 +246,34 @@ const profileFunction = {
             snapchat_username: { field: 'snapchat_username', base: 'https://snapchat.com/add/' }
         };
 
+        // Helper function to properly build social URL
+        // If value is already a full URL, use it directly
+        // If it's just a username, prepend the base URL
+        const buildSocialUrl = (value, baseUrl, field) => {
+            if (!value) return '';
+            value = value.trim();
+            
+            // For website field, just use the value directly
+            if (field === 'website') {
+                return value.startsWith('http') ? value : 'https://' + value;
+            }
+            
+            // If value is already a full URL (starts with http:// or https://)
+            if (value.startsWith('http://') || value.startsWith('https://')) {
+                return value;
+            }
+            
+            // If value starts with www., add https://
+            if (value.startsWith('www.')) {
+                return 'https://' + value;
+            }
+            
+            // Otherwise, it's a username - prepend base URL
+            // Remove @ symbol if present (common for Instagram/Twitter usernames)
+            const cleanValue = value.replace(/^@/, '');
+            return baseUrl + cleanValue;
+        };
+
         if (!window.PUBLIC_PROFILE) {
             // Edit mode - add visit links as before
             Object.entries(socialLinksConfig).forEach(([field, config]) => {
@@ -267,8 +295,8 @@ const profileFunction = {
                 const baseUrl = $(this).data('base');
                 const value = $(`#${field}`).val();
                 if (value) {
-                    const url = field === 'website' ? value : baseUrl + value;
-                    window.open(url.startsWith('http') ? url : 'https://' + url, '_blank');
+                    const url = buildSocialUrl(value, baseUrl, field);
+                    if (url) window.open(url, '_blank');
                 }
             });
         } else {
@@ -278,8 +306,7 @@ const profileFunction = {
                 const value = inputField.val();
 
                 if (value && value.trim() !== '') {
-                    const url = field === 'website' ? value : config.base + value;
-                    const finalUrl = url.startsWith('http') ? url : 'https://' + url;
+                    const finalUrl = buildSocialUrl(value, config.base, field);
 
                     // Add a visit button to the input group
                     const inputGroup = inputField.closest('.input-group');
@@ -308,6 +335,79 @@ const profileFunction = {
                 e.preventDefault();
                 const url = $(this).data('url');
                 window.open(url, '_blank');
+            });
+        }
+        
+        // Add real-time validation for website and social fields (non-public mode only)
+        if (!window.PUBLIC_PROFILE) {
+            // Validate website URL format
+            const isValidWebsite = (value) => {
+                if (!value || value.trim() === '') return true; // Empty is OK
+                value = value.trim();
+                // Must have at least one dot and valid TLD pattern
+                return /^(https?:\/\/)?[a-zA-Z0-9][a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}/.test(value);
+            };
+            
+            // Add validation to website field
+            $(document).on('blur', '#website', function() {
+                const value = $(this).val();
+                const inputGroup = $(this).closest('.input-group');
+                let errorEl = inputGroup.find('.validation-error');
+                
+                if (!isValidWebsite(value)) {
+                    if (!errorEl.length) {
+                        inputGroup.after('<div class="validation-error" style="color: #ff6b6b; font-size: 12px; margin-top: 4px;">Please enter a valid website URL (e.g., example.com or https://example.com)</div>');
+                    }
+                    $(this).css('border-color', '#ff6b6b');
+                } else {
+                    inputGroup.next('.validation-error').remove();
+                    $(this).css('border-color', '');
+                }
+            });
+            
+            // Also validate on input to clear error when corrected
+            $(document).on('input', '#website', function() {
+                if (isValidWebsite($(this).val())) {
+                    $(this).closest('.input-group').next('.validation-error').remove();
+                    $(this).css('border-color', '');
+                }
+            });
+            
+            // Validate LinkedIn URL format
+            const isValidLinkedIn = (value) => {
+                if (!value || value.trim() === '') return true;
+                const val = value.trim();
+                // If it looks like a URL (has http, www, or .com)
+                if (val.includes('http') || val.includes('www.') || val.includes('.com')) {
+                   // Must be a valid LinkedIn profile URL
+                   return /(?:https?:\/\/)?(?:www\.)?linkedin\.com\/in\/([^\/?#]+)/i.test(val);
+                }
+                return true; // Simple usernames are allowed
+            };
+
+            // Add validation to LinkedIn field
+            $(document).on('blur', '#linkedin_username', function() {
+                const value = $(this).val();
+                const inputGroup = $(this).closest('.input-group');
+                let errorEl = inputGroup.find('.validation-error');
+                
+                if (!isValidLinkedIn(value)) {
+                    if (!errorEl.length) {
+                        inputGroup.after('<div class="validation-error" style="color: #ff6b6b; font-size: 12px; margin-top: 4px;">Please enter a valid LinkedIn profile URL (e.g., linkedin.com/in/username)</div>');
+                    }
+                    $(this).css('border-color', '#ff6b6b');
+                } else {
+                    inputGroup.next('.validation-error').remove();
+                    $(this).css('border-color', '');
+                }
+            });
+
+            // Also validate on input (LinkedIn)
+            $(document).on('input', '#linkedin_username', function() {
+                if (isValidLinkedIn($(this).val())) {
+                    $(this).closest('.input-group').next('.validation-error').remove();
+                    $(this).css('border-color', '');
+                }
             });
         }
     },
@@ -789,6 +889,32 @@ const profileFunction = {
     handleProfileSubmit: function (e) {
         e.preventDefault();
         console.log('Profile submit triggered'); // Debug log
+
+        // Validate website field before saving
+        const websiteValue = $('#website').val();
+        if (websiteValue && websiteValue.trim() !== '') {
+            const isValidWebsite = /^(https?:\/\/)?[a-zA-Z0-9][a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}/.test(websiteValue.trim());
+            if (!isValidWebsite) {
+                showToast('Please enter a valid website URL (e.g., example.com)', 'error');
+                $('#website').focus().css('border-color', '#ff6b6b');
+                return; // Stop form submission
+            }
+        }
+
+        // Validate LinkedIn URL
+        const linkedinVal = $('#linkedin_username').val();
+        if (linkedinVal && linkedinVal.trim() !== '') {
+            const val = linkedinVal.trim();
+            // If it looks like a URL (has http, www, or .com)
+            if (val.includes('http') || val.includes('www.') || val.includes('.com')) {
+                // Must be a valid LinkedIn profile URL
+                if (!/(?:https?:\/\/)?(?:www\.)?linkedin\.com\/in\/([^\/?#]+)/i.test(val)) {
+                    showToast('Please enter a valid LinkedIn profile URL (e.g., linkedin.com/in/username)', 'error');
+                    $('#linkedin_username').focus().css('border-color', '#ff6b6b');
+                    return;
+                }
+            }
+        }
 
         const formData = {
             user_id: $('#user_id').val(),

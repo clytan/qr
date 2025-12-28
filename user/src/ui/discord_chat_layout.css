@@ -535,6 +535,7 @@ nav {
 }
 
 .lightbox-close {
+    display: none;
     position: absolute;
     top: 10px;
     right: 10px;
@@ -546,7 +547,6 @@ nav {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    display: flex;
     align-items: center;
     justify-content: center;
     transition: all 0.2s ease;

@@ -19,6 +19,57 @@ $is_public_address = isset($data['is_public_address']) ? (int)$data['is_public_a
 $fields = $data['fields'] ?? [];
 $links = $data['links'] ?? [];
 
+// Helper function to clean social media values - extract username from full URLs
+function cleanSocialValue($value, $type) {
+    if (empty($value)) return '';
+    $value = trim($value);
+    
+    // URL patterns for social platforms to extract username
+    $patterns = [
+        'instagram_username' => '/(?:https?:\/\/)?(?:www\.)?instagram\.com\/([^\/?#]+)/i',
+        'facebook_username' => '/(?:https?:\/\/)?(?:www\.)?facebook\.com\/([^\/?#]+)/i',
+        'twitter_username' => '/(?:https?:\/\/)?(?:www\.)?(?:twitter|x)\.com\/([^\/?#]+)/i',
+        'youtube_username' => '/(?:https?:\/\/)?(?:www\.)?youtube\.com\/(?:@|channel\/|c\/)?([^\/?#]+)/i',
+        'linkedin_username' => '/(?:https?:\/\/)?(?:www\.)?linkedin\.com\/in\/([^\/?#]+)/i',
+        'snapchat_username' => '/(?:https?:\/\/)?(?:www\.)?snapchat\.com\/add\/([^\/?#]+)/i',
+        'telegram_link' => '/(?:https?:\/\/)?(?:www\.)?t\.me\/([^\/?#]+)/i',
+        'whatsapp_link' => '/(?:https?:\/\/)?(?:wa\.me\/)?(\+?\d+)/i',
+    ];
+    
+    // For website, validate it's a proper URL
+    if ($type === 'website') {
+        // If it doesn't start with http, add https://
+        if (!preg_match('/^https?:\/\//i', $value)) {
+            // Check if it looks like a valid domain
+            if (preg_match('/^[a-zA-Z0-9][a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,}/', $value)) {
+                $value = 'https://' . $value;
+            } else {
+                // Invalid website - reject values like "IIII"
+                return '';
+            }
+        }
+        return $value;
+    }
+    
+    // For social platforms, try to extract username from URL
+    if (isset($patterns[$type])) {
+        if (preg_match($patterns[$type], $value, $matches)) {
+            return $matches[1]; // Return just the username
+        }
+    }
+    
+    // If not a URL, remove @ prefix and return as username
+    $value = ltrim($value, '@');
+    
+    // Basic validation - username should be alphanumeric with underscores/dots
+    // Allow more characters for WhatsApp (phone numbers with +)
+    if ($type === 'whatsapp_link') {
+        return preg_replace('/[^\d+]/', '', $value);
+    }
+    
+    return $value;
+}
+
 // Update user_user table
 global $conn;
 $user_sql = "UPDATE user_user SET user_full_name=?, user_phone=?, user_email=?, user_address=?, user_pincode=?, user_landmark=?, is_public_address=? WHERE id=?";
@@ -65,6 +116,9 @@ foreach ($fields as $type) {
     if (isset($linkData['is_public'])) {
         $is_public = (int)$linkData['is_public'];
     }
+    
+    // Clean up social media value - extract username from full URLs
+    $value = cleanSocialValue($value, $type);
 
     // Get link_type id from user_profile_links_type
     $type_id = null;
