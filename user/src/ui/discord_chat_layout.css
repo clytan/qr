@@ -361,11 +361,11 @@ nav {
     /* border: 1px solid rgba(255, 255, 255, 0.08); */
 }
 
-.message:hover {
+/* .message:hover {
     background: rgba(255, 255, 255, 0.05);
     border-color: rgba(102, 126, 234, 0.3);
     transform: translateX(2px);
-}
+} */
 
 /* Message Avatar */
 .message-avatar {
@@ -381,9 +381,9 @@ nav {
     transition: border-color 0.2s ease;
 }
 
-.message:hover .message-avatar {
+/* .message:hover .message-avatar {
     border-color: #5865F2;
-}
+} */
 
 /* Message Content - Better Visual Hierarchy */
 .message-content {
