@@ -257,16 +257,19 @@ function renderMessage(msg) {
     const renderAttachment = () => {
         if (!msg.attachment_path) return '';
 
-        if (isImageFile(msg.attachment_name)) {
+        // Use the correct path - attachment_path is stored as 'uploads/community/...'
+        const attachmentUrl = '../' + msg.attachment_path;
+        
+        if (isImageFile(msg.attachment_name || msg.attachment_path)) {
             return `
             <div class="message-attachment">
-                <img src="../${msg.attachment_path}" alt="${msg.attachment_name}" onclick="openLightbox('../${msg.attachment_path}')">
+                <img src="${attachmentUrl}" alt="${msg.attachment_name || 'Image'}" onclick="openLightbox('${attachmentUrl}')">
             </div>`;
         } else {
             return `
             <div class="message-attachment file">
-                <a href="../${msg.attachment_path}" target="_blank">
-                    <i class="fa fa-paperclip"></i>${msg.attachment_name}
+                <a href="${attachmentUrl}" target="_blank">
+                    <i class="fa fa-paperclip"></i>${msg.attachment_name || 'Attachment'}
                 </a>
             </div>`;
         }
