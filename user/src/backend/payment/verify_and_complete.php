@@ -150,7 +150,7 @@ try {
     $sqlMaxQr = "SELECT MAX(CAST(SUBSTRING(user_qr_id, 4) AS UNSIGNED)) as max_num FROM user_user WHERE user_qr_id LIKE 'ZOK%'";
     $resultMaxQr = $conn->query($sqlMaxQr);
     $rowMaxQr = $resultMaxQr->fetch_assoc();
-    $nextNum = ($rowMaxQr['max_num'] ?? 0) + 1;
+    $nextNum = max(($rowMaxQr['max_num'] ?? 0) + 1, 2222222); // Start from ZOK2222222
     $user_qr_id = 'ZOK' . str_pad(strval($nextNum), 7, '0', STR_PAD_LEFT);
 
     error_log("Generated sequential QR ID: " . $user_qr_id . " (Next number: " . $nextNum . ")");
