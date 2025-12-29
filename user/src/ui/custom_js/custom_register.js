@@ -458,11 +458,11 @@ var eventHandler = {
     $("#register_form").on("submit", function (e) {
       e.preventDefault();
       if (!registerFunction.isFormComplete()) {
-        alert("Please complete all required fields and verify your email.");
+        showToast("Please complete all required fields and verify your email.", "error");
         return;
       }
       if ($("#password").val().trim() !== $("#confirmpassword").val().trim()) {
-        alert("Passwords do not match.");
+        showToast("Passwords do not match.", "error");
         return;
       }
       var selectedUserType = registerFunction.getSelectedUserType();
@@ -519,8 +519,8 @@ var eventHandler = {
         dataType: "json",
         success: function (checkResponse) {
           if (checkResponse.exists) {
-            alert("This email is already registered. Please login instead.");
-            window.location.href = "login.php";
+            showToast("This email is already registered. Please login instead.", "error");
+            // window.location.href = "login.php";
             return;
           }
           // If user doesn't exist, proceed to create payment order
@@ -565,12 +565,12 @@ var eventHandler = {
             error: function (xhr, status, error) {
               console.error("❌ AJAX error:", status, error);
               console.error("Response text:", xhr.responseText);
-              alert("An error occurred while initiating payment: " + error);
+              showToast("An error occurred while initiating payment: " + error, "error");
             },
           });
         },
         error: function (xhr, status, error) {
-          alert("An error occurred while checking user: " + error);
+          showToast("An error occurred while checking user: " + error, "error");
         },
       });
     });

@@ -506,6 +506,7 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
     </div>
 
     <?php include('../components/jslinks.php'); ?>
+    <script src="custom_js/toast.js"></script>
 
     <script>
         let currentBalance = 0;
@@ -638,7 +639,7 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
 
         function showRedeemModal() {
             if (currentBalance < 100) {
-                alert('Minimum balance of ₹100 required for withdrawal');
+                showToast('Minimum balance of ₹100 required for withdrawal', 'error');
                 return;
             }
             $('#redeem-amount').val('');
@@ -678,12 +679,12 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
             const amount = parseFloat($('#redeem-amount').val()) || 0;
             
             if (amount < 100) {
-                alert('Minimum withdrawal amount is ₹100');
+                showToast('Minimum withdrawal amount is ₹100', 'error');
                 return;
             }
             
             if (amount > currentBalance) {
-                alert('Insufficient balance');
+                showToast('Insufficient balance', 'error');
                 return;
             }
 
@@ -695,7 +696,7 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
             if (selectedPaymentMethod === 'upi') {
                 data.upi_id = $('#upi-id').val().trim();
                 if (!data.upi_id) {
-                    alert('Please enter your UPI ID');
+                    showToast('Please enter your UPI ID', 'error');
                     return;
                 }
             } else {
@@ -706,7 +707,7 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
                 data.account_holder_name = $('#account-holder').val().trim();
 
                 if (!data.bank_name || !data.branch_name || !data.account_number || !data.ifsc_code || !data.account_holder_name) {
-                    alert('Please fill all bank details including branch name');
+                    showToast('Please fill all bank details including branch name', 'error');
                     return;
                 }
             }
@@ -721,16 +722,16 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
                 dataType: 'json',
                 success: function(response) {
                     if (response.status) {
-                        alert(response.message);
+                        showToast(response.message, 'success');
                         closeRedeemModal();
                         loadWalletData();
                         loadWithdrawals();
                     } else {
-                        alert(response.message || 'Request failed');
+                        showToast(response.message || 'Request failed', 'error');
                     }
                 },
                 error: function() {
-                    alert('Network error. Please try again.');
+                    showToast('Network error. Please try again.', 'error');
                 },
                 complete: function() {
                     $('#submit-redeem').prop('disabled', false).html('<i class="fas fa-paper-plane"></i> Submit Request');
@@ -751,15 +752,15 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
                 dataType: 'json',
                 success: function(response) {
                     if (response.status) {
-                        alert(response.message);
+                        showToast(response.message, 'success');
                         loadWalletData();
                         loadWithdrawals();
                     } else {
-                        alert(response.message || 'Failed to cancel');
+                        showToast(response.message || 'Failed to cancel', 'error');
                     }
                 },
                 error: function() {
-                    alert('Network error');
+                    showToast('Network error', 'error');
                 }
             });
         }

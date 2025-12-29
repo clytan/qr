@@ -691,12 +691,12 @@ function sendMessage() {
                     }, 100);
                 }
             } else {
-                alert(data.message || 'Failed to send message');
+                showToast(data.message || 'Failed to send message', 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Failed to send message. Please try again.');
+            showToast('Failed to send message. Please try again.', 'error');
         })
         .finally(() => {
             // Re-enable button after send completes
@@ -858,14 +858,14 @@ function timeoutUser(userId, messageId) {
                         }
                     }
                 });
-                alert('User has been timed out');
+                showToast('User has been timed out', 'success');
             } else {
-                alert(data.message || 'Failed to timeout user');
+                showToast(data.message || 'Failed to timeout user', 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Failed to timeout user. Please try again.');
+            showToast('Failed to timeout user. Please try again.', 'error');
         });
 }
 
@@ -900,14 +900,14 @@ function banUser(userId, messageId) {
                         }
                     }
                 });
-                alert('User has been banned');
+                showToast('User has been banned', 'success');
             } else {
-                alert(data.message || 'Failed to ban user');
+                showToast(data.message || 'Failed to ban user', 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Failed to ban user. Please try again.');
+            showToast('Failed to ban user. Please try again.', 'error');
         });
 }
 

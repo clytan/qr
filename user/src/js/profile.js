@@ -347,7 +347,7 @@ function submitSuperchargeRequest() {
     const link = linkInput.val() ? linkInput.val().trim() : '';
 
     if (!link) {
-        alert('Please enter a valid link');
+        showToast('Please enter a valid link', 'error');
         return;
     }
 
@@ -355,7 +355,7 @@ function submitSuperchargeRequest() {
     try {
         new URL(link);
     } catch (e) {
-        alert('Please enter a valid URL (must start with http:// or https://)');
+        showToast('Please enter a valid URL (must start with http:// or https://)', 'error');
         return;
     }
 
@@ -369,16 +369,16 @@ function submitSuperchargeRequest() {
         dataType: 'json',
         success: function (response) {
             if (response.success) {
-                alert(response.message);
+                showToast(response.message, 'success');
                 linkInput.val(''); // Clear the input field
                 checkSuperchargeStatus(); // Refresh status
             } else {
-                alert('Error: ' + response.message);
+                showToast('Error: ' + response.message, 'error');
             }
         },
         error: function (xhr, status, error) {
             console.error('Error submitting supercharge:', error);
-            alert('Failed to submit supercharge request. Please try again.');
+            showToast('Failed to submit supercharge request. Please try again.', 'error');
         }
     });
 }
@@ -509,7 +509,7 @@ function startRenewal() {
                 const orderId = encodeURIComponent(data.order_id);
                 window.location.href = '../backend/payment/intent_renewal.php?session=' + session + '&orderId=' + orderId;
             } else {
-                alert('Error: ' + (data.error || 'Failed to create payment order'));
+                showToast('Error: ' + (data.error || 'Failed to create payment order'), 'error');
                 if (renewBtn) {
                     renewBtn.disabled = false;
                     renewBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Renew Now';
@@ -518,7 +518,7 @@ function startRenewal() {
         })
         .catch(err => {
             console.error('Renewal error:', err);
-            alert('Error starting renewal. Please try again.');
+            showToast('Error starting renewal. Please try again.', 'error');
             if (renewBtn) {
                 renewBtn.disabled = false;
                 renewBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Renew Now';
@@ -539,16 +539,16 @@ function boostProfile() {
         .then(response => response.json())
         .then(data => {
             if (data.status) {
-                alert('✨ Success! Your profile has been Super Charged!\n\n' + data.message);
+                showToast('✨ Success! Your profile has been Super Charged!\n\n' + data.message, 'success');
                 // Reload page to reflect changes
                 location.reload();
             } else {
-                alert('❌ Error: ' + data.message);
+                showToast('❌ Error: ' + data.message, 'error');
             }
         })
         .catch(error => {
             console.error('Error boosting profile:', error);
-            alert('An error occurred while boosting your profile. Please try again.');
+            showToast('An error occurred while boosting your profile. Please try again.', 'error');
         });
 }
 
@@ -674,11 +674,11 @@ function toggleFollow(targetUserId) {
                 // Update followers count
                 checkFollowStatus();
             } else {
-                alert('Error: ' + response.message);
+                showToast('Error: ' + response.message, 'error');
             }
         },
         error: function () {
-            alert('Failed to update follow status. Please try again.');
+            showToast('Failed to update follow status. Please try again.', 'error');
         }
     });
 }
@@ -759,7 +759,7 @@ document.addEventListener('DOMContentLoaded', function () {
 function copyToClipboard(text) {
     if (navigator.clipboard) {
         navigator.clipboard.writeText(text).then(() => {
-            alert('✅ Profile link copied to clipboard!\n\n' + text);
+            showToast('✅ Profile link copied to clipboard!', 'success');
         }).catch(() => {
             fallbackCopyToClipboard(text);
         });
@@ -777,7 +777,7 @@ function fallbackCopyToClipboard(text) {
     textArea.select();
     try {
         document.execCommand('copy');
-        alert('✅ Profile link copied to clipboard!\n\n' + text);
+        showToast('✅ Profile link copied to clipboard!', 'success');
     } catch (err) {
         prompt('Copy this link manually:', text);
     }

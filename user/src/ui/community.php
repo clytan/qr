@@ -197,6 +197,7 @@ $hide_header_extras = true; // Hide notification/wallet buttons on this page
     </div>
 
     <?php include('../components/jslinks.php'); ?>
+    <script src="custom_js/toast.js"></script>
     <script src="custom_js/community.js?v=<?php echo time(); ?>"></script>
     <script src="custom_js/report.js"></script>
 </body>

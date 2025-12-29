@@ -28,14 +28,14 @@ function submitReport(event) {
         .then(response => response.json())
         .then(data => {
             if (data.status) {
-                alert('Message reported successfully');
+                showToast('Message reported successfully', 'success');
                 closeReportModal();
             } else {
-                alert(data.message || 'Failed to report message');
+                showToast(data.message || 'Failed to report message', 'error');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('Failed to report message');
+            showToast('Failed to report message', 'error');
         });
 }

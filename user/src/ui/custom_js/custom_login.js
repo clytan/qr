@@ -23,11 +23,11 @@ var loginFunction = {
 				if (response.status) {
 					window.location.href = response.data.redirect;
 				} else {
-					alert(response.message || 'Login failed.');
+					showToast(response.message || 'Login failed.', 'error');
 				}
 			},
 			error: function (xhr, status, error) {
-				alert('An error occurred: ' + error);
+				showToast('An error occurred: ' + error, 'error');
 			}
 		});
 	}

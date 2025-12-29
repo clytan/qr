@@ -195,6 +195,7 @@ if (!$is_logged_in) {
 
     <!-- Javascript Files -->
     <?php include('../components/jslinks.php'); ?>
+    <script src="custom_js/toast.js"></script>
     <script src="../js/reference.js"></script>
 
 </body>

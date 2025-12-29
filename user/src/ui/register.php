@@ -725,6 +725,7 @@ $ref_code = isset($_GET['ref']) ? htmlspecialchars($_GET['ref']) : '';
     <!-- Javascript Files
     ================================================== -->
     <?php include('../components/jslinks.php'); ?>
+    <script src="./custom_js/toast.js"></script>
     <script src="./custom_js/custom_register.js"></script>
 
     <!-- Password Toggle Script -->

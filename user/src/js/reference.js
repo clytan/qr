@@ -55,10 +55,10 @@ function loadReferralStats() {
                     e.preventDefault();
                     navigator.clipboard.writeText(fullMessage).then(() => {
                         window.open('https://www.instagram.com', '_blank');
-                        alert('Share text copied to clipboard. Paste it in Instagram to share.');
+                        showToast('Share text copied to clipboard. Opening Instagram...', 'success');
                     }).catch(() => {
                         window.open('https://www.instagram.com', '_blank');
-                        alert('Unable to copy automatically. Please paste your referral message manually in Instagram.');
+                        showToast('Unable to copy automatically. Please paste your referral message manually in Instagram.', 'warning');
                     });
                 });
             }

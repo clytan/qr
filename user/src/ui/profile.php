@@ -557,6 +557,7 @@ $is_viewing_other_profile = $viewing_qr && !empty($user_id) && $viewed_qr !== $u
     <!-- wrapper close -->
 
     <?php include('../components/jslinks.php'); ?>
+    <script src="./custom_js/toast.js"></script>
     <script src="../components/qr/qrcode.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.8/clipboard.min.js"></script>
     <script src="./custom_js/custom_profile_new.js"></script>

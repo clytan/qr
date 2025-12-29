@@ -536,14 +536,14 @@ const profileFunction = {
 
         const ext = file.name.split('.').pop().toLowerCase();
         if (!['jpg', 'jpeg', 'png'].includes(ext)) {
-            alert('Only JPG and PNG files are allowed.');
+            showToast('Only JPG and PNG files are allowed.', 'error');
             this.value = ''; // Clear the input
             return;
         }
 
         // Check file size (max 5MB)
         if (file.size > 5 * 1024 * 1024) {
-            alert('File size must be less than 5MB.');
+            showToast('File size must be less than 5MB.', 'error');
             this.value = '';
             return;
         }

@@ -211,6 +211,7 @@
     <!-- Javascript Files
     ================================================== -->
     <?php include('../components/jslinks.php'); ?>
+    <script src="./custom_js/toast.js"></script>
     <script src="./custom_js/custom_login.js"></script>
 
     <!-- Password Toggle Script -->
