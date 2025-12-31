@@ -81,39 +81,50 @@ if ($regStatus === 'completed') {
     exit;
 }
 
-// Verify payment with Cashfree
-$clientId = "1106277eab36909b950443d4c757726011";
-$clientSecret = "cfsk_ma_prod_36fd9bb92f7bbb654f807b60d6b7c67c_244c3bc6";
-$url = "https://api.cashfree.com/pg/orders/" . $orderId;
+// Check if this is a FREE registration (100% promo discount)
+$isFreeRegistration = ($originalAmount !== null && $discountAmount !== null && $originalAmount > 0 && $discountAmount >= $originalAmount);
 
-$headers = array(
-    "accept: application/json",
-    "x-api-version: 2023-08-01",
-    "x-client-id: " . $clientId,
-    "x-client-secret: " . $clientSecret
-);
+// Verify payment with Cashfree (skip if free registration)
+$paymentConfirmed = false;
+if ($isFreeRegistration) {
+    error_log("✓ Free registration detected (100% promo discount) - skipping payment verification");
+    $paymentConfirmed = true;
+    $orderData = ['order_status' => 'FREE'];
+} else {
+    $clientId = "1106277eab36909b950443d4c757726011";
+    $clientSecret = "cfsk_ma_prod_36fd9bb92f7bbb654f807b60d6b7c67c_244c3bc6";
+    $url = "https://api.cashfree.com/pg/orders/" . $orderId;
 
-$ch = curl_init($url);
-curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-curl_setopt($ch, CURLOPT_TIMEOUT, 10);
-curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 8);
-$response = curl_exec($ch);
-$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-curl_close($ch);
+    $headers = array(
+        "accept: application/json",
+        "x-api-version: 2023-08-01",
+        "x-client-id: " . $clientId,
+        "x-client-secret: " . $clientSecret
+    );
 
-error_log("Cashfree verification - HTTP Code: " . $httpCode . ", Response: " . $response);
+    $ch = curl_init($url);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 8);
+    $response = curl_exec($ch);
+    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
 
-$orderData = json_decode($response, true);
-$paymentConfirmed = ($httpCode == 200 && isset($orderData['order_status']) && $orderData['order_status'] === 'PAID');
+    error_log("Cashfree verification - HTTP Code: " . $httpCode . ", Response: " . $response);
+
+    $orderData = json_decode($response, true);
+    $paymentConfirmed = ($httpCode == 200 && isset($orderData['order_status']) && $orderData['order_status'] === 'PAID');
+}
 
 // **CRITICAL**: Process registration regardless - assume payment is done if we got here
 // This is because:
 // 1. User can only reach this endpoint after payment completes in the UPI app
 // 2. Cashfree API might be slow or have temporary issues
 // 3. We already stored pending registration, so it's safe to process
+// 4. For free registrations, no payment is required
 
 error_log("Payment confirmed via API: " . ($paymentConfirmed ? 'YES' : 'NO') . " - Processing registration anyway");
 

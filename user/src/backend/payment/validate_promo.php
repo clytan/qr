@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $data = json_decode(file_get_contents('php://input'), true);
 $code = isset($data['code']) ? strtoupper(trim($data['code'])) : '';
 $amount = isset($data['amount']) ? floatval($data['amount']) : 0;
+$userType = isset($data['user_type']) ? trim($data['user_type']) : '';
 
 if (empty($code)) {
     echo json_encode(['success' => false, 'message' => 'Promo code is required']);
@@ -19,6 +20,26 @@ if (empty($code)) {
 if ($amount <= 0) {
     echo json_encode(['success' => false, 'message' => 'Invalid amount']);
     exit;
+}
+
+// Validate user type for restricted promo codes
+// ZOKLIBUSINESS = only for Business (user_type = 3)
+// ZOKLICREATOR = only for Creator (user_type = 2)
+$restrictedPromos = [
+    'ZOKLIBUSINESS' => '3',  // Business
+    'ZOKLICREATOR' => '2',   // Creator
+];
+
+if (isset($restrictedPromos[$code])) {
+    $requiredUserType = $restrictedPromos[$code];
+    if ($userType !== $requiredUserType) {
+        $userTypeName = ($requiredUserType === '2') ? 'Creator' : 'Business';
+        echo json_encode([
+            'success' => false, 
+            'message' => "This promo code is only valid for $userTypeName registration"
+        ]);
+        exit;
+    }
 }
 
 try {

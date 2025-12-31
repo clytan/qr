@@ -264,10 +264,11 @@ function processReferral($conn, $referred_by_user_id, $new_user_id)
 
 if (isset($_GET['orderId'])) {
     $order_id = $_GET['orderId'];
-    error_log("Order ID from return URL: " . $order_id);
+    $isFreeRegistration = isset($_GET['free']) && $_GET['free'] === '1';
+    error_log("Order ID from return URL: " . $order_id . ($isFreeRegistration ? " (FREE REGISTRATION)" : ""));
 
     // First, get registration data from database (more reliable than session)
-    $sqlGetReg = "SELECT registration_data, status FROM user_pending_registration WHERE order_id = ? AND status = 'pending'";
+    $sqlGetReg = "SELECT registration_data, status, promo_code, discount_amount, original_amount FROM user_pending_registration WHERE order_id = ? AND status = 'pending'";
     $stmtGetReg = $conn->prepare($sqlGetReg);
     $stmtGetReg->bind_param('s', $order_id);
     $stmtGetReg->execute();
@@ -280,63 +281,132 @@ if (isset($_GET['orderId'])) {
     } else {
         $rowReg = $resultGetReg->fetch_assoc();
         $regData = json_decode($rowReg['registration_data'], true);
+        $promoCode = $rowReg['promo_code'];
+        $discountAmount = $rowReg['discount_amount'] ?? 0;
+        $originalAmount = $rowReg['original_amount'] ?? 0;
         error_log("Registration data retrieved from database: " . print_r($regData, true));
+        
+        // Check if this is actually a free registration (100% promo discount)
+        if ($isFreeRegistration || ($originalAmount > 0 && $discountAmount >= $originalAmount)) {
+            error_log("✓ FREE REGISTRATION: Processing without payment verification");
+            error_log("  Promo code: $promoCode, Discount: ₹$discountAmount, Original: ₹$originalAmount");
+            
+            // Process registration directly without Cashfree verification
+            $result = processRegistration($regData, 'FREE_' . $order_id, $order_id, $order_id);
 
-        // Verify payment status with Cashfree
-        $clientId = "1106277eab36909b950443d4c757726011"; // Production credentials
-        $clientSecret = "cfsk_ma_prod_36fd9bb92f7bbb654f807b60d6b7c67c_244c3bc6"; // Production credentials
-        $cashfreeBaseUrl = "https://api.cashfree.com/pg/"; // Production URL
+            if ($result['status']) {
+                error_log("Free registration successful, updating pending registration status");
 
-        $headers = array(
-            "accept: application/json",
-            "x-api-version: 2023-08-01",
-            "x-client-id: " . $clientId,
-            "x-client-secret: " . $clientSecret
-        );
-
-        $ch = curl_init($cashfreeBaseUrl . "orders/" . $order_id);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        $response = curl_exec($ch);
-        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $curlError = curl_error($ch);
-        curl_close($ch);
-
-        error_log("Cashfree order status response - HTTP Code: " . $httpCode);
-        error_log("Cashfree order status response - Body: " . $response);
-        if ($curlError) {
-            error_log("Cashfree CURL Error: " . $curlError);
-        }
-
-        $orderData = json_decode($response, true);
-
-        if ($httpCode == 200 && isset($orderData['order_status'])) {
-            error_log("Order status: " . $orderData['order_status']);
-
-            if ($orderData['order_status'] === 'PAID') {
-                error_log("Payment successful, processing registration");
-
-                // Extract payment ID from the response
-                $payment_id = null;
-                if (isset($orderData['payments']) && is_array($orderData['payments']) && count($orderData['payments']) > 0) {
-                    $payment_id = $orderData['payments'][0]['cf_payment_id'] ?? null;
-                } elseif (isset($orderData['payment_id'])) {
-                    $payment_id = $orderData['payment_id'];
+                // Update status to completed
+                $sqlUpdate = "UPDATE user_pending_registration SET status = 'completed' WHERE order_id = ?";
+                $stmtUpdate = $conn->prepare($sqlUpdate);
+                $stmtUpdate->bind_param('s', $order_id);
+                $stmtUpdate->execute();
+                $stmtUpdate->close();
+                
+                // Increment promo code usage if promo was used
+                if ($promoCode) {
+                    $sqlUpdatePromo = "UPDATE promo_codes SET current_uses = current_uses + 1 WHERE code = ?";
+                    $stmtUpdatePromo = $conn->prepare($sqlUpdatePromo);
+                    $stmtUpdatePromo->bind_param('s', $promoCode);
+                    $stmtUpdatePromo->execute();
+                    $stmtUpdatePromo->close();
+                    error_log("✓ Promo code usage incremented: $promoCode");
                 }
 
-                error_log("Extracted payment ID: " . ($payment_id ?? 'null'));
+                $message = "Registration successful! Redirecting to login...";
+                $redirect = "/user/src/ui/login.php";
+            } else {
+                error_log("Free registration failed: " . $result['message']);
+                $message = "Registration failed: " . $result['message'];
+                $redirect = "/user/src/ui/register.php";
+            }
+        } else {
+            // PAID registration - Verify payment status with Cashfree
+            $clientId = "1106277eab36909b950443d4c757726011"; // Production credentials
+            $clientSecret = "cfsk_ma_prod_36fd9bb92f7bbb654f807b60d6b7c67c_244c3bc6"; // Production credentials
+            $cashfreeBaseUrl = "https://api.cashfree.com/pg/"; // Production URL
 
-                $result = processRegistration($regData, $payment_id ?? $order_id, $order_id, $order_id);
+            $headers = array(
+                "accept: application/json",
+                "x-api-version: 2023-08-01",
+                "x-client-id: " . $clientId,
+                "x-client-secret: " . $clientSecret
+            );
+
+            $ch = curl_init($cashfreeBaseUrl . "orders/" . $order_id);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+            curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+            curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            $response = curl_exec($ch);
+            $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+            $curlError = curl_error($ch);
+            curl_close($ch);
+
+            error_log("Cashfree order status response - HTTP Code: " . $httpCode);
+            error_log("Cashfree order status response - Body: " . $response);
+            if ($curlError) {
+                error_log("Cashfree CURL Error: " . $curlError);
+            }
+
+            $orderData = json_decode($response, true);
+
+            if ($httpCode == 200 && isset($orderData['order_status'])) {
+                error_log("Order status: " . $orderData['order_status']);
+
+                if ($orderData['order_status'] === 'PAID') {
+                    error_log("Payment successful, processing registration");
+
+                    // Extract payment ID from the response
+                    $payment_id = null;
+                    if (isset($orderData['payments']) && is_array($orderData['payments']) && count($orderData['payments']) > 0) {
+                        $payment_id = $orderData['payments'][0]['cf_payment_id'] ?? null;
+                    } elseif (isset($orderData['payment_id'])) {
+                        $payment_id = $orderData['payment_id'];
+                    }
+
+                    error_log("Extracted payment ID: " . ($payment_id ?? 'null'));
+
+                    $result = processRegistration($regData, $payment_id ?? $order_id, $order_id, $order_id);
+
+                    if ($result['status']) {
+                        error_log("Registration successful, updating pending registration status");
+
+                        // Update status to completed
+                        $sqlUpdate = "UPDATE user_pending_registration SET status = 'completed' WHERE order_id = ?";
+                        $stmtUpdate = $conn->prepare($sqlUpdate);
+                        $stmtUpdate->bind_param('s', $order_id);
+                        $stmtUpdate->execute();
+                        $stmtUpdate->close();
+
+                        $message = "Registration successful! Redirecting to login...";
+                        $redirect = "/user/src/ui/login.php";
+                    } else {
+                        error_log("Registration failed: " . $result['message']);
+                        $message = "Registration failed: " . $result['message'];
+                        $redirect = "/user/src/ui/register.php";
+                    }
+                } else {
+                    $message = "Payment not completed. Status: " . $orderData['order_status'];
+                    $redirect = "/user/src/ui/register.php";
+                }
+            } else {
+                error_log("Could not verify payment status. HTTP Code: " . $httpCode);
+                error_log("Response received: " . json_encode($orderData));
+
+                // AGGRESSIVE FALLBACK: Always try to process registration if we have pending data
+                // This handles cases where Cashfree API is slow or has temporary issues
+                error_log("Processing registration as fallback (HTTP code: " . $httpCode . ")");
+
+                $result = processRegistration($regData, $order_id, $order_id, $order_id);
 
                 if ($result['status']) {
-                    error_log("Registration successful, updating pending registration status");
+                    error_log("Registration successful via fallback, updating pending registration status");
 
-                    // Update status to completed
                     $sqlUpdate = "UPDATE user_pending_registration SET status = 'completed' WHERE order_id = ?";
                     $stmtUpdate = $conn->prepare($sqlUpdate);
                     $stmtUpdate->bind_param('s', $order_id);
@@ -346,41 +416,12 @@ if (isset($_GET['orderId'])) {
                     $message = "Registration successful! Redirecting to login...";
                     $redirect = "/user/src/ui/login.php";
                 } else {
-                    error_log("Registration failed: " . $result['message']);
-                    $message = "Registration failed: " . $result['message'];
+                    error_log("Fallback registration also failed: " . $result['message']);
+                    $message = "Could not complete registration. Error: " . $result['message'];
                     $redirect = "/user/src/ui/register.php";
                 }
-            } else {
-                $message = "Payment not completed. Status: " . $orderData['order_status'];
-                $redirect = "/user/src/ui/register.php";
             }
-        } else {
-            error_log("Could not verify payment status. HTTP Code: " . $httpCode);
-            error_log("Response received: " . json_encode($orderData));
-
-            // AGGRESSIVE FALLBACK: Always try to process registration if we have pending data
-            // This handles cases where Cashfree API is slow or has temporary issues
-            error_log("Processing registration as fallback (HTTP code: " . $httpCode . ")");
-
-            $result = processRegistration($regData, $order_id, $order_id, $order_id);
-
-            if ($result['status']) {
-                error_log("Registration successful via fallback, updating pending registration status");
-
-                $sqlUpdate = "UPDATE user_pending_registration SET status = 'completed' WHERE order_id = ?";
-                $stmtUpdate = $conn->prepare($sqlUpdate);
-                $stmtUpdate->bind_param('s', $order_id);
-                $stmtUpdate->execute();
-                $stmtUpdate->close();
-
-                $message = "Registration successful! Redirecting to login...";
-                $redirect = "/user/src/ui/login.php";
-            } else {
-                error_log("Fallback registration also failed: " . $result['message']);
-                $message = "Could not complete registration. Error: " . $result['message'];
-                $redirect = "/user/src/ui/register.php";
-            }
-        }
+        } // End of else block for PAID registrations
     }
     $stmtGetReg->close();
 } else {

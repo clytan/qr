@@ -66,6 +66,7 @@ var eventHandler = {
           data: JSON.stringify({
             code: promoCode,
             amount: amount,
+            user_type: userType,  // Send user type for restricted promo codes
           }),
           success: function (response) {
             if (response.success) {
@@ -408,8 +409,20 @@ var eventHandler = {
     });
 
     $('input[name="user_type"]').on("change", function () {
+      // Re-validate promo code when user type changes (since some promos are type-restricted)
+      var promoCode = $("#promo_code").val().trim();
+      if (promoCode) {
+        // Reset applied promo and trigger re-validation by simulating input
+        appliedPromoCode = null;
+        promoDiscount = 0;
+        originalAmount = 0;
+        $("#promo-status").html('<span style="color: #94a3b8;">⏳ Re-checking promo code...</span>');
+        // Trigger the promo code input event to re-validate
+        $("#promo_code").trigger("input");
+      }
       registerFunction.updateSubmitText();
       registerFunction.updateSubmitState();
+      eventHandler.updatePayAmount();
     });
 
     $("#user_slab").on("change", function () {
@@ -532,6 +545,23 @@ var eventHandler = {
             dataType: "json",
             success: function (response) {
               console.log("Order.php response:", response);
+              
+              // Handle FREE registration (100% promo discount)
+              if (response.status && response.free_registration) {
+                console.log("✓ FREE REGISTRATION - Promo code provides 100% discount");
+                console.log("  Order ID:", response.order_id);
+                showToast(response.message || "Registration is free with this promo code!", "success");
+                
+                // Redirect to return.php with free=1 flag to process the free registration
+                const orderId = encodeURIComponent(response.order_id);
+                const redirectUrl = "../backend/payment/return.php?orderId=" + orderId + "&free=1";
+                
+                console.log("Redirecting to:", redirectUrl);
+                window.location.href = redirectUrl;
+                return false;
+              }
+              
+              // Handle PAID registration (normal flow)
               if (response.status && response.session) {
                 console.log("✓ Payment order created successfully");
                 console.log(

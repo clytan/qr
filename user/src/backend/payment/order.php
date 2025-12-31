@@ -116,6 +116,22 @@ try {
     $finalAmount = $originalAmount;
 
     if ($promoCode) {
+        // Validate user type for restricted promo codes
+        // ZOKLIBUSINESS = only for Business (user_type = 3)
+        // ZOKLICREATOR = only for Creator (user_type = 2)
+        $restrictedPromos = [
+            'ZOKLIBUSINESS' => '3',  // Business
+            'ZOKLICREATOR' => '2',   // Creator
+        ];
+        
+        if (isset($restrictedPromos[$promoCode])) {
+            $requiredUserType = $restrictedPromos[$promoCode];
+            if ($userType !== $requiredUserType) {
+                $userTypeName = ($requiredUserType === '2') ? 'Creator' : 'Business';
+                throw new Exception("Promo code $promoCode is only valid for $userTypeName registration");
+            }
+        }
+        
         // Validate and apply promo code
         $sqlPromo = "SELECT * FROM promo_codes 
                      WHERE code = ? 
@@ -188,18 +204,30 @@ try {
     $_SESSION['registration_data'] = $data;
     $_SESSION['order_id'] = $order_id;
 
-    $data = createOrder(
-        $clientId,
-        $clientSecret,
-        $order_id,
-        $customer_id,
-        $data['full_name'],
-        $data['email'],
-        $data['phone'],
-        $finalAmount  // Use discounted amount for payment
-    );
+    // If final amount is 0 (100% discount promo), skip payment gateway
+    if ($finalAmount <= 0) {
+        error_log("✓ FREE REGISTRATION: Promo code provides 100% discount, skipping payment gateway");
+        echo json_encode([
+            'status' => true,
+            'free_registration' => true,
+            'order_id' => $order_id,
+            'message' => 'Registration is free with this promo code!'
+        ]);
+    } else {
+        // Create Cashfree payment order for non-zero amounts
+        $data = createOrder(
+            $clientId,
+            $clientSecret,
+            $order_id,
+            $customer_id,
+            $data['full_name'],
+            $data['email'],
+            $data['phone'],
+            $finalAmount  // Use discounted amount for payment
+        );
 
-    echo json_encode($data);
+        echo json_encode($data);
+    }
 } catch (Exception $e) {
     error_log("❌ Exception in order.php: " . $e->getMessage());
     error_log("Exception trace: " . $e->getTraceAsString());

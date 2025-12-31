@@ -669,7 +669,7 @@ $ref_code = isset($_GET['ref']) ? htmlspecialchars($_GET['ref']) : '';
                 </div>
 
                 <!-- Promo Code Section -->
-                <div class="field-set d-none">
+                <div class="field-set">
                     <label for="promo_code">🎁 Promo Code</label>
                     <input type="text" name="promo_code" id="promo_code" class="form-input" placeholder="Enter promo code" style="text-transform: uppercase;">
                     <span id="promo-status" class="validation-status"></span>
