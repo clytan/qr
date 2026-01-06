@@ -11,6 +11,7 @@ $data = json_decode(file_get_contents('php://input'), true);
 $code = isset($data['code']) ? strtoupper(trim($data['code'])) : '';
 $amount = isset($data['amount']) ? floatval($data['amount']) : 0;
 $userType = isset($data['user_type']) ? trim($data['user_type']) : '';
+$studentLeader = isset($data['student_leader']) ? trim($data['student_leader']) : 'no';
 
 if (empty($code)) {
     echo json_encode(['success' => false, 'message' => 'Promo code is required']);
@@ -37,6 +38,17 @@ if (isset($restrictedPromos[$code])) {
         echo json_encode([
             'success' => false, 
             'message' => "This promo code is only valid for $userTypeName registration"
+        ]);
+        exit;
+    }
+}
+
+// ZOKLISTUDENT = only when Student Leader is "yes"
+if ($code === 'ZOKLISTUDENT') {
+    if ($studentLeader !== 'yes') {
+        echo json_encode([
+            'success' => false, 
+            'message' => "This promo code is only valid for Student Leader registration"
         ]);
         exit;
     }

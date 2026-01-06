@@ -67,6 +67,7 @@ var eventHandler = {
             code: promoCode,
             amount: amount,
             user_type: userType,  // Send user type for restricted promo codes
+            student_leader: $("#student_leader").val(),  // Send student leader for ZOKLISTUDENT
           }),
           success: function (response) {
             if (response.success) {
@@ -155,6 +156,17 @@ var eventHandler = {
         $("#membership_tier_section").show();
         eventHandler.updatePayAmount();
       }
+      
+      // Re-validate promo code when student leader changes (for ZOKLISTUDENT)
+      var promoCode = $("#promo_code").val().trim();
+      if (promoCode) {
+        appliedPromoCode = null;
+        promoDiscount = 0;
+        originalAmount = 0;
+        $("#promo-status").html('<span style="color: #94a3b8;">⏳ Re-checking promo code...</span>');
+        $("#promo_code").trigger("input");
+      }
+      
       registerFunction.updateSubmitState();
     });
   },

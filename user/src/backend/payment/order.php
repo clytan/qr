@@ -132,6 +132,13 @@ try {
             }
         }
         
+        // ZOKLISTUDENT = only when Student Leader is "yes"
+        if ($promoCode === 'ZOKLISTUDENT') {
+            if (!$isStudentLeader) {
+                throw new Exception("Promo code ZOKLISTUDENT is only valid for Student Leader registration");
+            }
+        }
+        
         // Validate and apply promo code
         $sqlPromo = "SELECT * FROM promo_codes 
                      WHERE code = ? 
